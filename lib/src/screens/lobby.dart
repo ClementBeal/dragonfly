@@ -9,10 +9,10 @@ class LobbyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    return const Material(
       child: Column(
         children: [
-          TabBar(),
+          BrowserTabBar(),
           BrowserActionBar(),
           Expanded(child: BrowserScreen())
         ],
@@ -21,12 +21,124 @@ class LobbyScreen extends StatelessWidget {
   }
 }
 
-class TabBar extends StatelessWidget {
-  const TabBar({super.key});
+class BrowserTabBar extends StatelessWidget {
+  const BrowserTabBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return SizedBox(
+      height: 48,
+      child: BlocBuilder<BrowserCubit, BrowserState>(
+        builder: (context, state) {
+          return Row(
+            children: [
+              // Tabs
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: state.tabs.length,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (context, index) {
+                  final tab = state.tabs[index];
+                  final isActive = index == state.currentTabId;
+
+                  return BrowserTab(
+                    tab: tab,
+                    isActive: isActive,
+                    onTap: () {
+                      context.read<BrowserCubit>().changeTab(index);
+                    },
+                    onClose: () {
+                      context.read<BrowserCubit>().closeTab(index);
+                    },
+                  );
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: InkWell(
+                  onTap: () => context.read<BrowserCubit>().addTab(),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(4.0),
+                    ),
+                    padding: const EdgeInsets.all(8.0),
+                    child: const Icon(Icons.add, size: 20),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class BrowserTab extends StatelessWidget {
+  final Response tab;
+  final bool isActive;
+  final VoidCallback onTap;
+  final VoidCallback onClose;
+
+  const BrowserTab({
+    super.key,
+    required this.tab,
+    required this.isActive,
+    required this.onTap,
+    required this.onClose,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+        child: GestureDetector(
+          onTap: onTap,
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: isActive ? Colors.blue : Colors.transparent,
+                  width: 2.0,
+                ),
+              ),
+            ),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Tab Title (if available)
+                if (tab.title != null)
+                  Text(
+                    tab.title!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight:
+                          isActive ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+
+                // Close button
+                IconButton(
+                  onPressed: onClose,
+                  icon: const Icon(Icons.close, size: 16.0),
+                  constraints: const BoxConstraints(
+                    maxWidth: 16.0,
+                    maxHeight: 16.0,
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -42,7 +154,12 @@ class BrowserActionBar extends StatelessWidget {
           children: [
             IconButton(onPressed: () {}, icon: Icon(Icons.arrow_back)),
             IconButton(onPressed: () {}, icon: Icon(Icons.arrow_forward)),
-            IconButton(onPressed: () {}, icon: Icon(Icons.refresh)),
+            IconButton(
+              onPressed: () {
+                context.read<BrowserCubit>().refreshCurrentTab();
+              },
+              icon: Icon(Icons.refresh),
+            ),
           ],
         ),
         Expanded(child: SearchBar()),
@@ -73,7 +190,7 @@ class _SearchBarState extends State<SearchBar> {
     return TextField(
       controller: _searchController,
       decoration: InputDecoration(
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
           prefix: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

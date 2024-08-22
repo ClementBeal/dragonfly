@@ -9,28 +9,34 @@ class BrowserScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<BrowserCubit, BrowserState>(
-      builder: (context, state) {
-        final tab = state.currentTag();
-        final currentTabId = state.currentTabId;
+    return SelectionArea(
+      child: BlocBuilder<BrowserCubit, BrowserState>(
+        builder: (context, state) {
+          final tab = state.currentTag();
+          final currentTabId = state.currentTabId;
 
-        if (tab == null) {
-          return Center(
-            child: Text("Enter an URL"),
-          );
-        }
+          if (tab == null) {
+            return Center(
+              child: Text("Enter an URL"),
+            );
+          }
 
-        return switch (tab) {
-          Success() => Text("Success"),
-          Loading() => Center(
-              child: CircularProgressIndicator(),
-            ),
-          ErrorResponse m => switch (m.error) {
-              NavigationError.cantFindPage =>
-                ServerNotFoundPage(tab: m, tabId: currentTabId),
-            },
-        };
-      },
+          return switch (tab) {
+            Success() => Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: tab.content,
+              ),
+            Loading() => Center(
+                child: CircularProgressIndicator(),
+              ),
+            ErrorResponse m => switch (m.error) {
+                NavigationError.cantFindPage =>
+                  ServerNotFoundPage(tab: m, tabId: currentTabId),
+              },
+          };
+        },
+      ),
     );
   }
 }

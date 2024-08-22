@@ -24,10 +24,10 @@ class ServerNotFoundPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16.0),
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 32.0),
               child: Text(
-                'The server is taking a break or is unavailable right now. Please check your internet connection or try again later.',
+                'The server ${tab.uri} is taking a break or is unavailable right now. Please check your internet connection or try again later.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16.0),
               ),

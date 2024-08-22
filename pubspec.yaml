@@ -10,7 +10,9 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.6
+  html: ^0.15.4
   http: ^1.2.2
+  xml: ^6.5.0
 
 dev_dependencies:
   flutter_test:
