@@ -43,10 +43,7 @@ class BrowserCubit extends Cubit<BrowserState> {
                 Empty(uri: Uri()),
                 Loading(uri: uri),
               ],
-              cssTheme: CssTheme(
-                classes: {},
-                customTagTheme: {},
-              ),
+              cssTheme: CssTheme.initial(),
             ),
           ],
           currentTabId: 0,
@@ -96,10 +93,7 @@ class BrowserCubit extends Cubit<BrowserState> {
       ...state.tabs,
       Tab(
         history: [Empty(uri: Uri())],
-        cssTheme: CssTheme(
-          customTagTheme: {},
-          classes: {},
-        ),
+        cssTheme: CssTheme.initial(),
       )
     ];
 
@@ -139,10 +133,7 @@ class BrowserCubit extends Cubit<BrowserState> {
       ...state.tabs,
       Tab(
         history: [Loading(uri: uri)],
-        cssTheme: CssTheme(
-          customTagTheme: {},
-          classes: {},
-        ),
+        cssTheme: CssTheme.initial(),
       )
     ];
 
@@ -202,10 +193,7 @@ class BrowserCubit extends Cubit<BrowserState> {
             sourceCode: sourceCode,
           )
         ],
-        cssTheme: CssTheme(
-          customTagTheme: {},
-          classes: {},
-        ),
+        cssTheme: CssTheme.initial(),
       )
     ];
 

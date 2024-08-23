@@ -7,43 +7,55 @@ enum DisplayType { block, flex }
 
 class CssTheme {
   CssTheme({
-    this.fontSize = const FontSize(type: FontSizeType.px, value: 16),
-    this.textColor = Colors.black,
+    required this.fontSize,
+    required this.textColor,
     this.backgroundColor,
-    this.fontWeight = FontWeight.normal,
-    this.margin = EdgeInsets.zero,
+    required this.fontWeight,
+    this.margin,
     this.textDecoration,
-    this.listDecoration = ListDecoration.none,
-    this.lineHeight = 1.0,
-    this.justifyContent = MainAxisAlignment.start,
-    this.alignItems = CrossAxisAlignment.start,
-    this.displayType = DisplayType.block,
-    this.textAlign = TextAlign.start,
-    this.isCentered = false,
+    this.listDecoration,
+    required this.lineHeight,
+    this.justifyContent,
+    this.alignItems,
+    this.displayType,
+    this.textAlign,
+    this.isCentered,
     this.maxWidth,
     this.border,
-    required this.customTagTheme,
-    required this.classes,
   });
+
+  CssTheme.initial()
+      : fontSize = const FontSize(type: FontSizeType.px, value: 16),
+        textColor = Colors.black,
+        fontWeight = FontWeight.normal,
+        margin = EdgeInsets.zero,
+        listDecoration = ListDecoration.none,
+        lineHeight = 1.0,
+        justifyContent = MainAxisAlignment.start,
+        alignItems = CrossAxisAlignment.start,
+        displayType = DisplayType.block,
+        textAlign = TextAlign.start,
+        backgroundColor = null,
+        textDecoration = null,
+        isCentered = null,
+        maxWidth = null,
+        border = null;
 
   final FontSize fontSize;
   final Color textColor;
   final Color? backgroundColor;
   final FontWeight fontWeight;
-  final EdgeInsets margin;
+  final EdgeInsets? margin;
   final TextDecoration? textDecoration;
-  final ListDecoration listDecoration;
-  final Map<Type, CssTheme> customTagTheme;
+  final ListDecoration? listDecoration;
   final double lineHeight;
-  final MainAxisAlignment justifyContent;
-  final CrossAxisAlignment alignItems;
-  final DisplayType displayType;
-  final TextAlign textAlign;
-  final bool isCentered;
+  final MainAxisAlignment? justifyContent;
+  final CrossAxisAlignment? alignItems;
+  final DisplayType? displayType;
+  final TextAlign? textAlign;
+  final bool? isCentered;
   final double? maxWidth;
   final Border? border;
-
-  final Map<String, CssTheme> classes;
 
   CssTheme copyWith({
     FontSize? fontSize,
@@ -72,8 +84,6 @@ class CssTheme {
         textDecoration:
             textDecoration != null ? textDecoration() : this.textDecoration,
         listDecoration: listDecoration ?? this.listDecoration,
-        customTagTheme: customTagTheme,
-        classes: classes,
         lineHeight: lineHeight ?? this.lineHeight,
         justifyContent: justifyContent ?? this.justifyContent,
         alignItems: alignItems ?? this.alignItems,
@@ -84,27 +94,27 @@ class CssTheme {
         border: border != null ? border() : this.border,
       );
 
-  // CssTheme merge(CssTheme theme1, CssTheme theme2) {
+  // CssTheme merge(CssTheme older, CssTheme newer) {
   //   return CssTheme(
-  //     customTagTheme: {...theme1.customTagTheme, ...theme2.customTagTheme},
-  //     classes: {...theme1.classes, ...theme2.classes},
-  //     alignItems: theme2.alignItems ?? theme2.
+  //     customTagTheme: {...older.customTagTheme, ...newer.customTagTheme},
+  //     classes: {...older.classes, ...newer.classes},
+  //     alignItems: newer.alignItems ?? newer.
   //   );
   // }
 
-  CssTheme mergeWithClasses(List<String> classes) {
-    return this.classes[classes.first]!;
-  }
+  // CssTheme mergeWithClasses(List<String> classes) {
+  //   return this.classes[classes.first]!;
+  // }
 
   CssTheme getStyleForNode(DomNode node, List<String> classes) {
-    if (classes.contains("main-nav") ||
-        classes.contains("container") ||
-        classes.contains("footer") ||
-        classes.contains("testimonial") ||
-        classes.contains("testimonials") ||
-        classes.contains("header")) {
-      return mergeWithClasses(classes);
-    }
+    // if (classes.contains("main-nav") ||
+    //     classes.contains("container") ||
+    //     classes.contains("footer") ||
+    //     classes.contains("testimonial") ||
+    //     classes.contains("testimonials") ||
+    //     classes.contains("header")) {
+    //   return mergeWithClasses(classes);
+    // }
 
     // if (node is BodyNode) {
     //   return copyWith(
@@ -172,10 +182,8 @@ class CssTheme {
       );
     }
     if (node is ANode) {
-      final customTheme = customTagTheme[ANode];
-
       return copyWith(
-        textColor: customTheme?.textColor ?? Colors.blue,
+        // textColor: customTheme?.textColor ?? Colors.blue,
         margin: EdgeInsets.symmetric(horizontal: 1),
         textDecoration: () => TextDecoration.underline,
       );
@@ -188,14 +196,6 @@ class CssTheme {
     }
 
     return this;
-  }
-
-  void addTheme(Type node, CssTheme cssTheme) {
-    customTagTheme[node] = cssTheme;
-  }
-
-  void addClass(String s, CssTheme cssTheme) {
-    classes[s] = cssTheme;
   }
 }
 

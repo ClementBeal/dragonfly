@@ -1,3 +1,5 @@
+import 'package:dragonfly/browser/css/css_theme.dart';
+
 part 'blocks/structure_node.dart';
 part 'texts/organisation_node.dart';
 part 'texts/header_node.dart';
@@ -6,10 +8,10 @@ part 'texts/text_node.dart';
 sealed class DomNode {
   final Map<Object, String> attributes;
   final List<String> classes;
+  final CssTheme theme;
 
-  DomNode(
-      {required this.attributes,
-      required this.classes}); // class ; id; style ; href...
+  DomNode({required this.attributes, required this.classes})
+      : theme = CssTheme.initial(); // class ; id; style ; href...
 }
 
 class PageNode extends DomNode {

@@ -56,11 +56,11 @@ class BrowserScreen extends StatelessWidget {
                       return Text.rich(htmlHighlighter.highlight(m.sourceCode));
                     }
 
-                    return DomWidget(m.content, parentStyle: tab.cssTheme);
+                    return DomWidget(m.content);
                   }),
                 ),
               ),
-            Loading() => Center(
+            Loading() => const Center(
                 child: CircularProgressIndicator(),
               ),
             ErrorResponse m => switch (m.error) {
@@ -77,22 +77,17 @@ class BrowserScreen extends StatelessWidget {
 }
 
 class DomWidget extends StatelessWidget {
-  const DomWidget(this.domNode, {super.key, this.parentStyle});
+  const DomWidget(this.domNode, {super.key});
 
   final Tree domNode;
-  final CssTheme? parentStyle;
 
   @override
   Widget build(BuildContext context) {
-    final cssTheme = parentStyle ??
-        CssTheme(
-          customTagTheme: {},
-          classes: {},
-        );
+    final style = domNode.data.theme;
     final data = domNode.data;
     final children = domNode.children;
     final classes = data.classes;
-    final style = cssTheme.getStyleForNode(data, classes);
+    // final style = cssTheme.getStyleForNode(data, classes);
 
     return switch (domNode.data) {
       PageNode() => Column(
@@ -101,7 +96,6 @@ class DomWidget extends StatelessWidget {
           children: children
               .map((e) => DomWidget(
                     e,
-                    parentStyle: cssTheme,
                   ))
               .toList(),
         ),
@@ -112,7 +106,6 @@ class DomWidget extends StatelessWidget {
           children: children
               .map((e) => DomWidget(
                     e,
-                    parentStyle: cssTheme,
                   ))
               .toList(),
         ),
@@ -130,7 +123,6 @@ class DomWidget extends StatelessWidget {
                   .map(
                     (e) => DomWidget(
                       e,
-                      parentStyle: cssTheme,
                     ),
                   )
                   .toList(),
@@ -141,7 +133,7 @@ class DomWidget extends StatelessWidget {
       LinkNode() => SizedBox.shrink(),
       DivNode() => Builder(builder: (context) {
           final c = Padding(
-            padding: style.margin,
+            padding: style.margin ?? EdgeInsets.zero,
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 maxWidth: style.maxWidth ?? double.infinity,
@@ -157,15 +149,14 @@ class DomWidget extends StatelessWidget {
                   children: children
                       .map((e) => DomWidget(
                             e,
-                            parentStyle: cssTheme,
                           ))
                       .toList(),
                 ),
               ),
             ),
           );
-          print(style.isCentered);
-          if (style.isCentered) {
+
+          if (style.isCentered ?? false) {
             return Center(
               child: c,
             );
@@ -179,15 +170,14 @@ class DomWidget extends StatelessWidget {
           ),
           child: Flex(
             direction: Axis.horizontal,
-            crossAxisAlignment: style.alignItems,
+            crossAxisAlignment: style.alignItems ?? CrossAxisAlignment.start,
             mainAxisSize: (style.displayType == DisplayType.flex)
                 ? MainAxisSize.max
                 : MainAxisSize.min,
-            mainAxisAlignment: style.justifyContent,
+            mainAxisAlignment: style.justifyContent ?? MainAxisAlignment.start,
             children: children
                 .map((e) => DomWidget(
                       e,
-                      parentStyle: cssTheme,
                     ))
                 .toList(),
           ),
@@ -202,7 +192,6 @@ class DomWidget extends StatelessWidget {
             children: children
                 .map((e) => DomWidget(
                       e,
-                      parentStyle: cssTheme,
                     ))
                 .toList(),
           ),
@@ -218,7 +207,6 @@ class DomWidget extends StatelessWidget {
             children: children
                 .map((e) => DomWidget(
                       e,
-                      parentStyle: cssTheme,
                     ))
                 .toList(),
           ),
@@ -230,22 +218,18 @@ class DomWidget extends StatelessWidget {
           children: children
               .map((e) => DomWidget(
                     e,
-                    parentStyle: cssTheme,
                   ))
               .toList(),
         ),
       UlNode() => Padding(
-          padding: style.margin,
+          padding: style.margin ?? EdgeInsets.zero,
           child: Flex(
             direction: Axis.vertical,
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: children
                 .map(
-                  (e) => DomWidget(
-                    e,
-                    parentStyle: style,
-                  ),
+                  (e) => DomWidget(e),
                 )
                 .toList(),
           ),
@@ -267,7 +251,6 @@ class DomWidget extends StatelessWidget {
                       ),
                     DomWidget(
                       e,
-                      parentStyle: cssTheme,
                     ),
                   ],
                 )),
@@ -280,13 +263,12 @@ class DomWidget extends StatelessWidget {
           children: children
               .map((e) => DomWidget(
                     e,
-                    parentStyle: cssTheme,
                   ))
               .toList(),
         ),
       ANode aNode => AWidget(t: aNode, style: style, children: children),
       H1Node(text: var t) => Padding(
-          padding: style.margin,
+          padding: style.margin ?? EdgeInsets.zero,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -302,13 +284,12 @@ class DomWidget extends StatelessWidget {
               ),
               ...children.map((e) => DomWidget(
                     e,
-                    parentStyle: cssTheme,
                   )),
             ],
           ),
         ),
       H2Node(text: var t) => Padding(
-          padding: style.margin,
+          padding: style.margin ?? EdgeInsets.zero,
           child: Column(
             // mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -324,13 +305,12 @@ class DomWidget extends StatelessWidget {
               ),
               ...children.map((e) => DomWidget(
                     e,
-                    parentStyle: cssTheme,
                   )),
             ],
           ),
         ),
       H3Node(text: var t) => Padding(
-          padding: style.margin,
+          padding: style.margin ?? EdgeInsets.zero,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -346,13 +326,12 @@ class DomWidget extends StatelessWidget {
               ),
               ...children.map((e) => DomWidget(
                     e,
-                    parentStyle: cssTheme,
                   )),
             ],
           ),
         ),
       H4Node(text: var t) => Padding(
-          padding: style.margin,
+          padding: style.margin ?? EdgeInsets.zero,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -368,13 +347,12 @@ class DomWidget extends StatelessWidget {
               ),
               ...children.map((e) => DomWidget(
                     e,
-                    parentStyle: cssTheme,
                   )),
             ],
           ),
         ),
       H5Node(text: var t) => Padding(
-          padding: style.margin,
+          padding: style.margin ?? EdgeInsets.zero,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -390,13 +368,12 @@ class DomWidget extends StatelessWidget {
               ),
               ...children.map((e) => DomWidget(
                     e,
-                    parentStyle: cssTheme,
                   )),
             ],
           ),
         ),
       H6Node(text: var t) => Padding(
-          padding: style.margin,
+          padding: style.margin ?? EdgeInsets.zero,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -412,7 +389,6 @@ class DomWidget extends StatelessWidget {
               ),
               ...children.map((e) => DomWidget(
                     e,
-                    parentStyle: cssTheme,
                   )),
             ],
           ),
@@ -422,7 +398,7 @@ class DomWidget extends StatelessWidget {
       EmNode(text: var t) => Text(t),
       StrongNode(text: var t) => Text(t),
       PNode(text: var t) => Padding(
-          padding: style.margin,
+          padding: style.margin ?? EdgeInsets.zero,
           child: Text(
             t,
             textAlign: style.textAlign,
@@ -489,12 +465,7 @@ class AWidget extends StatelessWidget {
                 decoration: style.textDecoration,
               ),
             ),
-            ...children
-                .map((e) => DomWidget(
-                      e,
-                      parentStyle: style,
-                    ))
-                .toList(),
+            ...children.map((e) => DomWidget(e)).toList(),
           ],
         ),
       ),
