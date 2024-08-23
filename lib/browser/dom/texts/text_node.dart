@@ -1,31 +1,21 @@
 part of '../html_node.dart';
 
 class INode extends DomNode {
-  INode(this.text, {required super.attributes, required super.classes});
-
-  final String text;
+  INode(super.text, {required super.attributes, required super.classes});
 }
 
 class BNode extends DomNode {
-  BNode(this.text, {required super.attributes, required super.classes});
-
-  final String text;
+  BNode(super.text, {required super.attributes, required super.classes});
 }
 
 class EmNode extends DomNode {
-  EmNode(this.text, {required super.attributes, required super.classes});
-
-  final String text;
+  EmNode(super.text, {required super.attributes, required super.classes});
 }
 
 class StrongNode extends DomNode {
-  StrongNode(this.text, {required super.attributes, required super.classes});
-
-  final String text;
+  StrongNode(super.text, {required super.attributes, required super.classes});
 }
 
 class PNode extends DomNode {
-  PNode(this.text, {required super.attributes, required super.classes});
-
-  final String text;
+  PNode(super.text, {required super.attributes, required super.classes});
 }

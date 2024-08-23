@@ -1,13 +1,15 @@
 import 'package:dragonfly/browser/css/css_theme.dart';
+import 'package:dragonfly/browser/css/cssom_builder.dart';
 import 'package:dragonfly/browser/dom/html_node.dart';
 import 'package:dragonfly/browser/dom_builder.dart';
 import 'package:dragonfly/main.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/browser/page.dart';
+import 'package:dragonfly/src/screens/browser/browser_theme.dart';
 import 'package:dragonfly/src/screens/browser/errors/cant_find_page.dart';
+import 'package:dragonfly/src/screens/browser/helpers/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:syntax_highlight/syntax_highlight.dart';
 
 class BrowserScreen extends StatelessWidget {
   const BrowserScreen({super.key});
@@ -29,7 +31,7 @@ class BrowserScreen extends StatelessWidget {
                 context.read<BrowserCubit>().addTabAndViewSourceCode(
                     Uri.parse(
                         "view-source:${currentTab!.currentResponse!.uri.toString()}"),
-                    (currentTab!.currentResponse! as Success).sourceCode);
+                    (currentTab.currentResponse! as Success).sourceCode);
               },
               label: 'View Source',
             ),
@@ -56,7 +58,14 @@ class BrowserScreen extends StatelessWidget {
                       return Text.rich(htmlHighlighter.highlight(m.sourceCode));
                     }
 
-                    return DomWidget(m.content);
+                    if (m.theme == null) {
+                      return CircularProgressIndicator();
+                    }
+
+                    return CSSOMProvider(
+                      cssom: m.theme!,
+                      child: DomWidget(m.content),
+                    );
                   }),
                 ),
               ),
@@ -67,8 +76,8 @@ class BrowserScreen extends StatelessWidget {
                 NavigationError.cantFindPage =>
                   ServerNotFoundPage(tab: m, tabId: currentTabId),
               },
-            null => SizedBox.shrink(),
-            Empty() => SizedBox.shrink(),
+            null => const SizedBox.shrink(),
+            Empty() => const SizedBox.shrink(),
           };
         },
       ),
@@ -83,11 +92,32 @@ class DomWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = domNode.data.theme;
     final data = domNode.data;
     final children = domNode.children;
-    final classes = data.classes;
-    // final style = cssTheme.getStyleForNode(data, classes);
+    final style = CSSOMProvider.of(context)!
+            .cssom
+            .find(switch (data) {
+              BodyNode() => "body",
+              H1Node() => "h1",
+              H2Node() => "h2",
+              H3Node() => "h3",
+              ANode() => "a",
+              _ => "body",
+            })
+            ?.data ??
+        CssStyle.initial();
+
+    for (var className in data.classes) {
+      final newTheme =
+          CSSOMProvider.of(context)!.cssom.find(".$className")?.data;
+      print(className);
+      print(newTheme);
+      if (newTheme != null) {
+        style.merge(newTheme);
+      }
+    }
+
+    // print(CSSOMProvider.of(context)!.cssom.find(HTMLTag.a)?.data);
 
     return switch (domNode.data) {
       PageNode() => Column(
@@ -99,7 +129,7 @@ class DomWidget extends StatelessWidget {
                   ))
               .toList(),
         ),
-      UnkownNode() => SizedBox.shrink(),
+      UnkownNode() => const SizedBox.shrink(),
       HtmlNode() => Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,13 +139,15 @@ class DomWidget extends StatelessWidget {
                   ))
               .toList(),
         ),
-      HeadNode() => SizedBox.shrink(),
+      HeadNode() => const SizedBox.shrink(),
       BodyNode() => DecoratedBox(
           decoration: BoxDecoration(
-            color: style.backgroundColor,
+            color: (style.backgroundColor != null)
+                ? HexColor.fromHex(style.backgroundColor!)
+                : null,
           ),
           child: Padding(
-            padding: EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,110 +161,17 @@ class DomWidget extends StatelessWidget {
             ),
           ),
         ),
-      TitleNode() => SizedBox.shrink(),
-      LinkNode() => SizedBox.shrink(),
-      DivNode() => Builder(builder: (context) {
-          final c = Padding(
-            padding: style.margin ?? EdgeInsets.zero,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: style.maxWidth ?? double.infinity,
-              ),
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  border: style.border,
-                ),
-                child: Flex(
-                  direction: Axis.vertical,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: children
-                      .map((e) => DomWidget(
-                            e,
-                          ))
-                      .toList(),
-                ),
-              ),
-            ),
-          );
-
-          if (style.isCentered ?? false) {
-            return Center(
-              child: c,
-            );
-          }
-
-          return c;
-        }),
-      NavNode() => DecoratedBox(
-          decoration: BoxDecoration(
-            color: style.backgroundColor,
-          ),
-          child: Flex(
-            direction: Axis.horizontal,
-            crossAxisAlignment: style.alignItems ?? CrossAxisAlignment.start,
-            mainAxisSize: (style.displayType == DisplayType.flex)
-                ? MainAxisSize.max
-                : MainAxisSize.min,
-            mainAxisAlignment: style.justifyContent ?? MainAxisAlignment.start,
-            children: children
-                .map((e) => DomWidget(
-                      e,
-                    ))
-                .toList(),
-          ),
-        ),
-      FooterNode() => DecoratedBox(
-          decoration: BoxDecoration(
-            color: style.backgroundColor,
-          ),
-          child: Flex(
-            direction: Axis.horizontal,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: children
-                .map((e) => DomWidget(
-                      e,
-                    ))
-                .toList(),
-          ),
-        ),
-      SectionNode() => DecoratedBox(
-          decoration: BoxDecoration(
-            color: style.backgroundColor,
-          ),
-          child: Flex(
-            direction: Axis.vertical,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: children
-                .map((e) => DomWidget(
-                      e,
-                    ))
-                .toList(),
-          ),
-        ),
-      HeaderNode() => Flex(
+      TitleNode() => const SizedBox.shrink(),
+      LinkNode() => const SizedBox.shrink(),
+      UlNode() => Flex(
           direction: Axis.vertical,
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: children
-              .map((e) => DomWidget(
-                    e,
-                  ))
+              .map(
+                (e) => DomWidget(e),
+              )
               .toList(),
-        ),
-      UlNode() => Padding(
-          padding: style.margin ?? EdgeInsets.zero,
-          child: Flex(
-            direction: Axis.vertical,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: children
-                .map(
-                  (e) => DomWidget(e),
-                )
-                .toList(),
-          ),
         ),
       LiNode(text: var t) => Flex(
           direction: Axis.vertical,
@@ -244,11 +183,11 @@ class DomWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (style.listDecoration == ListDecoration.disc)
-                      Text(
-                        "\u2022",
-                        style: TextStyle(color: style.textColor),
-                      ),
+                    // if (style.listDecoration == ListDecoration.disc)
+                    //   Text(
+                    //     "\u2022",
+                    //     style: TextStyle(color: style.textColor),
+                    //   ),
                     DomWidget(
                       e,
                     ),
@@ -267,145 +206,43 @@ class DomWidget extends StatelessWidget {
               .toList(),
         ),
       ANode aNode => AWidget(t: aNode, style: style, children: children),
-      H1Node(text: var t) => Padding(
-          padding: style.margin ?? EdgeInsets.zero,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                t,
-                style: TextStyle(
-                  height: style.lineHeight,
-                  color: style.textColor,
-                  fontSize: style.fontSize.value,
-                  fontWeight: style.fontWeight,
+      INode(text: var t) ||
+      BNode(text: var t) ||
+      EmNode(text: var t) ||
+      StrongNode(text: var t) ||
+      H1Node(text: var t) ||
+      H2Node(text: var t) ||
+      H3Node(text: var t) ||
+      H4Node(text: var t) ||
+      H5Node(text: var t) ||
+      H6Node(text: var t) ||
+      PNode(text: var t) =>
+        TextNode(
+          text: t,
+          style: style,
+          children: children
+              .map(
+                (e) => DomWidget(
+                  e,
                 ),
-              ),
-              ...children.map((e) => DomWidget(
-                    e,
-                  )),
-            ],
-          ),
+              )
+              .toList(),
         ),
-      H2Node(text: var t) => Padding(
-          padding: style.margin ?? EdgeInsets.zero,
-          child: Column(
-            // mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                t,
-                style: TextStyle(
-                  height: style.lineHeight,
-                  color: style.textColor,
-                  fontSize: style.fontSize.value,
-                  fontWeight: style.fontWeight,
+      SectionNode() ||
+      DivNode() ||
+      HeaderNode() ||
+      FooterNode() ||
+      NavNode() =>
+        TextNode(
+          text: null,
+          style: style,
+          children: children
+              .map(
+                (e) => DomWidget(
+                  e,
                 ),
-              ),
-              ...children.map((e) => DomWidget(
-                    e,
-                  )),
-            ],
-          ),
-        ),
-      H3Node(text: var t) => Padding(
-          padding: style.margin ?? EdgeInsets.zero,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                t,
-                style: TextStyle(
-                  height: style.lineHeight,
-                  color: style.textColor,
-                  fontSize: style.fontSize.value,
-                  fontWeight: style.fontWeight,
-                ),
-              ),
-              ...children.map((e) => DomWidget(
-                    e,
-                  )),
-            ],
-          ),
-        ),
-      H4Node(text: var t) => Padding(
-          padding: style.margin ?? EdgeInsets.zero,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                t,
-                style: TextStyle(
-                  height: style.lineHeight,
-                  color: style.textColor,
-                  fontSize: style.fontSize.value,
-                  fontWeight: style.fontWeight,
-                ),
-              ),
-              ...children.map((e) => DomWidget(
-                    e,
-                  )),
-            ],
-          ),
-        ),
-      H5Node(text: var t) => Padding(
-          padding: style.margin ?? EdgeInsets.zero,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                t,
-                style: TextStyle(
-                  height: style.lineHeight,
-                  color: style.textColor,
-                  fontSize: style.fontSize.value,
-                  fontWeight: style.fontWeight,
-                ),
-              ),
-              ...children.map((e) => DomWidget(
-                    e,
-                  )),
-            ],
-          ),
-        ),
-      H6Node(text: var t) => Padding(
-          padding: style.margin ?? EdgeInsets.zero,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                t,
-                style: TextStyle(
-                  height: style.lineHeight,
-                  color: style.textColor,
-                  fontSize: style.fontSize.value,
-                  fontWeight: style.fontWeight,
-                ),
-              ),
-              ...children.map((e) => DomWidget(
-                    e,
-                  )),
-            ],
-          ),
-        ),
-      INode(text: var t) => Text(t),
-      BNode(text: var t) => Text(t),
-      EmNode(text: var t) => Text(t),
-      StrongNode(text: var t) => Text(t),
-      PNode(text: var t) => Padding(
-          padding: style.margin ?? EdgeInsets.zero,
-          child: Text(
-            t,
-            textAlign: style.textAlign,
-            style: TextStyle(
-              color: style.textColor,
-            ),
-          ),
+              )
+              .toList(),
         ),
     };
   }
@@ -420,7 +257,7 @@ class AWidget extends StatelessWidget {
   });
 
   final ANode t;
-  final CssTheme style;
+  final CssStyle style;
   final List<Tree> children;
 
   @override
@@ -428,47 +265,116 @@ class AWidget extends StatelessWidget {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () {
-          final href = t.attributes["href"]!;
+          onTap: () {
+            final href = t.attributes["href"]!;
 
-          Uri uri;
-          if (href.startsWith('/') ||
-              href.startsWith('./') ||
-              !href.contains('://')) {
-            // Relative link
-            uri = Uri.parse(context
-                    .read<BrowserCubit>()
-                    .state
-                    .currentTab!
-                    .history
-                    .last
-                    .uri
-                    .toString())
-                .resolve(href);
-          } else {
-            // Assume absolute URI
-            uri = Uri.parse(href);
-          }
+            Uri uri;
+            if (href.startsWith('/') ||
+                href.startsWith('./') ||
+                !href.contains('://')) {
+              // Relative link
+              uri = Uri.parse(context
+                      .read<BrowserCubit>()
+                      .state
+                      .currentTab!
+                      .history
+                      .last
+                      .uri
+                      .toString())
+                  .resolve(href);
+            } else {
+              // Assume absolute URI
+              uri = Uri.parse(href);
+            }
 
-          context.read<BrowserCubit>().visitUri(uri);
-        },
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+            context.read<BrowserCubit>().visitUri(uri);
+          },
+          child: TextNode(
+            text: t.text,
+            style: style,
+            children: children.map((e) => DomWidget(e)).toList(),
+          )),
+    );
+  }
+}
+
+class TextNode extends StatelessWidget {
+  const TextNode(
+      {super.key, required this.style, this.text, this.children = const []});
+
+  final CssStyle style;
+  final String? text;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    // padding: EdgeInsets.only(
+    //   bottom: (style.marginBottom != null)
+    //       ? FontSize(value: style.marginBottom!).getValue(12)
+    //       : 0.0,
+    //   left: (style.marginLeft != null)
+    //       ? FontSize(value: style.marginLeft!).getValue(12)
+    //       : 0.0,
+    //   top: (style.marginTop != null)
+    //       ? FontSize(value: style.marginTop!).getValue(12)
+    //       : 0.0,
+    //   right: (style.marginRight != null)
+    //       ? FontSize(value: style.marginRight!).getValue(12)
+    //       : 0.0,
+    // ),
+    Widget a = DecoratedBox(
+      decoration: BoxDecoration(
+        color: (style.backgroundColor != null)
+            ? HexColor.fromHex(style.backgroundColor!)
+            : null,
+      ),
+      child: Flex(
+        direction: Axis.vertical,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          if (text != null)
             Text(
-              t.text,
+              text!,
               style: TextStyle(
-                fontSize: style.fontSize.value,
-                color: style.textColor,
-                decorationColor: style.textColor,
-                decoration: style.textDecoration,
+                height: style.lineHeight,
+                fontSize: (style.fontSize != null)
+                    ? FontSize(value: style.fontSize!).getValue(12)
+                    : null,
+                decoration: (style.textDecoration == "underline")
+                    ? TextDecoration.underline
+                    : null,
+                fontWeight: style.fontWeight == "bold" ? FontWeight.bold : null,
+                color: (style.textColor != null)
+                    ? HexColor.fromHex(style.textColor!)
+                    : null,
               ),
             ),
-            ...children.map((e) => DomWidget(e)).toList(),
-          ],
-        ),
+          ...children,
+        ],
       ),
     );
+
+    if (style.marginBottom == "auto" &&
+        style.marginLeft == "auto" &&
+        style.marginTop == "auto" &&
+        style.marginRight == "auto") {
+      a = Center(
+        child: a,
+      );
+    }
+
+    if (style.maxWidth != null) {
+      print("Sip");
+      a = ConstrainedBox(
+          constraints: BoxConstraints(
+        maxWidth: (style.maxWidth != null)
+            ? FontSize(value: style.maxWidth!).getValue(12)
+            : double.infinity,
+      ));
+    }
+
+    return a;
   }
 }

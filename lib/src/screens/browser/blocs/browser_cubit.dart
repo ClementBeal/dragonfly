@@ -1,9 +1,7 @@
-import 'package:dragonfly/browser/css/css_theme.dart';
 import 'package:dragonfly/browser/dom/html_node.dart';
 import 'package:dragonfly/browser/dom_builder.dart';
 import 'package:dragonfly/browser/page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart';
 
 class BrowserState {
   final List<Tab> tabs;
@@ -43,7 +41,6 @@ class BrowserCubit extends Cubit<BrowserState> {
                 Empty(uri: Uri()),
                 Loading(uri: uri),
               ],
-              cssTheme: CssTheme.initial(),
             ),
           ],
           currentTabId: 0,
@@ -93,7 +90,6 @@ class BrowserCubit extends Cubit<BrowserState> {
       ...state.tabs,
       Tab(
         history: [Empty(uri: Uri())],
-        cssTheme: CssTheme.initial(),
       )
     ];
 
@@ -133,7 +129,6 @@ class BrowserCubit extends Cubit<BrowserState> {
       ...state.tabs,
       Tab(
         history: [Loading(uri: uri)],
-        cssTheme: CssTheme.initial(),
       )
     ];
 
@@ -174,7 +169,7 @@ class BrowserCubit extends Cubit<BrowserState> {
         final theme =
             await getCSS(tab.currentResponse!.uri.replace(path: href));
 
-        state.tabs[tabId].cssTheme = theme;
+        (state.tabs[tabId].currentResponse as Success).theme = theme;
         emit(state.copyWith(tabs: state.tabs));
       }
     }
@@ -193,7 +188,6 @@ class BrowserCubit extends Cubit<BrowserState> {
             sourceCode: sourceCode,
           )
         ],
-        cssTheme: CssTheme.initial(),
       )
     ];
 

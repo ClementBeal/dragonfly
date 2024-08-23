@@ -2,12 +2,9 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
-import 'package:dragonfly/browser/body_parser.dart';
-import 'package:dragonfly/browser/css/css_theme.dart';
+import 'package:dragonfly/browser/css/cssom_builder.dart';
 import 'package:dragonfly/browser/dom/html_node.dart';
 import 'package:dragonfly/browser/dom_builder.dart';
-import 'package:flutter/widgets.dart';
-import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 
 enum NavigationError {
@@ -92,13 +89,11 @@ class Favicon {
 class Tab {
   final List<Response> history;
   int currentPageId;
-  late CssTheme cssTheme;
   String sourceCode;
 
   Tab({
     required this.history,
     this.currentPageId = 0,
-    required this.cssTheme,
     this.sourceCode = "",
   });
 
@@ -156,6 +151,7 @@ class Success extends Response {
   });
 
   final Tree content;
+  CSSOM? theme;
   final Favicon? favicon;
   final String sourceCode;
 }
@@ -201,7 +197,7 @@ Future<Response> getHttp(Uri uri) async {
       favicon: null,
       content: dom,
       sourceCode: page.body,
-    );
+    )..theme = CSSOM.initial();
   } catch (e) {
     print(e);
     return ErrorResponse(
@@ -212,7 +208,7 @@ Future<Response> getHttp(Uri uri) async {
   }
 }
 
-Future<CssTheme> getCSS(Uri uri) async {
+Future<CSSOM> getCSS(Uri uri) async {
   final page = await http.get(
     uri,
     headers: {
@@ -220,7 +216,7 @@ Future<CssTheme> getCSS(Uri uri) async {
     },
   );
 
-  final theme = CssTheme.initial();
+  final theme = CssomBuilder().parse(page.body);
 
   // theme.addTheme(
   //   ANode,

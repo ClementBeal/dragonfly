@@ -93,7 +93,7 @@ class BrowserTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: 250, minWidth: 100),
+      constraints: const BoxConstraints(maxWidth: 250, minWidth: 100),
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         child: Padding(
@@ -115,7 +115,7 @@ class BrowserTab extends StatelessWidget {
                 spacing: 8,
                 children: [
                   switch (tab.favicon?.type) {
-                    FaviconType.unknown || null => SizedBox.shrink(),
+                    FaviconType.unknown || null => const SizedBox.shrink(),
                     FaviconType.url =>
                       Image.network(tab.favicon!.href, height: 22, width: 22),
                     FaviconType.png ||
@@ -176,7 +176,7 @@ class BrowserActionBar extends StatelessWidget {
                         context.read<BrowserCubit>().navigatePrevious();
                       }
                     : null,
-                icon: Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back),
               ),
             ),
             BlocBuilder<BrowserCubit, BrowserState>(
@@ -186,19 +186,19 @@ class BrowserActionBar extends StatelessWidget {
                         context.read<BrowserCubit>().navigateNext();
                       }
                     : null,
-                icon: Icon(Icons.arrow_forward),
+                icon: const Icon(Icons.arrow_forward),
               ),
             ),
             IconButton(
               onPressed: () {
                 context.read<BrowserCubit>().refreshCurrentTab();
               },
-              icon: Icon(Icons.refresh),
+              icon: const Icon(Icons.refresh),
             ),
           ],
         ),
-        Expanded(child: SearchBar()),
-        SettingsBar(),
+        const Expanded(child: SearchBar()),
+        const SettingsBar(),
       ],
     );
   }
@@ -234,7 +234,7 @@ class _SearchBarState extends State<SearchBar> {
             prefix: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton(onPressed: () {}, icon: Icon(Icons.lock_open)),
+                IconButton(onPressed: () {}, icon: const Icon(Icons.lock_open)),
               ],
             ),
             suffix: Row(
@@ -246,10 +246,10 @@ class _SearchBarState extends State<SearchBar> {
 
                     context.read<BrowserCubit>().visitUri(uri);
                   },
-                  icon: Icon(Icons.arrow_forward),
+                  icon: const Icon(Icons.arrow_forward),
                 ),
-                Chip(label: Text("100%")),
-                IconButton(onPressed: () {}, icon: Icon(Icons.star_border)),
+                const Chip(label: Text("100%")),
+                IconButton(onPressed: () {}, icon: const Icon(Icons.star_border)),
               ],
             )),
       ),
@@ -267,7 +267,7 @@ class SettingsBar extends StatelessWidget {
       children: [
         IconButton(
           onPressed: () {},
-          icon: Icon(Icons.more_vert),
+          icon: const Icon(Icons.more_vert),
         ),
       ],
     );

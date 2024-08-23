@@ -41,41 +41,41 @@ class BodyParser {
     return {
       "h1": (element) => Text(
             element.text,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 32, // 2.0
               fontWeight: FontWeight.bold,
             ),
           ),
       "h2": (element) => Text(
             element.text,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 24, // 1.5
               fontWeight: FontWeight.bold,
             ),
           ),
       "h3": (element) => Text(
             element.text,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18.72, // 1.17
               fontWeight: FontWeight.bold,
             ),
           ),
       "h4": (element) => Text(
             element.text,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
             ),
           ),
       "h5": (element) => Text(
             element.text,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 13.28, // 0.83
               fontWeight: FontWeight.bold,
             ),
           ),
       "h6": (element) => Text(
             element.text,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 10.72, // 0.67
               fontWeight: FontWeight.bold,
             ),
@@ -87,33 +87,33 @@ class BodyParser {
     return {
       "small": (element) => Text(
             element.text,
-            style: TextStyle(fontSize: 12),
+            style: const TextStyle(fontSize: 12),
           ),
       "code": (element) => Text(
             element.text,
-            style: TextStyle(fontFamily: "monospace"),
+            style: const TextStyle(fontFamily: "monospace"),
           ),
       "strong": (element) => Text(
             element.text,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
       "b": (element) => Text(
             element.text,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
       "i": (element) => Text(
             element.text,
-            style: TextStyle(fontStyle: FontStyle.italic),
+            style: const TextStyle(fontStyle: FontStyle.italic),
           ),
       "em": (element) => Text(
             element.text,
-            style: TextStyle(fontStyle: FontStyle.italic),
+            style: const TextStyle(fontStyle: FontStyle.italic),
           ),
       "blockquote": (element) => Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
             child: Text(
               element.text,
-              style: TextStyle(),
+              style: const TextStyle(),
             ),
           ),
       "ol": (element) => Column(
@@ -171,13 +171,13 @@ class BodyParser {
                   children: [
                     Text(
                       element.text,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.blue,
                         decorationColor: Colors.blue,
                         decoration: TextDecoration.underline,
                       ),
                     ),
-                    ...element.children.map((child) => parse(child)).toList(),
+                    ...element.children.map((child) => parse(child)),
                   ],
                 ),
               );
@@ -252,7 +252,7 @@ class BodyParser {
           ),
       "th": (e) => Text(
             e.text,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
       "td": (e) => Text(e.text),
     };
@@ -260,7 +260,7 @@ class BodyParser {
 
   Widget parse(Element? elementToParse) {
     if (elementToParse == null) {
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     }
 
     final tags = <String?, Widget Function(Element element)>{

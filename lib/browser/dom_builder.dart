@@ -29,18 +29,18 @@ class Tree {
     List<Tree> result = [];
 
     // Helper function to recursively traverse the tree
-    void _search(Tree node) {
+    void search(Tree node) {
       if (node.data is T) {
         result.add(node);
       }
 
       // Recursively search in children
       for (Tree child in node.children) {
-        _search(child);
+        search(child);
       }
     }
 
-    _search(root);
+    search(root);
     return result;
   }
 
@@ -51,7 +51,6 @@ class Tree {
 
   // Recursive helper function for pretty-printing the tree
   String _toStringHelper(Tree node, String prefix) {
-    if (node == null) return "";
     String result = "$prefix${node.data}\n";
     for (int i = 0; i < node.children.length; i++) {
       result += _toStringHelper(node.children[i],
@@ -81,36 +80,36 @@ class DomBuilder {
       node = HeadNode(
           attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "html") {
-      node = HtmlNode(
+      node = HtmlNode(element.text,
           attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "body") {
-      node = BodyNode(
+      node = BodyNode(element.text,
           attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "title") {
       node = TitleNode(element.text, attributes: element.attributes);
     } else if (element.localName == "div") {
-      node = DivNode(
+      node = DivNode(element.text,
           attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "nav") {
-      node = NavNode(
+      node = NavNode(element.text,
           attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "footer") {
-      node = FooterNode(
+      node = FooterNode(element.text,
           attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "section") {
-      node = SectionNode(
+      node = SectionNode(element.text,
           attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "header") {
-      node = HeaderNode(
+      node = HeaderNode(element.text,
           attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "ul") {
-      node = UlNode(
+      node = UlNode(element.text,
           attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "li") {
       node = LiNode(element.text,
           attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "ol") {
-      node = OlNode(
+      node = OlNode(element.text,
           attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "a") {
       node = ANode(element.text,

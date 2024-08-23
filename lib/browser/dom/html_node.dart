@@ -8,38 +8,39 @@ part 'texts/text_node.dart';
 sealed class DomNode {
   final Map<Object, String> attributes;
   final List<String> classes;
-  final CssTheme theme;
+  final String text;
 
-  DomNode({required this.attributes, required this.classes})
-      : theme = CssTheme.initial(); // class ; id; style ; href...
+  DomNode(this.text,
+      {required this.attributes,
+      required this.classes}); // class ; id; style ; href...
 }
 
 class PageNode extends DomNode {
-  PageNode() : super(attributes: {}, classes: []);
+  PageNode() : super("", attributes: {}, classes: []);
 }
 
 class UnkownNode extends DomNode {
-  UnkownNode() : super(attributes: {}, classes: []);
+  UnkownNode() : super("", attributes: {}, classes: []);
 }
 
 class HtmlNode extends DomNode {
-  HtmlNode({required super.attributes, required super.classes});
+  HtmlNode(super.text, {required super.attributes, required super.classes});
 }
 
 class HeadNode extends DomNode {
-  HeadNode({required super.attributes, required super.classes});
+  HeadNode({required super.attributes, required super.classes}) : super('');
 }
 
 class BodyNode extends DomNode {
-  BodyNode({required super.attributes, required super.classes});
+  BodyNode(super.text, {required super.attributes, required super.classes});
 }
 
 class TitleNode extends DomNode {
   final String title;
 
-  TitleNode(this.title, {required super.attributes}) : super(classes: []);
+  TitleNode(this.title, {required super.attributes}) : super("", classes: []);
 }
 
 class LinkNode extends DomNode {
-  LinkNode({required super.attributes}) : super(classes: []);
+  LinkNode({required super.attributes}) : super("", classes: []);
 }

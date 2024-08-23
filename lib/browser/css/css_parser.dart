@@ -21,7 +21,7 @@ class Declaration {
 
   @override
   String toString() {
-    return "${property}: ${value}";
+    return "$property: $value";
   }
 }
 
@@ -138,6 +138,7 @@ class CssParser {
           // and we go bac kto the selector parsing
           var char = css[i++];
           final a = [];
+
           while (char != ":") {
             a.add(char);
             char = css[i++];
@@ -145,6 +146,7 @@ class CssParser {
 
           final property = a.join("");
 
+          char = css[i++];
           while (char == " ") {
             char = css[i++];
           }

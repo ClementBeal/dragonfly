@@ -1,14 +1,13 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 body {
   font-family: "Roboto", sans-serif;
   line-height: 1.6;
   background-color: #f4f4f4;
   color: #333;
+}
+
+a {
+  color: #333;
+  text-decoration: none;
 }
 
 .container {
@@ -18,30 +17,9 @@ body {
   padding: 0 2rem;
 }
 
-a {
-  color: #333;
-  text-decoration: none;
-}
-
-ul {
-  list-style: none;
-}
-
-h1,
-h2,
-h3 {
-  font-weight: 400;
-  line-height: 1.2;
-  margin-bottom: 1rem;
-}
-
-.header {
-  background-color: #fff;
+.footer {
+  background-color: #333;
+  color: #fff;
+  text-align: center;
   padding: 1rem 0;
-}
-
-.main-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
