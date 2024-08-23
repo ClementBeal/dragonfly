@@ -5,7 +5,9 @@ class UlNode extends DomNode {
 }
 
 class LiNode extends DomNode {
-  LiNode({required super.attributes});
+  LiNode(this.text, {required super.attributes});
+
+  final String text;
 }
 
 class OlNode extends DomNode {
@@ -13,5 +15,7 @@ class OlNode extends DomNode {
 }
 
 class ANode extends DomNode {
-  ANode({required super.attributes});
+  ANode(this.text, {required super.attributes});
+
+  final String text;
 }

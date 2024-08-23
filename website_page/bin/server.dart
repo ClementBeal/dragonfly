@@ -9,15 +9,17 @@ void main(List<String> args) async {
   print('Serving at http://${server.address.host}:${server.port}');
 
   await for (HttpRequest request in server) {
-    // Get the requested path.
     final path = request.uri.path;
 
-    request.response.headers.contentType = ContentType.html;
-
-    // Serve different HTML based on the path.
-    if (path == '/other-page') {
-      request.response.write(generateOtherPage());
+    if (path == "/style.css") {
+      request.response.headers.contentType =
+          ContentType("text", "css", charset: "utf-8");
+      request.response.write(
+        File(r"/home/clement/Documents/Projets/librairies/dragonfly/style.css")
+            .readAsStringSync(),
+      );
     } else {
+      request.response.headers.contentType = ContentType.html;
       request.response.write(generateHomePage());
     }
 
@@ -27,42 +29,6 @@ void main(List<String> args) async {
 
 // HTML for the home page.
 String generateHomePage() {
-  return File(
-          r"/home/clement/Téléchargements/Flutter Gems - A Curated List of Top Dart and Flutter packages (8_22_2024 8_28_07 PM).html")
+  return File(r"/home/clement/Documents/Projets/librairies/dragonfly/a.html")
       .readAsStringSync();
-  return '''
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Home Page</title>
-</head>
-<body>
-
-  <h1>Home Page</h1>
-  <a href="/other-page">Go to Other Page</a>
-  <!-- Other HTML elements... -->
-
-</body>
-</html>
-  ''';
-}
-
-// HTML for the linked page.
-String generateOtherPage() {
-  return '''
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Other Page</title>
-</head>
-<body>
-
-  <h1>Other Page</h1>
-  <p>You have navigated to another page!</p>
-  <a href="/">Go Back Home</a> 
-  <a href="https://perdu.com">Or if you are lost...</a>
-
-</body>
-</html>
-  ''';
 }

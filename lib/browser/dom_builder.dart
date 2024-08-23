@@ -2,21 +2,21 @@ import 'package:dragonfly/browser/dom/html_node.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 
-class Node {
+class Tree {
   DomNode data;
-  late List<Node> children;
+  late List<Tree> children;
 
-  Node(this.data) {
+  Tree(this.data) {
     children = [];
   }
 
   // Add a child node
-  void addChild(Node child) {
+  void addChild(Tree child) {
     children.add(child);
   }
 
   // Remove a child node
-  void removeChild(Node child) {
+  void removeChild(Tree child) {
     children.remove(child);
   }
 
@@ -25,13 +25,32 @@ class Node {
     return children.isNotEmpty;
   }
 
+  List<Tree> findSubtreesOfType<T>(Tree root) {
+    List<Tree> result = [];
+
+    // Helper function to recursively traverse the tree
+    void _search(Tree node) {
+      if (node.data is T) {
+        result.add(node);
+      }
+
+      // Recursively search in children
+      for (Tree child in node.children) {
+        _search(child);
+      }
+    }
+
+    _search(root);
+    return result;
+  }
+
   @override
   String toString() {
     return _toStringHelper(this, "");
   }
 
   // Recursive helper function for pretty-printing the tree
-  String _toStringHelper(Node node, String prefix) {
+  String _toStringHelper(Tree node, String prefix) {
     if (node == null) return "";
     String result = "$prefix${node.data}\n";
     for (int i = 0; i < node.children.length; i++) {
@@ -43,10 +62,10 @@ class Node {
 }
 
 class DomBuilder {
-  Node parse(String html) {
+  Tree parse(String html) {
     final document = HtmlParser(html).parse();
 
-    final tree = Node(PageNode());
+    final tree = Tree(PageNode());
 
     for (var child in document.children) {
       tree.addChild(_parse(child));
@@ -55,7 +74,7 @@ class DomBuilder {
     return tree;
   }
 
-  Node _parse(Element element) {
+  Tree _parse(Element element) {
     DomNode node;
 
     if (element.localName == "head") {
@@ -79,40 +98,40 @@ class DomBuilder {
     } else if (element.localName == "ul") {
       node = UlNode(attributes: element.attributes);
     } else if (element.localName == "li") {
-      node = LiNode(attributes: element.attributes);
+      node = LiNode(element.text, attributes: element.attributes);
     } else if (element.localName == "ol") {
       node = OlNode(attributes: element.attributes);
     } else if (element.localName == "a") {
-      node = ANode(attributes: element.attributes);
+      node = ANode(element.text, attributes: element.attributes);
     } else if (element.localName == "h1") {
-      node = H1Node(attributes: element.attributes);
+      node = H1Node(element.text, attributes: element.attributes);
     } else if (element.localName == "h2") {
-      node = H2Node(attributes: element.attributes);
+      node = H2Node(element.text, attributes: element.attributes);
     } else if (element.localName == "h3") {
-      node = H3Node(attributes: element.attributes);
+      node = H3Node(element.text, attributes: element.attributes);
     } else if (element.localName == "h4") {
-      node = H4Node(attributes: element.attributes);
+      node = H4Node(element.text, attributes: element.attributes);
     } else if (element.localName == "h5") {
-      node = H5Node(attributes: element.attributes);
+      node = H5Node(element.text, attributes: element.attributes);
     } else if (element.localName == "h6") {
-      node = H6Node(attributes: element.attributes);
+      node = H6Node(element.text, attributes: element.attributes);
     } else if (element.localName == "i") {
-      node = INode(attributes: element.attributes);
+      node = INode(element.text, attributes: element.attributes);
     } else if (element.localName == "b") {
-      node = BNode(attributes: element.attributes);
+      node = BNode(element.text, attributes: element.attributes);
     } else if (element.localName == "em") {
-      node = EmNode(attributes: element.attributes);
+      node = EmNode(element.text, attributes: element.attributes);
     } else if (element.localName == "strong") {
-      node = StrongNode(attributes: element.attributes);
+      node = StrongNode(element.text, attributes: element.attributes);
     } else if (element.localName == "p") {
-      node = PNode(attributes: element.attributes);
+      node = PNode(element.text, attributes: element.attributes);
     } else if (element.localName == "link") {
       node = LinkNode(attributes: element.attributes);
     } else {
       node = UnkownNode();
     }
 
-    final tree = Node(node);
+    final tree = Tree(node);
 
     for (var child in element.children) {
       tree.addChild(_parse(child));

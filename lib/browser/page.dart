@@ -3,6 +3,9 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:dragonfly/browser/body_parser.dart';
+import 'package:dragonfly/browser/css/css_theme.dart';
+import 'package:dragonfly/browser/dom/html_node.dart';
+import 'package:dragonfly/browser/dom_builder.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
@@ -89,8 +92,13 @@ class Favicon {
 class Tab {
   final List<Response> history;
   int currentPageId;
+  late CssTheme cssTheme;
 
-  Tab({required this.history, this.currentPageId = 0});
+  Tab({
+    required this.history,
+    this.currentPageId = 0,
+    required this.cssTheme,
+  });
 
   bool isLoading() => history.last is Loading;
   Response? get currentResponse => getCurrentPage();
@@ -144,7 +152,7 @@ class Success extends Response {
     required this.favicon,
   });
 
-  final Widget content;
+  final Tree content;
   final Favicon? favicon;
 }
 
@@ -179,17 +187,13 @@ Future<Response> getHttp(Uri uri) async {
       },
     );
 
-    final xml = parse(page.body);
-
-    final body = xml.querySelector("body");
-    final faviconHref =
-        xml.querySelector('link[rel="icon"]')?.attributes['href'];
+    final dom = DomBuilder().parse(page.body);
 
     return Success(
       uri: uri,
-      title: xml.querySelector("head > title")?.text,
-      favicon: faviconHref != null ? Favicon(href: faviconHref) : null,
-      content: BodyParser().parse(body),
+      title: "",
+      favicon: null,
+      content: dom,
     );
   } catch (e) {
     print(e);
@@ -199,4 +203,59 @@ Future<Response> getHttp(Uri uri) async {
       title: NavigationError.cantFindPage.title,
     );
   }
+}
+
+Future<CssTheme> getCSS(Uri uri) async {
+  final page = await http.get(
+    uri,
+    headers: {
+      "User-Agent": "DragonFly/1.0",
+    },
+  );
+
+  final theme = CssTheme(customTagTheme: {});
+  theme.addTheme(
+    ANode,
+    CssTheme(
+      customTagTheme: {},
+      listDecoration: ListDecoration.none,
+      textColor: Color(0xff333333),
+      textDecoration: null,
+    ),
+  );
+  theme.addTheme(
+    H1Node,
+    CssTheme(
+      customTagTheme: {},
+      fontWeight: FontWeight.w400,
+      lineHeight: 1.2,
+      margin: EdgeInsets.only(
+        bottom: theme.fontSize.getValue(FontSizeType.rem, 1).value,
+      ),
+    ),
+  );
+  theme.addTheme(
+    H2Node,
+    CssTheme(
+      customTagTheme: {},
+      fontWeight: FontWeight.w400,
+      lineHeight: 1.2,
+      margin: EdgeInsets.only(
+        bottom: theme.fontSize.getValue(FontSizeType.rem, 1).value,
+      ),
+    ),
+  );
+  theme.addTheme(
+    H3Node,
+    CssTheme(
+      customTagTheme: {},
+      fontWeight: FontWeight.w400,
+      lineHeight: 1.2,
+      margin: EdgeInsets.only(
+        bottom: theme.fontSize.getValue(FontSizeType.rem, 1).value,
+      ),
+    ),
+  );
+
+  return theme;
 }

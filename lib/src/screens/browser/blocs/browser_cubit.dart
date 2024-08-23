@@ -1,5 +1,8 @@
+import 'package:dragonfly/browser/css/css_theme.dart';
+import 'package:dragonfly/browser/dom/html_node.dart';
 import 'package:dragonfly/browser/page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart';
 
 class BrowserState {
   final List<Tab> tabs;
@@ -39,6 +42,9 @@ class BrowserCubit extends Cubit<BrowserState> {
                 Empty(uri: Uri()),
                 Loading(uri: uri),
               ],
+              cssTheme: CssTheme(
+                customTagTheme: {},
+              ),
             ),
           ],
           currentTabId: 0,
@@ -48,6 +54,17 @@ class BrowserCubit extends Cubit<BrowserState> {
 
     final response = await getHttp(uri);
     final newTabs = [...state.tabs];
+
+    if (response is Success) {
+      final linkNodes = response.content
+          .findSubtreesOfType<LinkNode>(response.content)
+          .map((e) => e.data)
+          .cast<LinkNode>()
+          .toList();
+
+      _loadLinks(linkNodes, state.currentTabId);
+    }
+
     newTabs[state.currentTabId].addPage(response);
 
     emit(state.copyWith(tabs: newTabs));
@@ -75,7 +92,12 @@ class BrowserCubit extends Cubit<BrowserState> {
   void addTab() {
     final newTabs = [
       ...state.tabs,
-      Tab(history: [Empty(uri: Uri())])
+      Tab(
+        history: [Empty(uri: Uri())],
+        cssTheme: CssTheme(
+          customTagTheme: {},
+        ),
+      )
     ];
 
     emit(state.copyWith(
@@ -112,7 +134,12 @@ class BrowserCubit extends Cubit<BrowserState> {
   void addTabWithUri(Uri uri) {
     final newTabs = [
       ...state.tabs,
-      Tab(history: [Loading(uri: uri)])
+      Tab(
+        history: [Loading(uri: uri)],
+        cssTheme: CssTheme(
+          customTagTheme: {},
+        ),
+      )
     ];
 
     emit(state.copyWith(
@@ -140,6 +167,25 @@ class BrowserCubit extends Cubit<BrowserState> {
     if (state.currentTab!.canNavigateNext) {
       state.currentTab!.nextPage();
       refreshCurrentTab();
+    }
+  }
+
+  Future<void> _loadLinks(List<LinkNode> links, int tabId) async {
+    final tab = state.tabs[tabId];
+
+    for (var link in links) {
+      if (link.attributes["rel"] == "stylesheet") {
+        final href = link.attributes["href"]!;
+        final theme =
+            await getCSS(tab.currentResponse!.uri.replace(path: href));
+
+        state.tabs[tabId].cssTheme = theme;
+        emit(state.copyWith(tabs: state.tabs));
+      }
+    }
+
+    for (var tav in state.tabs) {
+      print(tav.cssTheme);
     }
   }
 }
