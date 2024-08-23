@@ -3,6 +3,7 @@ import 'package:dragonfly/browser/page.dart';
 import 'package:dragonfly/src/screens/browser/browser_screen.dart';
 import 'package:flutter/material.dart' hide Tab;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class LobbyScreen extends StatelessWidget {
   const LobbyScreen({super.key});
@@ -113,9 +114,18 @@ class BrowserTab extends StatelessWidget {
               child: Row(
                 spacing: 8,
                 children: [
-                  // Tab Title (if available)
-                  if (tab.favicon != null)
-                    Image.network(tab.favicon!, height: 22, width: 22),
+                  switch (tab.favicon?.type) {
+                    FaviconType.unknown || null => SizedBox.shrink(),
+                    FaviconType.url =>
+                      Image.network(tab.favicon!.href, height: 22, width: 22),
+                    FaviconType.png ||
+                    FaviconType.ico ||
+                    FaviconType.jpeg ||
+                    FaviconType.gif =>
+                      Image.memory(tab.favicon!.decodeBase64()!),
+                    FaviconType.svg =>
+                      SvgPicture.memory(tab.favicon!.decodeBase64()!),
+                  },
                   if (tab.currentResponse?.title != null)
                     Expanded(
                       child: Text(

@@ -36,6 +36,7 @@ class BrowserCubit extends Cubit<BrowserState> {
           tabs: [
             Tab(
               history: [
+                Empty(uri: Uri()),
                 Loading(uri: uri),
               ],
             ),

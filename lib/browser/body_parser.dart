@@ -2,9 +2,11 @@
  HML5 specs -> https://www.w3.org/TR/2012/WD-html-markup-20121025/Overview.html#toc
 */
 
+import 'package:dragonfly/browser/page.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:flutter/material.dart' hide Element;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:html/dom.dart' hide Text;
 
 class BodyParser {
@@ -12,6 +14,24 @@ class BodyParser {
     return {
       "body": (e) => Column(
             mainAxisSize: MainAxisSize.min,
+            children: e.children.map((child) => parse(child)).toList(),
+          ),
+      "nav": (e) => Row(
+            mainAxisSize: MainAxisSize.min,
+            children: e.children.map((child) => parse(child)).toList(),
+          ),
+      "header": (e) => Flex(
+            direction: Axis.vertical,
+            children: e.children.map((child) => parse(child)).toList(),
+          ),
+      "div": (e) {
+        return Flex(
+          direction: Axis.vertical,
+          children: e.children.map((child) => parse(child)).toList(),
+        );
+      },
+      "main": (e) => Flex(
+            direction: Axis.vertical,
             children: e.children.map((child) => parse(child)).toList(),
           ),
     };
@@ -65,6 +85,10 @@ class BodyParser {
 
   Map<String, Widget Function(Element element)> textTag() {
     return {
+      "small": (element) => Text(
+            element.text,
+            style: TextStyle(fontSize: 12),
+          ),
       "code": (element) => Text(
             element.text,
             style: TextStyle(fontFamily: "monospace"),
@@ -141,9 +165,9 @@ class BodyParser {
 
                   context.read<BrowserCubit>().visitUri(uri);
                 },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+                child: Wrap(
+                  // mainAxisAlignment: MainAxisAlignment.start,
+                  // mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       element.text,
@@ -152,7 +176,8 @@ class BodyParser {
                         decorationColor: Colors.blue,
                         decoration: TextDecoration.underline,
                       ),
-                    )
+                    ),
+                    ...element.children.map((child) => parse(child)).toList(),
                   ],
                 ),
               );
@@ -163,10 +188,32 @@ class BodyParser {
 
   Map<String, Widget Function(Element element)> actionTags() {
     return {
-      "img": (e) => Image.network(
-            e.attributes["src"]!,
-            semanticLabel: e.attributes["alt"],
-          ),
+      "img": (e) {
+        print("got images");
+        final image = Favicon(href: e.attributes["src"]!);
+        final alt = e.attributes["alt"];
+
+        print(image.type);
+
+        return switch (image.type) {
+          FaviconType.unknown || null => Container(
+              color: Colors.red,
+              width: 50,
+              height: 50,
+            ),
+          FaviconType.url => Image.network(image.href),
+          FaviconType.png ||
+          FaviconType.ico ||
+          FaviconType.jpeg ||
+          FaviconType.gif =>
+            Image.memory(image.decodeBase64()!),
+          FaviconType.svg => SvgPicture.memory(
+              image.decodeBase64()!,
+              height: 120,
+              width: 120,
+            ),
+        };
+      },
       "table": (e) => Column(
             mainAxisSize: MainAxisSize.min,
             spacing: 8,

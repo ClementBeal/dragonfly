@@ -27,6 +27,9 @@ void main(List<String> args) async {
 
 // HTML for the home page.
 String generateHomePage() {
+  return File(
+          r"/home/clement/Téléchargements/Flutter Gems - A Curated List of Top Dart and Flutter packages (8_22_2024 8_28_07 PM).html")
+      .readAsStringSync();
   return '''
 <!DOCTYPE html>
 <html>
