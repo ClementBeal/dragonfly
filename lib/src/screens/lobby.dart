@@ -1,7 +1,7 @@
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/browser/page.dart';
 import 'package:dragonfly/src/screens/browser/browser_screen.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Tab;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LobbyScreen extends StatelessWidget {
@@ -76,7 +76,7 @@ class BrowserTabBar extends StatelessWidget {
 }
 
 class BrowserTab extends StatelessWidget {
-  final Response tab;
+  final Tab tab;
   final bool isActive;
   final VoidCallback onTap;
   final VoidCallback onClose;
@@ -91,49 +91,56 @@ class BrowserTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: GestureDetector(
-          onTap: onTap,
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: isActive ? Colors.blue : Colors.transparent,
-                  width: 2.0,
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: 250, minWidth: 100),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: GestureDetector(
+            onTap: onTap,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: isActive ? Colors.blue : Colors.transparent,
+                    width: 2.0,
+                  ),
                 ),
               ),
-            ),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Tab Title (if available)
-                if (tab.title != null)
-                  Text(
-                    tab.title!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontWeight:
-                          isActive ? FontWeight.bold : FontWeight.normal,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Row(
+                spacing: 8,
+                children: [
+                  // Tab Title (if available)
+                  if (tab.favicon != null)
+                    Image.network(tab.favicon!, height: 22, width: 22),
+                  if (tab.currentResponse?.title != null)
+                    Expanded(
+                      child: Text(
+                        tab.currentResponse!.title!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontWeight:
+                              isActive ? FontWeight.bold : FontWeight.normal,
+                        ),
+                      ),
                     ),
-                  ),
 
-                // Close button
-                IconButton(
-                  onPressed: onClose,
-                  icon: const Icon(Icons.close, size: 16.0),
-                  constraints: const BoxConstraints(
-                    maxWidth: 16.0,
-                    maxHeight: 16.0,
+                  // Close button
+                  IconButton(
+                    onPressed: onClose,
+                    icon: const Icon(Icons.close, size: 16.0),
+                    constraints: const BoxConstraints(
+                      maxWidth: 16.0,
+                      maxHeight: 16.0,
+                    ),
+                    padding: EdgeInsets.zero,
                   ),
-                  padding: EdgeInsets.zero,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -152,8 +159,26 @@ class BrowserActionBar extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            IconButton(onPressed: () {}, icon: Icon(Icons.arrow_back)),
-            IconButton(onPressed: () {}, icon: Icon(Icons.arrow_forward)),
+            BlocBuilder<BrowserCubit, BrowserState>(
+              builder: (context, state) => IconButton(
+                onPressed: (state.currentTab?.canNavigatePrevious ?? false)
+                    ? () {
+                        context.read<BrowserCubit>().navigatePrevious();
+                      }
+                    : null,
+                icon: Icon(Icons.arrow_back),
+              ),
+            ),
+            BlocBuilder<BrowserCubit, BrowserState>(
+              builder: (context, state) => IconButton(
+                onPressed: (state.currentTab?.canNavigateNext ?? false)
+                    ? () {
+                        context.read<BrowserCubit>().navigateNext();
+                      }
+                    : null,
+                icon: Icon(Icons.arrow_forward),
+              ),
+            ),
             IconButton(
               onPressed: () {
                 context.read<BrowserCubit>().refreshCurrentTab();
@@ -182,36 +207,42 @@ class _SearchBarState extends State<SearchBar> {
   @override
   void initState() {
     super.initState();
-    _searchController.text = "https://www.perdu.com/";
+    _searchController.text = "http://127.0.0.1:8088";
   }
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: _searchController,
-      decoration: InputDecoration(
-          border: const OutlineInputBorder(),
-          prefix: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(onPressed: () {}, icon: Icon(Icons.lock_open)),
-            ],
-          ),
-          suffix: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton.filled(
-                onPressed: () {
-                  var uri = Uri.parse(_searchController.text);
+    return BlocListener<BrowserCubit, BrowserState>(
+      listener: (context, state) {
+        _searchController.text =
+            state.currentTab?.currentResponse?.uri.toString() ?? "no uri";
+      },
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            prefix: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(onPressed: () {}, icon: Icon(Icons.lock_open)),
+              ],
+            ),
+            suffix: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton.filled(
+                  onPressed: () {
+                    var uri = Uri.parse(_searchController.text);
 
-                  context.read<BrowserCubit>().visitUri(uri);
-                },
-                icon: Icon(Icons.arrow_forward),
-              ),
-              Chip(label: Text("100%")),
-              IconButton(onPressed: () {}, icon: Icon(Icons.star_border)),
-            ],
-          )),
+                    context.read<BrowserCubit>().visitUri(uri);
+                  },
+                  icon: Icon(Icons.arrow_forward),
+                ),
+                Chip(label: Text("100%")),
+                IconButton(onPressed: () {}, icon: Icon(Icons.star_border)),
+              ],
+            )),
+      ),
     );
   }
 }

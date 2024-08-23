@@ -12,20 +12,21 @@ class BrowserScreen extends StatelessWidget {
     return SelectionArea(
       child: BlocBuilder<BrowserCubit, BrowserState>(
         builder: (context, state) {
-          final tab = state.currentTag();
+          final tab = state.currentTab;
           final currentTabId = state.currentTabId;
 
           if (tab == null) {
-            return Center(
+            return const Center(
               child: Text("Enter an URL"),
             );
           }
 
-          return switch (tab) {
-            Success() => Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: tab.content,
+          return switch (tab.currentResponse) {
+            Success m => SingleChildScrollView(
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: m.content,
+                ),
               ),
             Loading() => Center(
                 child: CircularProgressIndicator(),
@@ -34,6 +35,8 @@ class BrowserScreen extends StatelessWidget {
                 NavigationError.cantFindPage =>
                   ServerNotFoundPage(tab: m, tabId: currentTabId),
               },
+            null => SizedBox.shrink(),
+            Empty() => SizedBox.shrink(),
           };
         },
       ),

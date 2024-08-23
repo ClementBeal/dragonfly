@@ -2,13 +2,13 @@ import 'package:dragonfly/browser/page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BrowserState {
-  final List<Response> tabs;
+  final List<Tab> tabs;
   final int currentTabId;
 
   BrowserState({required this.tabs, required this.currentTabId});
 
   BrowserState copyWith({
-    List<Response>? tabs,
+    List<Tab>? tabs,
     int? currentTabId,
   }) {
     return BrowserState(
@@ -17,7 +17,7 @@ class BrowserState {
     );
   }
 
-  Response? currentTag() {
+  Tab? get currentTab {
     if (currentTabId < 0 || currentTabId >= tabs.length) {
       return null;
     }
@@ -31,13 +31,23 @@ class BrowserCubit extends Cubit<BrowserState> {
 
   Future<void> visitUri(Uri uri) async {
     if (state.currentTabId < 0) {
-      emit(BrowserState(tabs: [Loading(uri: uri)], currentTabId: 0));
-      return; // Exit early if it's the first tab
+      emit(
+        BrowserState(
+          tabs: [
+            Tab(
+              history: [
+                Loading(uri: uri),
+              ],
+            ),
+          ],
+          currentTabId: 0,
+        ),
+      );
     }
 
     final response = await getHttp(uri);
     final newTabs = [...state.tabs];
-    newTabs[state.currentTabId] = response;
+    newTabs[state.currentTabId].addPage(response);
 
     emit(state.copyWith(tabs: newTabs));
   }
@@ -46,11 +56,11 @@ class BrowserCubit extends Cubit<BrowserState> {
     final tab = state.tabs[tabId];
 
     final newTabs = [...state.tabs];
-    newTabs[tabId] = Loading(uri: tab.uri);
+    newTabs[tabId].refresh();
     emit(state.copyWith(tabs: newTabs)); // Update UI immediately with loading
 
-    final response = await getHttp(tab.uri);
-    newTabs[tabId] = response;
+    final response = await getHttp(tab.history.last.uri);
+    newTabs[tabId].setLastPage(response);
 
     emit(state.copyWith(tabs: newTabs));
   }
@@ -62,7 +72,11 @@ class BrowserCubit extends Cubit<BrowserState> {
   }
 
   void addTab() {
-    final newTabs = [...state.tabs, Loading(uri: Uri())];
+    final newTabs = [
+      ...state.tabs,
+      Tab(history: [Empty(uri: Uri())])
+    ];
+
     emit(state.copyWith(
       tabs: newTabs,
       currentTabId: newTabs.length - 1,
@@ -92,5 +106,39 @@ class BrowserCubit extends Cubit<BrowserState> {
       tabs: newTabs,
       currentTabId: newCurrentTabId,
     ));
+  }
+
+  void addTabWithUri(Uri uri) {
+    final newTabs = [
+      ...state.tabs,
+      Tab(history: [Loading(uri: uri)])
+    ];
+
+    emit(state.copyWith(
+      tabs: newTabs,
+      currentTabId: newTabs.length - 1,
+    ));
+  }
+
+  void navigatePrevious() {
+    if (state.currentTab == null) {
+      return;
+    }
+
+    if (state.currentTab!.canNavigatePrevious) {
+      state.currentTab!.previousPage();
+      refreshCurrentTab();
+    }
+  }
+
+  void navigateNext() {
+    if (state.currentTab == null) {
+      return;
+    }
+
+    if (state.currentTab!.canNavigateNext) {
+      state.currentTab!.nextPage();
+      refreshCurrentTab();
+    }
   }
 }
