@@ -1,5 +1,6 @@
 import 'package:dragonfly/browser/css/css_theme.dart';
 import 'package:dragonfly/browser/dom/html_node.dart';
+import 'package:dragonfly/browser/dom_builder.dart';
 import 'package:dragonfly/browser/page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
@@ -43,6 +44,7 @@ class BrowserCubit extends Cubit<BrowserState> {
                 Loading(uri: uri),
               ],
               cssTheme: CssTheme(
+                classes: {},
                 customTagTheme: {},
               ),
             ),
@@ -96,6 +98,7 @@ class BrowserCubit extends Cubit<BrowserState> {
         history: [Empty(uri: Uri())],
         cssTheme: CssTheme(
           customTagTheme: {},
+          classes: {},
         ),
       )
     ];
@@ -138,6 +141,7 @@ class BrowserCubit extends Cubit<BrowserState> {
         history: [Loading(uri: uri)],
         cssTheme: CssTheme(
           customTagTheme: {},
+          classes: {},
         ),
       )
     ];
@@ -183,9 +187,31 @@ class BrowserCubit extends Cubit<BrowserState> {
         emit(state.copyWith(tabs: state.tabs));
       }
     }
+  }
 
-    for (var tav in state.tabs) {
-      print(tav.cssTheme);
-    }
+  void addTabAndViewSourceCode(Uri uri, String sourceCode) {
+    final newTabs = [
+      ...state.tabs,
+      Tab(
+        history: [
+          Success(
+            uri: uri,
+            favicon: null,
+            title: uri.replace(scheme: "").toString(),
+            content: Tree(UnkownNode()),
+            sourceCode: sourceCode,
+          )
+        ],
+        cssTheme: CssTheme(
+          customTagTheme: {},
+          classes: {},
+        ),
+      )
+    ];
+
+    emit(state.copyWith(
+      tabs: newTabs,
+      currentTabId: newTabs.length - 1,
+    ));
   }
 }

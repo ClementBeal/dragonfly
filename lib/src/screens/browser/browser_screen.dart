@@ -1,11 +1,13 @@
 import 'package:dragonfly/browser/css/css_theme.dart';
 import 'package:dragonfly/browser/dom/html_node.dart';
 import 'package:dragonfly/browser/dom_builder.dart';
+import 'package:dragonfly/main.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/browser/page.dart';
 import 'package:dragonfly/src/screens/browser/errors/cant_find_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:syntax_highlight/syntax_highlight.dart';
 
 class BrowserScreen extends StatelessWidget {
   const BrowserScreen({super.key});
@@ -13,6 +15,27 @@ class BrowserScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SelectionArea(
+      contextMenuBuilder: (BuildContext context, editableTextState) {
+        return AdaptiveTextSelectionToolbar.buttonItems(
+          anchors: editableTextState.contextMenuAnchors,
+          buttonItems: <ContextMenuButtonItem>[
+            ...editableTextState.contextMenuButtonItems,
+            ContextMenuButtonItem(
+              onPressed: () {
+                final state = context.read<BrowserCubit>().state;
+                final currentTab = state.currentTab;
+
+                // TODO : it will break
+                context.read<BrowserCubit>().addTabAndViewSourceCode(
+                    Uri.parse(
+                        "view-source:${currentTab!.currentResponse!.uri.toString()}"),
+                    (currentTab!.currentResponse! as Success).sourceCode);
+              },
+              label: 'View Source',
+            ),
+          ],
+        );
+      },
       child: BlocBuilder<BrowserCubit, BrowserState>(
         builder: (context, state) {
           final tab = state.currentTab;
@@ -24,14 +47,17 @@ class BrowserScreen extends StatelessWidget {
             );
           }
 
-          print("Tab -> ${tab}");
-          print("Tab css -> ${tab.cssTheme}");
-
           return switch (tab.currentResponse) {
             Success m => SingleChildScrollView(
                 child: Align(
                   alignment: Alignment.topLeft,
-                  child: DomWidget(m.content, parentStyle: tab.cssTheme),
+                  child: Builder(builder: (context) {
+                    if (m.uri.scheme == "view-source") {
+                      return Text.rich(htmlHighlighter.highlight(m.sourceCode));
+                    }
+
+                    return DomWidget(m.content, parentStyle: tab.cssTheme);
+                  }),
                 ),
               ),
             Loading() => Center(
@@ -58,10 +84,15 @@ class DomWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cssTheme = parentStyle ?? CssTheme(customTagTheme: {});
+    final cssTheme = parentStyle ??
+        CssTheme(
+          customTagTheme: {},
+          classes: {},
+        );
     final data = domNode.data;
     final children = domNode.children;
-    final style = cssTheme.getStyleForNode(data);
+    final classes = data.classes;
+    final style = cssTheme.getStyleForNode(data, classes);
 
     return switch (domNode.data) {
       PageNode() => Column(
@@ -88,7 +119,7 @@ class DomWidget extends StatelessWidget {
       HeadNode() => SizedBox.shrink(),
       BodyNode() => DecoratedBox(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: style.backgroundColor,
           ),
           child: Padding(
             padding: EdgeInsets.all(8),
@@ -108,49 +139,89 @@ class DomWidget extends StatelessWidget {
         ),
       TitleNode() => SizedBox.shrink(),
       LinkNode() => SizedBox.shrink(),
-      DivNode() => Flex(
-          direction: Axis.vertical,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: children
-              .map((e) => DomWidget(
-                    e,
-                    parentStyle: cssTheme,
-                  ))
-              .toList(),
+      DivNode() => Builder(builder: (context) {
+          final c = Padding(
+            padding: style.margin,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: style.maxWidth ?? double.infinity,
+              ),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  border: style.border,
+                ),
+                child: Flex(
+                  direction: Axis.vertical,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: children
+                      .map((e) => DomWidget(
+                            e,
+                            parentStyle: cssTheme,
+                          ))
+                      .toList(),
+                ),
+              ),
+            ),
+          );
+          print(style.isCentered);
+          if (style.isCentered) {
+            return Center(
+              child: c,
+            );
+          }
+
+          return c;
+        }),
+      NavNode() => DecoratedBox(
+          decoration: BoxDecoration(
+            color: style.backgroundColor,
+          ),
+          child: Flex(
+            direction: Axis.horizontal,
+            crossAxisAlignment: style.alignItems,
+            mainAxisSize: (style.displayType == DisplayType.flex)
+                ? MainAxisSize.max
+                : MainAxisSize.min,
+            mainAxisAlignment: style.justifyContent,
+            children: children
+                .map((e) => DomWidget(
+                      e,
+                      parentStyle: cssTheme,
+                    ))
+                .toList(),
+          ),
         ),
-      NavNode() => Flex(
-          direction: Axis.vertical,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: children
-              .map((e) => DomWidget(
-                    e,
-                    parentStyle: cssTheme,
-                  ))
-              .toList(),
+      FooterNode() => DecoratedBox(
+          decoration: BoxDecoration(
+            color: style.backgroundColor,
+          ),
+          child: Flex(
+            direction: Axis.horizontal,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: children
+                .map((e) => DomWidget(
+                      e,
+                      parentStyle: cssTheme,
+                    ))
+                .toList(),
+          ),
         ),
-      FooterNode() => Flex(
-          direction: Axis.vertical,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: children
-              .map((e) => DomWidget(
-                    e,
-                    parentStyle: cssTheme,
-                  ))
-              .toList(),
-        ),
-      SectionNode() => Flex(
-          direction: Axis.vertical,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: children
-              .map((e) => DomWidget(
-                    e,
-                    parentStyle: cssTheme,
-                  ))
-              .toList(),
+      SectionNode() => DecoratedBox(
+          decoration: BoxDecoration(
+            color: style.backgroundColor,
+          ),
+          child: Flex(
+            direction: Axis.vertical,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: children
+                .map((e) => DomWidget(
+                      e,
+                      parentStyle: cssTheme,
+                    ))
+                .toList(),
+          ),
         ),
       HeaderNode() => Flex(
           direction: Axis.vertical,
@@ -239,7 +310,7 @@ class DomWidget extends StatelessWidget {
       H2Node(text: var t) => Padding(
           padding: style.margin,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            // mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -352,7 +423,13 @@ class DomWidget extends StatelessWidget {
       StrongNode(text: var t) => Text(t),
       PNode(text: var t) => Padding(
           padding: style.margin,
-          child: Text(t),
+          child: Text(
+            t,
+            textAlign: style.textAlign,
+            style: TextStyle(
+              color: style.textColor,
+            ),
+          ),
         ),
     };
   }

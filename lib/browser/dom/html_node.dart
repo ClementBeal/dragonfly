@@ -5,36 +5,39 @@ part 'texts/text_node.dart';
 
 sealed class DomNode {
   final Map<Object, String> attributes;
+  final List<String> classes;
 
-  DomNode({required this.attributes}); // class ; id; style ; href...
+  DomNode(
+      {required this.attributes,
+      required this.classes}); // class ; id; style ; href...
 }
 
 class PageNode extends DomNode {
-  PageNode() : super(attributes: {});
+  PageNode() : super(attributes: {}, classes: []);
 }
 
 class UnkownNode extends DomNode {
-  UnkownNode() : super(attributes: {});
+  UnkownNode() : super(attributes: {}, classes: []);
 }
 
 class HtmlNode extends DomNode {
-  HtmlNode({required super.attributes});
+  HtmlNode({required super.attributes, required super.classes});
 }
 
 class HeadNode extends DomNode {
-  HeadNode({required super.attributes});
+  HeadNode({required super.attributes, required super.classes});
 }
 
 class BodyNode extends DomNode {
-  BodyNode({required super.attributes});
+  BodyNode({required super.attributes, required super.classes});
 }
 
 class TitleNode extends DomNode {
   final String title;
 
-  TitleNode(this.title, {required super.attributes});
+  TitleNode(this.title, {required super.attributes}) : super(classes: []);
 }
 
 class LinkNode extends DomNode {
-  LinkNode({required super.attributes});
+  LinkNode({required super.attributes}) : super(classes: []);
 }

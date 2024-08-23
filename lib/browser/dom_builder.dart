@@ -78,53 +78,76 @@ class DomBuilder {
     DomNode node;
 
     if (element.localName == "head") {
-      node = HeadNode(attributes: element.attributes);
+      node = HeadNode(
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "html") {
-      node = HtmlNode(attributes: element.attributes);
+      node = HtmlNode(
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "body") {
-      node = BodyNode(attributes: element.attributes);
+      node = BodyNode(
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "title") {
       node = TitleNode(element.text, attributes: element.attributes);
     } else if (element.localName == "div") {
-      node = DivNode(attributes: element.attributes);
+      node = DivNode(
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "nav") {
-      node = NavNode(attributes: element.attributes);
+      node = NavNode(
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "footer") {
-      node = FooterNode(attributes: element.attributes);
+      node = FooterNode(
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "section") {
-      node = SectionNode(attributes: element.attributes);
+      node = SectionNode(
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "header") {
-      node = HeaderNode(attributes: element.attributes);
+      node = HeaderNode(
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "ul") {
-      node = UlNode(attributes: element.attributes);
+      node = UlNode(
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "li") {
-      node = LiNode(element.text, attributes: element.attributes);
+      node = LiNode(element.text,
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "ol") {
-      node = OlNode(attributes: element.attributes);
+      node = OlNode(
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "a") {
-      node = ANode(element.text, attributes: element.attributes);
+      node = ANode(element.text,
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "h1") {
-      node = H1Node(element.text, attributes: element.attributes);
+      node = H1Node(element.text,
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "h2") {
-      node = H2Node(element.text, attributes: element.attributes);
+      node = H2Node(element.text,
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "h3") {
-      node = H3Node(element.text, attributes: element.attributes);
+      node = H3Node(element.text,
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "h4") {
-      node = H4Node(element.text, attributes: element.attributes);
+      node = H4Node(element.text,
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "h5") {
-      node = H5Node(element.text, attributes: element.attributes);
+      node = H5Node(element.text,
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "h6") {
-      node = H6Node(element.text, attributes: element.attributes);
+      node = H6Node(element.text,
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "i") {
-      node = INode(element.text, attributes: element.attributes);
+      node = INode(element.text,
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "b") {
-      node = BNode(element.text, attributes: element.attributes);
+      node = BNode(element.text,
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "em") {
-      node = EmNode(element.text, attributes: element.attributes);
+      node = EmNode(element.text,
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "strong") {
-      node = StrongNode(element.text, attributes: element.attributes);
+      node = StrongNode(element.text,
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "p") {
-      node = PNode(element.text, attributes: element.attributes);
+      node = PNode(element.text,
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "link") {
       node = LinkNode(attributes: element.attributes);
     } else {

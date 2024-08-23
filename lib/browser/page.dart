@@ -93,11 +93,13 @@ class Tab {
   final List<Response> history;
   int currentPageId;
   late CssTheme cssTheme;
+  String sourceCode;
 
   Tab({
     required this.history,
     this.currentPageId = 0,
     required this.cssTheme,
+    this.sourceCode = "",
   });
 
   bool isLoading() => history.last is Loading;
@@ -150,10 +152,12 @@ class Success extends Response {
     required super.title,
     required this.content,
     required this.favicon,
+    required this.sourceCode,
   });
 
   final Tree content;
   final Favicon? favicon;
+  final String sourceCode;
 }
 
 class Loading extends Response {
@@ -188,12 +192,15 @@ Future<Response> getHttp(Uri uri) async {
     );
 
     final dom = DomBuilder().parse(page.body);
+    final title =
+        dom.findSubtreesOfType<TitleNode>(dom).firstOrNull?.data as TitleNode;
 
     return Success(
       uri: uri,
-      title: "",
+      title: (title).title,
       favicon: null,
       content: dom,
+      sourceCode: page.body,
     );
   } catch (e) {
     print(e);
@@ -213,11 +220,15 @@ Future<CssTheme> getCSS(Uri uri) async {
     },
   );
 
-  final theme = CssTheme(customTagTheme: {});
+  final theme = CssTheme(
+    customTagTheme: {},
+    classes: {},
+  );
   theme.addTheme(
     ANode,
     CssTheme(
       customTagTheme: {},
+      classes: {},
       listDecoration: ListDecoration.none,
       textColor: Color(0xff333333),
       textDecoration: null,
@@ -227,6 +238,7 @@ Future<CssTheme> getCSS(Uri uri) async {
     H1Node,
     CssTheme(
       customTagTheme: {},
+      classes: {},
       fontWeight: FontWeight.w400,
       lineHeight: 1.2,
       margin: EdgeInsets.only(
@@ -238,6 +250,7 @@ Future<CssTheme> getCSS(Uri uri) async {
     H2Node,
     CssTheme(
       customTagTheme: {},
+      classes: {},
       fontWeight: FontWeight.w400,
       lineHeight: 1.2,
       margin: EdgeInsets.only(
@@ -249,11 +262,96 @@ Future<CssTheme> getCSS(Uri uri) async {
     H3Node,
     CssTheme(
       customTagTheme: {},
+      classes: {},
       fontWeight: FontWeight.w400,
       lineHeight: 1.2,
       margin: EdgeInsets.only(
         bottom: theme.fontSize.getValue(FontSizeType.rem, 1).value,
       ),
+    ),
+  );
+
+  theme.addTheme(
+    BodyNode,
+    CssTheme(
+      customTagTheme: {},
+      classes: {},
+      lineHeight: 1.6,
+      textColor: Color(0xff333),
+      backgroundColor: Color(0xfff4f4f4),
+    ),
+  );
+
+  theme.addClass(
+    "main-nav",
+    CssTheme(
+      customTagTheme: {},
+      classes: {},
+      displayType: DisplayType.flex,
+      justifyContent: MainAxisAlignment.spaceBetween,
+      alignItems: CrossAxisAlignment.center,
+    ),
+  );
+
+  theme.addClass(
+    "header",
+    CssTheme(
+      customTagTheme: {},
+      classes: {},
+      backgroundColor: Color(0xFFFFFFFF),
+      margin: EdgeInsets.symmetric(
+        horizontal: theme.fontSize.getValue(FontSizeType.rem, 1).value,
+      ),
+    ),
+  );
+  theme.addClass(
+    "footer",
+    CssTheme(
+      customTagTheme: {},
+      classes: {},
+      textColor: Color(0xffffffff),
+      backgroundColor: Color(0xFF333333),
+      textAlign: TextAlign.center,
+      margin: EdgeInsets.symmetric(
+        horizontal: theme.fontSize.getValue(FontSizeType.rem, 1).value,
+      ),
+    ),
+  );
+  theme.addClass(
+    "container",
+    CssTheme(
+      customTagTheme: {},
+      classes: {},
+      isCentered: true,
+      maxWidth: 1200,
+      margin: EdgeInsets.symmetric(
+        vertical: theme.fontSize.getValue(FontSizeType.rem, 1).value,
+      ),
+    ),
+  );
+  theme.addClass(
+    "testimonials",
+    CssTheme(
+      customTagTheme: {},
+      classes: {},
+      textAlign: TextAlign.center,
+      backgroundColor: Color(0xfff8f8f8),
+      margin: EdgeInsets.symmetric(
+        horizontal: theme.fontSize.getValue(FontSizeType.rem, 4).value,
+      ),
+    ),
+  );
+  theme.addClass(
+    "testimonial",
+    CssTheme(
+      customTagTheme: {},
+      classes: {},
+      border: Border(left: BorderSide(color: Color(0xff007bff), width: 5)),
+      textAlign: TextAlign.center,
+      backgroundColor: Color(0xfff8f8f8),
+      margin: EdgeInsets.only(
+        bottom: theme.fontSize.getValue(FontSizeType.rem, 2).value,
+      ).add(EdgeInsets.all(2)).resolve(TextDirection.ltr),
     ),
   );
 
