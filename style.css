@@ -20,6 +20,11 @@ a {
 .footer {
   background-color: #333;
   color: #fff;
-  text-align: center;
   padding: 1rem 0;
+  text-align: center;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: 700;
 }

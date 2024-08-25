@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:dragonfly/browser/css/css_theme.dart';
 import 'package:dragonfly/browser/css/cssom_builder.dart';
 import 'package:dragonfly/browser/dom/html_node.dart';
@@ -50,25 +52,24 @@ class BrowserScreen extends StatelessWidget {
           }
 
           return switch (tab.currentResponse) {
-            Success m => SingleChildScrollView(
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Builder(builder: (context) {
-                    if (m.uri.scheme == "view-source") {
-                      return Text.rich(htmlHighlighter.highlight(m.sourceCode));
-                    }
+            Success m => Builder(builder: (context) {
+                if (m.uri.scheme == "view-source") {
+                  return Text.rich(htmlHighlighter.highlight(m.sourceCode));
+                }
 
-                    if (m.theme == null) {
-                      return CircularProgressIndicator();
-                    }
+                if (m.theme == null) {
+                  return const CircularProgressIndicator();
+                }
 
-                    return CSSOMProvider(
+                return SizedBox.expand(
+                  child: SingleChildScrollView(
+                    child: CSSOMProvider(
                       cssom: m.theme!,
                       child: DomWidget(m.content),
-                    );
-                  }),
-                ),
-              ),
+                    ),
+                  ),
+                );
+              }),
             Loading() => const Center(
                 child: CircularProgressIndicator(),
               ),
@@ -86,9 +87,10 @@ class BrowserScreen extends StatelessWidget {
 }
 
 class DomWidget extends StatelessWidget {
-  const DomWidget(this.domNode, {super.key});
+  const DomWidget(this.domNode, {super.key, this.parentStyle});
 
   final Tree domNode;
+  final CssStyle? parentStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -97,102 +99,46 @@ class DomWidget extends StatelessWidget {
     final style = CSSOMProvider.of(context)!
             .cssom
             .find(switch (data) {
+              UlNode() => "ul",
               BodyNode() => "body",
+              DivNode() => "div",
               H1Node() => "h1",
               H2Node() => "h2",
               H3Node() => "h3",
               ANode() => "a",
+              PNode() => "p",
               _ => "body",
             })
             ?.data ??
         CssStyle.initial();
 
+    if (parentStyle != null) {
+      style.merge(parentStyle!);
+    }
+
+    // the styles from the classes are not passed to the children
+    // final styleWithClasses = style.clone();
+
     for (var className in data.classes) {
       final newTheme =
           CSSOMProvider.of(context)!.cssom.find(".$className")?.data;
-      print(className);
-      print(newTheme);
       if (newTheme != null) {
-        style.merge(newTheme);
+        style.mergeClass(newTheme);
       }
     }
 
-    // print(CSSOMProvider.of(context)!.cssom.find(HTMLTag.a)?.data);
-
     return switch (domNode.data) {
-      PageNode() => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: children
-              .map((e) => DomWidget(
-                    e,
-                  ))
-              .toList(),
-        ),
       UnkownNode() => const SizedBox.shrink(),
-      HtmlNode() => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: children
-              .map((e) => DomWidget(
-                    e,
-                  ))
-              .toList(),
-        ),
       HeadNode() => const SizedBox.shrink(),
-      BodyNode() => DecoratedBox(
-          decoration: BoxDecoration(
-            color: (style.backgroundColor != null)
-                ? HexColor.fromHex(style.backgroundColor!)
-                : null,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: children
-                  .map(
-                    (e) => DomWidget(
-                      e,
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
-        ),
       TitleNode() => const SizedBox.shrink(),
       LinkNode() => const SizedBox.shrink(),
-      UlNode() => Flex(
-          direction: Axis.vertical,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: children
-              .map(
-                (e) => DomWidget(e),
-              )
-              .toList(),
-        ),
       LiNode(text: var t) => Flex(
           direction: Axis.vertical,
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Text(t),
-            ...children.map((e) => Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // if (style.listDecoration == ListDecoration.disc)
-                    //   Text(
-                    //     "\u2022",
-                    //     style: TextStyle(color: style.textColor),
-                    //   ),
-                    DomWidget(
-                      e,
-                    ),
-                  ],
-                )),
+            const Icon(Icons.circle, size: 8),
+            ...children.map((e) => DomWidget(e)).toList(),
           ],
         ),
       OlNode() => Flex(
@@ -202,6 +148,7 @@ class DomWidget extends StatelessWidget {
           children: children
               .map((e) => DomWidget(
                     e,
+                    parentStyle: style,
                   ))
               .toList(),
         ),
@@ -217,13 +164,14 @@ class DomWidget extends StatelessWidget {
       H5Node(text: var t) ||
       H6Node(text: var t) ||
       PNode(text: var t) =>
-        TextNode(
+        BlockNode(
           text: t,
           style: style,
           children: children
               .map(
                 (e) => DomWidget(
                   e,
+                  parentStyle: style,
                 ),
               )
               .toList(),
@@ -231,15 +179,20 @@ class DomWidget extends StatelessWidget {
       SectionNode() ||
       DivNode() ||
       HeaderNode() ||
+      PageNode() ||
+      UlNode() ||
       FooterNode() ||
+      HtmlNode() ||
+      BodyNode() ||
       NavNode() =>
-        TextNode(
+        BlockNode(
           text: null,
           style: style,
           children: children
               .map(
                 (e) => DomWidget(
                   e,
+                  parentStyle: style,
                 ),
               )
               .toList(),
@@ -265,41 +218,42 @@ class AWidget extends StatelessWidget {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-          onTap: () {
-            final href = t.attributes["href"]!;
+        onTap: () {
+          final href = t.attributes["href"]!;
 
-            Uri uri;
-            if (href.startsWith('/') ||
-                href.startsWith('./') ||
-                !href.contains('://')) {
-              // Relative link
-              uri = Uri.parse(context
-                      .read<BrowserCubit>()
-                      .state
-                      .currentTab!
-                      .history
-                      .last
-                      .uri
-                      .toString())
-                  .resolve(href);
-            } else {
-              // Assume absolute URI
-              uri = Uri.parse(href);
-            }
+          Uri uri;
+          if (href.startsWith('/') ||
+              href.startsWith('./') ||
+              !href.contains('://')) {
+            // Relative link
+            uri = Uri.parse(context
+                    .read<BrowserCubit>()
+                    .state
+                    .currentTab!
+                    .history
+                    .last
+                    .uri
+                    .toString())
+                .resolve(href);
+          } else {
+            // Assume absolute URI
+            uri = Uri.parse(href);
+          }
 
-            context.read<BrowserCubit>().visitUri(uri);
-          },
-          child: TextNode(
-            text: t.text,
-            style: style,
-            children: children.map((e) => DomWidget(e)).toList(),
-          )),
+          context.read<BrowserCubit>().visitUri(uri);
+        },
+        child: BlockNode(
+          text: t.text,
+          style: style,
+          children: children.map((e) => DomWidget(e)).toList(),
+        ),
+      ),
     );
   }
 }
 
-class TextNode extends StatelessWidget {
-  const TextNode(
+class BlockNode extends StatelessWidget {
+  const BlockNode(
       {super.key, required this.style, this.text, this.children = const []});
 
   final CssStyle style;
@@ -308,73 +262,138 @@ class TextNode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // padding: EdgeInsets.only(
-    //   bottom: (style.marginBottom != null)
-    //       ? FontSize(value: style.marginBottom!).getValue(12)
-    //       : 0.0,
-    //   left: (style.marginLeft != null)
-    //       ? FontSize(value: style.marginLeft!).getValue(12)
-    //       : 0.0,
-    //   top: (style.marginTop != null)
-    //       ? FontSize(value: style.marginTop!).getValue(12)
-    //       : 0.0,
-    //   right: (style.marginRight != null)
-    //       ? FontSize(value: style.marginRight!).getValue(12)
-    //       : 0.0,
-    // ),
-    Widget a = DecoratedBox(
-      decoration: BoxDecoration(
-        color: (style.backgroundColor != null)
-            ? HexColor.fromHex(style.backgroundColor!)
-            : null,
-      ),
-      child: Flex(
-        direction: Axis.vertical,
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          if (text != null)
-            Text(
-              text!,
-              style: TextStyle(
-                height: style.lineHeight,
-                fontSize: (style.fontSize != null)
-                    ? FontSize(value: style.fontSize!).getValue(12)
-                    : null,
-                decoration: (style.textDecoration == "underline")
-                    ? TextDecoration.underline
-                    : null,
-                fontWeight: style.fontWeight == "bold" ? FontWeight.bold : null,
-                color: (style.textColor != null)
-                    ? HexColor.fromHex(style.textColor!)
-                    : null,
-              ),
-            ),
-          ...children,
-        ],
-      ),
-    );
+    // TODO : it works on my machine. Probably not on another one
+    // the Mediaquery.devicePixelRatio returns 1 for me when it's 3...
+    const pixelRatio = 3;
 
-    if (style.marginBottom == "auto" &&
-        style.marginLeft == "auto" &&
-        style.marginTop == "auto" &&
-        style.marginRight == "auto") {
-      a = Center(
-        child: a,
-      );
-    }
+    Widget bloc = Flex(
+      direction: Axis.vertical,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        if (text != null) TextWidget(text: text, style: style),
+        ...children,
+      ],
+    );
 
     if (style.maxWidth != null) {
       print("Sip");
-      a = ConstrainedBox(
-          constraints: BoxConstraints(
-        maxWidth: (style.maxWidth != null)
-            ? FontSize(value: style.maxWidth!).getValue(12)
-            : double.infinity,
-      ));
+      bloc = ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: (style.maxWidth != null)
+              ? FontSize(value: style.maxWidth!).getValue(16, 1)
+              : double.infinity,
+        ),
+        child: bloc,
+      );
     }
 
-    return a;
+    if (style.paddingBottom != null ||
+        style.paddingLeft != null ||
+        style.paddingTop != null ||
+        style.paddingRight != null) {
+      bloc = Padding(
+        padding: EdgeInsets.only(
+          bottom: (style.paddingBottom != null && style.paddingBottom != "0")
+              ? FontSize(value: style.paddingBottom!).getValue(16, pixelRatio)
+              : 0.0,
+          left: (style.paddingLeft != null && style.paddingLeft != "0")
+              ? FontSize(value: style.paddingLeft!).getValue(16, pixelRatio)
+              : 0.0,
+          top: (style.paddingTop != null && style.paddingTop != "0")
+              ? FontSize(value: style.paddingTop!).getValue(16, pixelRatio)
+              : 0.0,
+          right: (style.paddingRight != null && style.paddingRight != "0")
+              ? FontSize(value: style.paddingRight!).getValue(16, pixelRatio)
+              : 0.0,
+        ),
+        child: bloc,
+      );
+    }
+
+    if (style.marginBottom != null ||
+        style.marginLeft != null ||
+        style.marginTop != null ||
+        style.marginRight != null) {
+      if (style.marginBottom == "auto" &&
+          style.marginLeft == "auto" &&
+          style.marginTop == "auto" &&
+          style.marginRight == "auto") {
+        bloc = Align(
+          alignment: Alignment.center,
+          child: bloc,
+        );
+      } else {
+        bloc = Container(
+          margin: EdgeInsets.only(
+            bottom: (style.marginBottom != null && style.marginBottom != "0")
+                ? FontSize(value: style.marginBottom!).getValue(16, pixelRatio)
+                : 0.0,
+            left: (style.marginLeft != null && style.marginLeft != "0")
+                ? FontSize(value: style.marginLeft!).getValue(16, pixelRatio)
+                : 0.0,
+            top: (style.marginTop != null && style.marginTop != "0")
+                ? FontSize(value: style.marginTop!).getValue(16, pixelRatio)
+                : 0.0,
+            right: (style.marginRight != null && style.marginRight != "0")
+                ? FontSize(value: style.marginRight!).getValue(16, pixelRatio)
+                : 0.0,
+          ),
+          child: bloc,
+        );
+      }
+    }
+
+    if (style.backgroundColor != null)
+      bloc = DecoratedBox(
+        decoration: BoxDecoration(
+          color: (style.backgroundColor != null)
+              ? HexColor.fromHex(style.backgroundColor!)
+              : null,
+        ),
+        child: bloc,
+      );
+
+    return bloc;
+  }
+}
+
+class TextWidget extends StatelessWidget {
+  const TextWidget({
+    super.key,
+    required this.text,
+    required this.style,
+  });
+
+  final String? text;
+  final CssStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text!,
+      textAlign: switch (style.textAlign) {
+        "left" => TextAlign.left,
+        "center" => TextAlign.center,
+        _ => TextAlign.left
+      },
+      style: TextStyle(
+        height: style.lineHeight,
+        fontSize: (style.fontSize != null)
+            // TODO : why we can use logical pixel here and not for margin?
+            ? FontSize(value: style.fontSize!).getValue(16, 1)
+            : null,
+        decoration: (style.textDecoration == "underline")
+            ? TextDecoration.underline
+            : null,
+        fontWeight: switch (style.fontWeight) {
+          "bold" || "700" => FontWeight.bold,
+          _ => null,
+        },
+        color: (style.textColor != null)
+            ? HexColor.fromHex(style.textColor!)
+            : null,
+      ),
+    );
   }
 }

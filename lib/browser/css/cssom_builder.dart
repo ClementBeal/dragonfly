@@ -13,8 +13,11 @@ class CSSOM {
     ..addChild(CSSOM("head", CssStyle.initial()))
     ..addChild(
       CSSOM("body", CssStyle.body())
-        ..addChild(CSSOM("h1", CssStyle.h1()))
         ..addChild(CSSOM("a", CssStyle.a()))
+        ..addChild(CSSOM("ul", CssStyle.ul()))
+        ..addChild(CSSOM("div", CssStyle.div()))
+        ..addChild(CSSOM("p", CssStyle.p()))
+        ..addChild(CSSOM("h1", CssStyle.h1()))
         ..addChild(CSSOM("h2", CssStyle.h2()))
         ..addChild(CSSOM("h3", CssStyle.h3())),
     );
@@ -55,11 +58,13 @@ class CSSOM {
 
   // Recursive helper function for pretty-printing the tree
   String _toStringHelper(CSSOM node, String prefix) {
-    String result = "$prefix${node.data}\n";
+    String result = "${node.htmlTag}\n$prefix${node.data}\n";
+
     for (int i = 0; i < node.children.length; i++) {
       result += _toStringHelper(node.children[i],
           "$prefix${i == node.children.length - 1 ? "└── " : "├── "}");
     }
+
     return result;
   }
 }
@@ -68,15 +73,7 @@ class CssomBuilder {
   CSSOM parse(String css) {
     final document = CssParser(css).parse();
 
-    final tree = CSSOM("html", CssStyle.initial())
-      ..addChild(CSSOM("head", CssStyle.initial()))
-      ..addChild(
-        CSSOM("body", CssStyle.body())
-          ..addChild(CSSOM("h1", CssStyle.h1()))
-          ..addChild(CSSOM("a", CssStyle.a()))
-          ..addChild(CSSOM("h2", CssStyle.h2()))
-          ..addChild(CSSOM("h3", CssStyle.h3())),
-      );
+    final tree = CSSOM.initial();
 
     for (var rule in document.rules) {
       final tag = rule.selector;
@@ -98,17 +95,29 @@ class CssomBuilder {
           }
         } else if (declaration.property == "max-width") {
           newTheme.maxWidth = declaration.value;
+        } else if (declaration.property == "padding") {
+          final tokens = declaration.value.split(" ");
+          if (tokens.length == 2) {
+            newTheme.paddingTop = tokens[0];
+            newTheme.paddingBottom = tokens[0];
+            newTheme.paddingLeft = tokens[1];
+            newTheme.paddingRight = tokens[1];
+          }
+        } else if (declaration.property == "text-align") {
+          newTheme.textAlign = declaration.value;
+        } else if (declaration.property == "font-size") {
+          newTheme.fontSize = declaration.value;
+        } else if (declaration.property == "font-weight") {
+          newTheme.fontWeight = declaration.value;
         }
       }
 
       final style = tree.find(tag);
 
-      print(tag);
-
       if (style == null) {
-        tree.addChild(CSSOM(tag, CssStyle.initial()..merge(newTheme)));
+        tree.addChild(CSSOM(tag, newTheme));
       } else {
-        style.data.merge(newTheme);
+        style.data.mergeClass(newTheme);
       }
     }
 
@@ -127,14 +136,24 @@ class CssStyle {
     this.lineHeight,
     this.backgroundColor,
     this.textColor,
-    this.fontSize = "16px",
+    this.fontSize,
+    this.fontWeight,
+    this.textDecoration,
+    this.textAlign,
+    this.listStyleType,
+    this.paddingTop,
+    this.paddingBottom,
+    this.paddingLeft,
+    this.paddingRight,
+    this.maxWidth,
+    this.maxHeight,
+    this.isCentered,
   });
 
   CssStyle.initial()
       : lineHeight = 1.0,
         backgroundColor = null,
-        textColor = "#000000",
-        fontSize = "12px";
+        fontSize = "16px";
 
   CssStyle.body()
       : marginBottom = "8px",
@@ -157,10 +176,18 @@ class CssStyle {
         marginRight = "1rem",
         fontSize = "1.17rem";
   CssStyle.a()
-      : marginLeft = "1rem",
-        marginRight = "1rem",
-        textColor = "#00F",
+      : textColor = "#00F",
         textDecoration = "underline";
+  CssStyle.p()
+      : textColor = "#000000",
+        marginTop = "1em",
+        marginBottom = "1em";
+  CssStyle.ul()
+      : listStyleType = "disc",
+        marginTop = "1em",
+        marginBottom = "1em",
+        paddingLeft = "40px";
+  CssStyle.div();
 
   double? lineHeight;
   String? backgroundColor;
@@ -169,12 +196,18 @@ class CssStyle {
   String? marginBottom;
   String? marginLeft;
   String? marginRight;
+  String? paddingTop;
+  String? paddingBottom;
+  String? paddingLeft;
+  String? paddingRight;
   String? maxWidth;
   String? maxHeight;
   bool? isCentered;
   String? fontSize;
   String? fontWeight;
   String? textDecoration;
+  String? textAlign;
+  String? listStyleType;
 
   CssStyle copyWith({
     double? lineHeight,
@@ -189,15 +222,51 @@ class CssStyle {
     );
   }
 
+  CssStyle clone() {
+    return CssStyle(
+      marginTop: marginTop,
+      marginBottom: marginBottom,
+      marginLeft: marginLeft,
+      marginRight: marginRight,
+      lineHeight: lineHeight,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      textDecoration: textDecoration,
+      textAlign: textAlign,
+      listStyleType: listStyleType,
+      paddingTop: paddingTop,
+      paddingBottom: paddingBottom,
+      paddingLeft: paddingLeft,
+      paddingRight: paddingRight,
+      maxWidth: maxWidth,
+      maxHeight: maxHeight,
+      isCentered: isCentered,
+    );
+  }
+
   void merge(CssStyle newTheme) {
     lineHeight = newTheme.lineHeight ?? lineHeight;
-    backgroundColor = newTheme.backgroundColor ?? backgroundColor;
     textColor = newTheme.textColor ?? textColor;
+    textDecoration = newTheme.textDecoration ?? textDecoration;
+    textAlign = newTheme.textAlign ?? textAlign;
+    fontWeight = newTheme.fontWeight ?? fontWeight;
+    fontSize = newTheme.fontSize ?? fontSize;
+  }
+
+  void mergeClass(CssStyle newTheme) {
+    merge(newTheme);
+    backgroundColor = newTheme.backgroundColor ?? backgroundColor;
     marginTop = newTheme.marginTop ?? marginTop;
     marginBottom = newTheme.marginBottom ?? marginBottom;
     marginLeft = newTheme.marginLeft ?? marginLeft;
     marginRight = newTheme.marginRight ?? marginRight;
-    textDecoration = newTheme.textDecoration ?? textDecoration;
+    paddingTop = newTheme.paddingTop ?? paddingTop;
+    paddingBottom = newTheme.paddingBottom ?? paddingBottom;
+    paddingLeft = newTheme.paddingLeft ?? paddingLeft;
+    paddingRight = newTheme.paddingRight ?? paddingRight;
+    maxWidth = newTheme.maxWidth ?? maxWidth;
   }
 
   @override
@@ -211,7 +280,13 @@ marginLeft: $marginLeft
 marginBottom: $marginBottom
 marginRight: $marginRight
 marginTop: $marginTop
+paddingLeft: $paddingLeft
+paddingBottom: $paddingBottom
+paddingRight: $paddingRight
+paddingTop: $paddingTop
 textDecoration: $textDecoration
+textAlign: $textAlign
+maxWidth: $maxWidth
 """;
   }
 }
