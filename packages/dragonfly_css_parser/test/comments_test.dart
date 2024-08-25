@@ -50,8 +50,17 @@ void main() {
       expect(result.rules[0].selector, "body");
       expect(result.rules[0].declarations.isEmpty, true);
     });
-    test('Single line commentright after a rule', () {
+    test('Single line comment right after a rule', () {
       final css = "body {}// another comment";
+      final result = cssParser.parse(css);
+
+      expect(result.rules.length, 1);
+      expect(result.rules[0].selector, "body");
+      expect(result.rules[0].declarations.isEmpty, true);
+    });
+
+    test('Single line in a rule\'s declaration', () {
+      final css = "body {// another comment}";
       final result = cssParser.parse(css);
 
       expect(result.rules.length, 1);
