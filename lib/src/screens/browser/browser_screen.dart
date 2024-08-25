@@ -96,21 +96,22 @@ class DomWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final data = domNode.data;
     final children = domNode.children;
-    final style = CSSOMProvider.of(context)!
-            .cssom
-            .find(switch (data) {
-              UlNode() => "ul",
-              BodyNode() => "body",
-              DivNode() => "div",
-              H1Node() => "h1",
-              H2Node() => "h2",
-              H3Node() => "h3",
-              ANode() => "a",
-              PNode() => "p",
-              _ => "body",
-            })
-            ?.data ??
-        CssStyle.initial();
+    final style = (CSSOMProvider.of(context)!
+                .cssom
+                .find(switch (data) {
+                  UlNode() => "ul",
+                  BodyNode() => "body",
+                  DivNode() => "div",
+                  H1Node() => "h1",
+                  H2Node() => "h2",
+                  H3Node() => "h3",
+                  ANode() => "a",
+                  PNode() => "p",
+                  _ => "body",
+                })
+                ?.data ??
+            CssStyle.initial())
+        .clone();
 
     if (parentStyle != null) {
       style.inheritFromParent(parentStyle!);
@@ -137,7 +138,8 @@ class DomWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.circle, size: 8),
+            // const Icon(Icons.circle, size: 8),
+            // Text("stp")
             ...children.map((e) => DomWidget(e)),
           ],
         ),
@@ -184,6 +186,7 @@ class DomWidget extends StatelessWidget {
       FooterNode() ||
       HtmlNode() ||
       BodyNode() ||
+      PreNode() ||
       NavNode() =>
         BlockNode(
           text: null,
@@ -271,43 +274,28 @@ class BlockNode extends StatelessWidget {
         ? FontSize(value: style.fontSize!).getValue(16, 0.0, 1)
         : null;
 
-    Widget bloc = Flex(
-      direction: switch (display) {
-        "inline-block" => Axis.horizontal,
-        _ => Axis.vertical,
-      },
-      crossAxisAlignment: switch (display) {
-        "inline-block" => CrossAxisAlignment.start,
-        _ => CrossAxisAlignment.stretch,
-      },
-      mainAxisSize: switch (display) {
-        "inline-block" => MainAxisSize.min,
-        _ => MainAxisSize.max,
-      },
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        if (text != null) TextWidget(text: text, style: style),
-        ...children,
-      ],
-    );
-
-    if (style.maxWidth != null) {
-      bloc = ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: (style.maxWidth != null)
-              ? FontSize(value: style.maxWidth!)
-                  .getValue(16, fontSize ?? 0.0, 1)
-              : double.infinity,
+    // if (style.backgroundColor != null || style.borderLeft!=null)
+    final bloc = DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(
+          left: parseBorderSide(style.borderLeft ?? style.border),
+          right: parseBorderSide(style.borderRight ?? style.border),
+          top: parseBorderSide(style.borderTop ?? style.border),
+          bottom: parseBorderSide(style.borderBottom ?? style.border),
         ),
-        child: bloc,
-      );
-    }
-
-    if (style.paddingBottom != null ||
-        style.paddingLeft != null ||
-        style.paddingTop != null ||
-        style.paddingRight != null) {
-      bloc = Padding(
+        borderRadius: (style.borderRadius != null)
+            ? BorderRadius.all(
+                Radius.circular(
+                  FontSize(value: style.borderRadius!)
+                      .getValue(16, fontSize ?? 0.0, 1),
+                ),
+              )
+            : null,
+        color: (style.backgroundColor != null)
+            ? HexColor.fromHex(style.backgroundColor!)
+            : null,
+      ),
+      child: Padding(
         padding: EdgeInsets.only(
           bottom: (style.paddingBottom != null && style.paddingBottom != "0")
               ? FontSize(value: style.paddingBottom!)
@@ -326,9 +314,63 @@ class BlockNode extends StatelessWidget {
                   .getValue(16, fontSize ?? 0.0, pixelRatio)
               : 0.0,
         ),
-        child: bloc,
-      );
-    }
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: (style.maxWidth != null)
+                ? FontSize(value: style.maxWidth!)
+                    .getValue(16, fontSize ?? 0.0, 1)
+                : double.infinity,
+            minHeight: (style.minHeight != null)
+                ? FontSize(value: style.minHeight!)
+                    .getValue(16, fontSize ?? 0.0, 1)
+                : 0.0,
+          ),
+          child: switch (display) {
+            "grid" => GridView.count(
+                shrinkWrap: true,
+                crossAxisSpacing: (style.gap != null)
+                    ? FontSize(value: style.gap!).getValue(16, 16, 1)
+                    : 0,
+                mainAxisSpacing: (style.gap != null)
+                    ? FontSize(value: style.gap!).getValue(16, 16, 1)
+                    : 0,
+                crossAxisCount: 3,
+                children: <Widget>[
+                  if (text != null) TextWidget(text: text, style: style),
+                  ...children,
+                ],
+              ),
+            _ => Flex(
+                direction: switch (display) {
+                  "inline-block" => Axis.horizontal,
+                  // "flex" => Axis.horizontal,
+                  _ => Axis.vertical,
+                },
+                crossAxisAlignment: switch (display) {
+                  "inline-block" => CrossAxisAlignment.start,
+                  _ => CrossAxisAlignment.stretch,
+                },
+                mainAxisSize: switch (display) {
+                  "inline-block" => MainAxisSize.min,
+                  _ => MainAxisSize.max,
+                },
+                mainAxisAlignment: switch (display) {
+                  "inline-block" => MainAxisAlignment.start,
+                  "flex" => switch (style.justifyContent) {
+                      "center" => MainAxisAlignment.center,
+                      _ => MainAxisAlignment.start
+                    },
+                  _ => MainAxisAlignment.start,
+                },
+                children: [
+                  if (text != null) TextWidget(text: text, style: style),
+                  ...children,
+                ],
+              ),
+          },
+        ),
+      ),
+    );
 
     if (style.marginBottom != null ||
         style.marginLeft != null ||
@@ -338,13 +380,12 @@ class BlockNode extends StatelessWidget {
           style.marginLeft == "auto" &&
           style.marginTop == "auto" &&
           style.marginRight == "auto") {
-        bloc = Align(
+        return Align(
           alignment: Alignment.center,
           child: bloc,
         );
       } else {
-        print("margin bottom -> ${style.marginBottom}");
-        bloc = Container(
+        return Container(
           margin: EdgeInsets.only(
             bottom: (style.marginBottom != null &&
                     style.marginBottom != "0" &&
@@ -376,33 +417,12 @@ class BlockNode extends StatelessWidget {
       }
     }
 
-    // if (style.backgroundColor != null || style.borderLeft!=null)
-    bloc = DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border(
-          left: (style.borderLeft != null)
-              ? parseBorderSide(style.borderLeft!)
-              : BorderSide.none,
-        ),
-        borderRadius: (style.borderRadius != null)
-            ? BorderRadius.all(
-                Radius.circular(
-                  FontSize(value: style.borderRadius!)
-                      .getValue(16, fontSize ?? 0.0, 1),
-                ),
-              )
-            : null,
-        color: (style.backgroundColor != null)
-            ? HexColor.fromHex(style.backgroundColor!)
-            : null,
-      ),
-      child: bloc,
-    );
-
     return bloc;
   }
 
-  BorderSide parseBorderSide(String borderString) {
+  BorderSide parseBorderSide(String? borderString) {
+    if (borderString == null) return BorderSide.none;
+
     final parts = borderString.split(' ');
 
     final width = FontSize(value: parts[0]).getValue(16, 0, 1);
@@ -460,6 +480,7 @@ class TextWidget extends StatelessWidget {
             : null,
         fontWeight: switch (style.fontWeight) {
           "bold" || "700" => FontWeight.bold,
+          "400" => FontWeight.w400,
           _ => null,
         },
         color: (style.textColor != null)

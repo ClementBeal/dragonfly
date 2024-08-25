@@ -30,6 +30,13 @@ class Rule {
   final List<Declaration> declarations;
 
   Rule(this.selector, this.declarations);
+
+  Rule copyWith({String? selector, List<Declaration>? declarations}) {
+    return Rule(
+      selector ?? this.selector,
+      declarations ?? this.declarations,
+    );
+  }
 }
 
 class StyleSheet {
@@ -122,7 +129,20 @@ class CssParser {
           var char = css[i++];
 
           if (char == "}") {
-            if (currentRule != null) styleSheet.rules.add(currentRule);
+            if (currentRule != null) {
+              // if we have a selector like "h1, h2, h3, h4"
+              if (currentRule.selector.contains(",")) {
+                final tags = currentRule.selector.split(",").map(
+                      (e) => e.trim(),
+                    );
+
+                for (var tag in tags) {
+                  styleSheet.rules.add(currentRule.copyWith(selector: tag));
+                }
+              } else {
+                styleSheet.rules.add(currentRule);
+              }
+            }
             state = CssParserState.nothing;
           } else if (char != " " && char != "\n") {
             i--;

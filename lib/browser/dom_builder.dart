@@ -147,6 +147,9 @@ class DomBuilder {
     } else if (element.localName == "p") {
       node = PNode(element.text,
           attributes: element.attributes, classes: element.classes.toList());
+    } else if (element.localName == "pre") {
+      node = PreNode(element.text,
+          attributes: element.attributes, classes: element.classes.toList());
     } else if (element.localName == "link") {
       node = LinkNode(attributes: element.attributes);
     } else {

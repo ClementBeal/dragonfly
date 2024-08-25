@@ -34,14 +34,12 @@ class FontSize {
   }
 
   double getValue(double rootFontSize, double currentFontSize, int pixelRatio) {
-    // print("${type} => $size $pixelRatio");
     final value = switch (type) {
       FontSizeType.px => size / pixelRatio,
       FontSizeType.rem => rootFontSize * size,
       FontSizeType.em => currentFontSize * size,
     };
 
-    // print(value);
     return value;
   }
 }

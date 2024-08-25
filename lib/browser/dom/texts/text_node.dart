@@ -19,3 +19,7 @@ class StrongNode extends DomNode {
 class PNode extends DomNode {
   PNode(super.text, {required super.attributes, required super.classes});
 }
+
+class PreNode extends DomNode {
+  PreNode(super.text, {required super.attributes, required super.classes});
+}

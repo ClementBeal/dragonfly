@@ -67,6 +67,13 @@ class CSSOM {
 
     return result;
   }
+
+  void visit(Function(CSSOM node) onVisit) {
+    onVisit(this);
+    for (var child in children) {
+      child.visit(onVisit);
+    }
+  }
 }
 
 class CssomBuilder {
@@ -87,7 +94,14 @@ class CssomBuilder {
         } else if (declaration.property == "text-decoration") {
           newTheme.textDecoration = declaration.value;
         } else if (declaration.property == "margin") {
-          if (declaration.value == "auto") {
+          final tokens = declaration.value.split(" ");
+
+          if (tokens.length == 1 && declaration.value == "auto") {
+            newTheme.marginBottom = declaration.value;
+            newTheme.marginLeft = declaration.value;
+            newTheme.marginTop = declaration.value;
+            newTheme.marginRight = declaration.value;
+          } else if (tokens.length == 1) {
             newTheme.marginBottom = declaration.value;
             newTheme.marginLeft = declaration.value;
             newTheme.marginTop = declaration.value;
@@ -129,19 +143,37 @@ class CssomBuilder {
           newTheme.marginTop = declaration.value;
         } else if (declaration.property == "margin-bottom") {
           newTheme.marginBottom = declaration.value;
+        } else if (declaration.property == "gap") {
+          newTheme.gap = declaration.value;
+        } else if (declaration.property == "border") {
+          newTheme.border = declaration.value;
+        } else if (declaration.property == "justify-content") {
+          newTheme.justifyContent = declaration.value;
+        } else if (declaration.property == "align-items") {
+          newTheme.alignItems = declaration.value;
+        } else if (declaration.property == "min-height") {
+          newTheme.minHeight = declaration.value;
         }
       }
 
-      final style = tree.find(tag);
-
-      if (style == null) {
-        tree.addChild(CSSOM(tag, newTheme));
+      if (tag == "*") {
+        print("le star");
+        tree.visit((node) => node.data.mergeClass(newTheme));
       } else {
-        style.data.mergeClass(newTheme);
+        final style = tree.find(tag);
+        final styleClass = tree.find(".$tag");
+
+        if (style == null) {
+          tree.addChild(CSSOM(tag, newTheme));
+        } else if (styleClass != null) {
+          styleClass.data.merge(newTheme);
+        } else {
+          style.data.mergeClass(newTheme);
+        }
       }
     }
 
-    print(tree);
+    // print(tree);
 
     return tree;
   }
@@ -168,6 +200,17 @@ class CssStyle {
     this.maxWidth,
     this.maxHeight,
     this.isCentered,
+    this.display,
+    this.borderRadius,
+    this.borderLeft,
+    this.borderRight,
+    this.borderTop,
+    this.borderBottom,
+    this.gap,
+    this.border,
+    this.justifyContent,
+    this.alignItems,
+    this.minHeight,
   });
 
   CssStyle.initial()
@@ -234,6 +277,11 @@ class CssStyle {
   String? borderRight;
   String? borderTop;
   String? borderBottom;
+  String? gap;
+  String? border;
+  String? justifyContent;
+  String? alignItems;
+  String? minHeight;
 
   CssStyle copyWith({
     double? lineHeight,
@@ -244,7 +292,6 @@ class CssStyle {
       lineHeight: lineHeight ?? this.lineHeight,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       textColor: textColor ?? this.textColor,
-      // margin: margin ?? this.margin,
     );
   }
 
@@ -260,15 +307,20 @@ class CssStyle {
   void mergeClass(CssStyle newTheme) {
     merge(newTheme);
     backgroundColor = newTheme.backgroundColor ?? backgroundColor;
+
     marginTop = newTheme.marginTop ?? marginTop;
     marginBottom = newTheme.marginBottom ?? marginBottom;
     marginLeft = newTheme.marginLeft ?? marginLeft;
     marginRight = newTheme.marginRight ?? marginRight;
+
     paddingTop = newTheme.paddingTop ?? paddingTop;
     paddingBottom = newTheme.paddingBottom ?? paddingBottom;
     paddingLeft = newTheme.paddingLeft ?? paddingLeft;
     paddingRight = newTheme.paddingRight ?? paddingRight;
+
     maxWidth = newTheme.maxWidth ?? maxWidth;
+    minHeight = newTheme.minHeight ?? minHeight;
+
     display = newTheme.display ?? display;
     borderRadius = newTheme.borderRadius ?? borderRadius;
 
@@ -276,6 +328,11 @@ class CssStyle {
     borderRight = newTheme.borderRight ?? borderRight;
     borderTop = newTheme.borderTop ?? borderTop;
     borderBottom = newTheme.borderBottom ?? borderBottom;
+    border = newTheme.border ?? border;
+
+    gap = newTheme.gap ?? gap;
+    justifyContent = newTheme.justifyContent ?? justifyContent;
+    alignItems = newTheme.alignItems ?? alignItems;
   }
 
   void inheritFromParent(CssStyle newTheme) {
@@ -311,6 +368,46 @@ borderLeft: $borderLeft
 borderRight: $borderRight
 borderTop: $borderTop
 borderBottom: $borderBottom
+gap: $gap
+border: $border
+justifyContent: $justifyContent
+alignItmes: $alignItems
+minHeight: $minHeight
 """;
+  }
+
+  CssStyle clone() {
+    return CssStyle(
+      marginTop: marginTop,
+      marginBottom: marginBottom,
+      marginLeft: marginLeft,
+      marginRight: marginRight,
+      lineHeight: lineHeight,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      textDecoration: textDecoration,
+      textAlign: textAlign,
+      listStyleType: listStyleType,
+      paddingTop: paddingTop,
+      paddingBottom: paddingBottom,
+      paddingLeft: paddingLeft,
+      paddingRight: paddingRight,
+      maxWidth: maxWidth,
+      maxHeight: maxHeight,
+      isCentered: isCentered,
+      display: display,
+      borderRadius: borderRadius,
+      borderLeft: borderLeft,
+      borderRight: borderRight,
+      borderTop: borderTop,
+      borderBottom: borderBottom,
+      gap: gap,
+      border: border,
+      justifyContent: justifyContent,
+      alignItems: alignItems,
+      minHeight: minHeight,
+    );
   }
 }

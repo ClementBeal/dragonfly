@@ -1,13 +1,14 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   font-family: "Roboto", sans-serif;
   line-height: 1.6;
   background-color: #f4f4f4;
   color: #333;
-}
-
-a {
-  color: #333;
-  text-decoration: none;
 }
 
 .container {
@@ -17,16 +18,67 @@ a {
   padding: 0 2rem;
 }
 
-.footer {
-  background-color: #333;
-  color: #fff;
+a {
+  color: #333;
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 400;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.header {
+  background-color: #fff;
   padding: 1rem 0;
-  text-align: center;
+}
+
+.main-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.main-nav ul {
+  display: flex;
+}
+
+.main-nav li {
+  margin-left: 3rem;
 }
 
 .logo {
   font-size: 2rem;
   font-weight: 700;
+}
+
+.hero {
+  background: url("hero-image.jpg") no-repeat center center/cover;
+  color: #fff;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.hero .container {
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  margin-bottom: 2rem;
 }
 
 .btn {
@@ -36,6 +88,36 @@ a {
   color: #fff;
   border-radius: 5px;
   transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #0069d9;
+}
+
+.features {
+  padding: 4rem 0;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.feature {
+  text-align: center;
+  padding: 2rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.feature i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.feature h3 {
+  margin-bottom: 0.5rem;
 }
 
 .testimonials {
@@ -48,4 +130,16 @@ a {
   padding: 2rem;
   border-left: 5px solid #007bff;
   margin-bottom: 2rem;
+}
+
+.testimonial .author {
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.footer {
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 1rem 0;
 }
