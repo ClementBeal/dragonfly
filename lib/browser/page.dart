@@ -178,6 +178,10 @@ class ErrorResponse extends Response {
   });
 }
 
+class FileSuccess extends Response {
+  FileSuccess({required super.uri, required super.title});
+}
+
 Future<Response> getHttp(Uri uri) async {
   try {
     final page = await http.get(

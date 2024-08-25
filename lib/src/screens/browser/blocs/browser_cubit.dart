@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:path/path.dart' as p;
 import 'package:dragonfly/browser/dom/html_node.dart';
 import 'package:dragonfly/browser/dom_builder.dart';
 import 'package:dragonfly/browser/page.dart';
@@ -46,6 +49,21 @@ class BrowserCubit extends Cubit<BrowserState> {
           currentTabId: 0,
         ),
       );
+    }
+
+    if (uri.scheme == "file") {
+      final r = FileSuccess(
+        uri: uri,
+        title: p.basename(uri.toFilePath()),
+      );
+
+      final newTabs = [...state.tabs];
+
+      newTabs[state.currentTabId].addPage(r);
+
+      emit(state.copyWith(tabs: newTabs));
+
+      return;
     }
 
     final response = await getHttp(uri);

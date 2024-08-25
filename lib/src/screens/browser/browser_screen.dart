@@ -10,6 +10,7 @@ import 'package:dragonfly/browser/page.dart';
 import 'package:dragonfly/src/screens/browser/browser_theme.dart';
 import 'package:dragonfly/src/screens/browser/errors/cant_find_page.dart';
 import 'package:dragonfly/src/screens/browser/helpers/color_utils.dart';
+import 'package:dragonfly/src/screens/browser/pages/file_special_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -52,9 +53,16 @@ class BrowserScreen extends StatelessWidget {
           }
 
           return switch (tab.currentResponse) {
+            FileSuccess m => FileSpecialPage(uri: m.uri),
             Success m => Builder(builder: (context) {
                 if (m.uri.scheme == "view-source") {
-                  return Text.rich(htmlHighlighter.highlight(m.sourceCode));
+                  return SingleChildScrollView(
+                      child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text.rich(htmlHighlighter.highlight(m.sourceCode)),
+                    ],
+                  ));
                 }
 
                 if (m.theme == null) {
