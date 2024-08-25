@@ -1,4 +1,4 @@
-import 'package:dragonfly/browser/css/css_parser.dart';
+import 'package:dragonfly_css_parser/dragonfly_css_parser.dart';
 
 class CSSOM {
   String htmlTag;
@@ -79,7 +79,7 @@ class CSSOM {
 
 class CssomBuilder {
   CSSOM parse(String css) {
-    final document = CssParser(css).parse();
+    final document = CssParser().parse(css);
 
     final tree = CSSOM.initial();
 

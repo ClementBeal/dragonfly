@@ -1,0 +1,4 @@
+# melos_managed_dependency_overrides: dragonfly_css_parser
+dependency_overrides:
+  dragonfly_css_parser:
+    path: ../../packages/dragonfly_css_parser

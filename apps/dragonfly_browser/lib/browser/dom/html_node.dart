@@ -1,5 +1,3 @@
-import 'package:dragonfly/browser/css/css_theme.dart';
-
 part 'blocks/structure_node.dart';
 part 'texts/organisation_node.dart';
 part 'texts/header_node.dart';

@@ -3,4 +3,5 @@
 /// More dartdocs go here.
 library;
 
-export 'src/css_parser.dart' show CssParser, Rule, Declaration;
+export 'src/css_parser.dart' show CssParser;
+export 'src/stylesheet.dart' show StyleSheet, Rule, Declaration;

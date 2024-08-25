@@ -1,14 +1,12 @@
 name: dragonfly_css_parser
 description: A starting point for Dart libraries or applications.
-version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+version: 0.0.1
 
 environment:
   sdk: ^3.6.0-149.3.beta
 
-# Add regular dependencies here.
 dependencies:
-  # path: ^1.8.0
+  petitparser: ^6.0.2
 
 dev_dependencies:
   lints: ^4.0.0

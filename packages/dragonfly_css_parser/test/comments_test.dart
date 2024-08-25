@@ -60,7 +60,7 @@ void main() {
     });
 
     test('Single line in a rule\'s declaration', () {
-      final css = "body {// another comment}";
+      final css = "body {// another comment\n}";
       final result = cssParser.parse(css);
 
       expect(result.rules.length, 1);

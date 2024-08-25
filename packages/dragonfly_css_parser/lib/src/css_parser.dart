@@ -1,183 +1,111 @@
-enum CssParserState {
-  nothing,
-  selector,
-  selectorEmpty,
-  selectorParsing,
-  singleComment,
-  multiComment,
-  finish,
-  parseDeclaration,
+import 'package:dragonfly_css_parser/dragonfly_css_parser.dart';
+import 'package:petitparser/petitparser.dart';
+
+class CSSParserException implements Exception {
+  String message;
+
+  CSSParserException(this.message);
 }
 
-class Declaration {
-  final String property;
-  final String value;
+class CssGrammar extends GrammarDefinition {
+  @override
+  Parser start() => ref0(term).end();
 
-  Declaration(this.property, this.value);
+  Parser term() => ref0(styleSheet);
+
+  Parser styleSheet() =>
+      (whitespaceOptional() & ref0(rules) & whitespaceOptional()).pick(1);
+
+  Parser rules() => ref0(rule).star();
+  Parser rule() => (ref0(selector) & ref0(declarations));
+
+  Parser declarations() =>
+      char("{") &
+      ref0(whitespaceOptional) &
+      ref0(declaration).star() &
+      ref0(whitespaceOptional) &
+      char("}");
+
+  Parser declaration() =>
+      ref0(property) & ref0(colon) & ref0(propertyValue) & ref0(semicolon);
+  Parser property() => ref0(identifier) & ref0(whitespaceOptional);
+  Parser propertyValue() => digit().plus().flatten();
+
+  Parser colon() => char(':') & ref0(whitespaceOptional);
+  Parser semicolon() => char(';') & ref0(whitespaceOptional);
+
+  Parser selector() => ref0(identifier) & ref0(whitespaceOptional);
+  Parser whitespaceOptional() =>
+      (whitespace() | comment() | multiLineComment()).star();
+
+  Parser identifier() =>
+      (char('.') | letter() | char('-') | digit()).plus().flatten();
+
+  Parser comment() => string("//") & pattern("\n").neg().star();
+  Parser multiLineComment() =>
+      string("/*") &
+      (ref0(multiLineComment) | string('*/').neg()).star() &
+      string("*/");
+}
+
+class CssEvaluator extends CssGrammar {
+  @override
+  Parser styleSheet() => super.styleSheet().map(
+        (value) => StyleSheet(value),
+      );
 
   @override
-  String toString() {
-    return "$property: $value";
-  }
-}
+  Parser rules() => super.rules().castList<Rule>();
 
-class Rule {
-  final String selector;
-  final List<Declaration> declarations;
+  @override
+  Parser rule() => super.rule().map(
+        (value) {
+          return Rule(value[0], value[1]);
+        },
+        // value[1]),
+      );
 
-  Rule(this.selector, this.declarations);
+  @override
+  Parser selector() => super.selector().map(
+        (value) => value[0],
+      );
 
-  Rule copyWith({String? selector, List<Declaration>? declarations}) {
-    return Rule(
-      selector ?? this.selector,
-      declarations ?? this.declarations,
-    );
-  }
-}
+  @override
+  Parser declarations() => super
+      .declarations()
+      .map(
+        (value) => value[2],
+      )
+      .castList<Declaration>();
 
-class StyleSheet {
-  final List<Rule> rules;
+  @override
+  Parser declaration() => super.declaration().map(
+        (value) {
+          print(value[2]);
+          return Declaration(value[0], value[2]);
+        },
+      );
 
-  StyleSheet() : rules = [];
+  @override
+  Parser property() => super.property().map(
+        (value) {
+          return value[0];
+        },
+      );
 }
 
 class CssParser {
-  CssParserState state = CssParserState.nothing;
+  final parser = CssEvaluator();
 
-  StyleSheet parse(String css) {
-    state = CssParserState.nothing;
+  StyleSheet parse(String input) {
+    var result = parser.build().parse(input);
 
-    final styleSheet = StyleSheet();
-    Rule? currentRule;
+    switch (result) {
+      case Success():
+        return result.value as StyleSheet;
 
-    int length = css.length;
-    int i = 0;
-
-    while (i < length && state != CssParserState.finish) {
-      switch (state) {
-        case CssParserState.nothing:
-          final char = css[i++];
-
-          if (char == "/") {
-            final nextChar = css[i++];
-            if (nextChar == "/") {
-              state = CssParserState.singleComment;
-            } else if (nextChar == "*") {
-              state = CssParserState.multiComment;
-            }
-          } else if (char != " " && char != "\n") {
-            state = CssParserState.selector;
-            i--;
-          }
-
-          break;
-        case CssParserState.selector:
-          // capture the selector -> body {font-color: red;}
-          // I capture the "bpdy"
-          final selector = [];
-          var char = css[i++];
-
-          while (char != " ") {
-            selector.add(char);
-            char = css[i++];
-          }
-
-          currentRule = Rule(selector.join(""), []);
-          state = CssParserState.selectorEmpty;
-          break;
-        case CssParserState.selectorEmpty:
-          // between the "body" and the "{"
-          var char = css[i++];
-          while (char != "{") {
-            char = css[i++];
-          }
-
-          state = CssParserState.selectorParsing;
-
-          break;
-        case CssParserState.singleComment:
-          // if we have a single comment of type "//"
-          var char = css[i++];
-          if (char == "\n") {
-            state = CssParserState.nothing;
-          }
-          break;
-        case CssParserState.multiComment:
-          // if we have a multiline comment /* */
-          var char = css[i++];
-
-          if (char == "*") {
-            char = css[i++];
-            if (char == "/") {
-              state = CssParserState.nothing;
-            }
-          }
-          break;
-        case CssParserState.finish:
-          // we're done
-          break;
-        case CssParserState.selectorParsing:
-          // parse the inside of body {}
-          // if it's empty, we go to the next char (next loop iteration)
-          // if we have "}", we're done parsing
-          var char = css[i++];
-
-          if (char == "}") {
-            if (currentRule != null) {
-              // if we have a selector like "h1, h2, h3, h4"
-              if (currentRule.selector.contains(",")) {
-                final tags = currentRule.selector.split(",").map(
-                      (e) => e.trim(),
-                    );
-
-                for (var tag in tags) {
-                  styleSheet.rules.add(currentRule.copyWith(selector: tag));
-                }
-              } else {
-                styleSheet.rules.add(currentRule);
-              }
-            }
-            state = CssParserState.nothing;
-          } else if (char != " " && char != "\n") {
-            i--;
-            state = CssParserState.parseDeclaration;
-          }
-          break;
-        case CssParserState.parseDeclaration:
-          // when we have something like "border: 2px solid red;"
-          // propert name: parse until we have a ":"
-          // then we skip the whitespaces
-          // when we first encounter a char,it's the value
-          // we stop when we reach ";"
-          // and we go bac kto the selector parsing
-          var char = css[i++];
-          final a = [];
-
-          while (char != ":") {
-            a.add(char);
-            char = css[i++];
-          }
-
-          final property = a.join("");
-
-          char = css[i++];
-          while (char == " ") {
-            char = css[i++];
-          }
-
-          a.clear();
-
-          while (char != ";") {
-            a.add(char);
-            char = css[i++];
-          }
-
-          currentRule?.declarations.add(Declaration(property, a.join("")));
-          state = CssParserState.selectorParsing;
-          break;
-      }
+      case Failure():
+        throw CSSParserException(result.message);
     }
-
-    return styleSheet;
   }
 }

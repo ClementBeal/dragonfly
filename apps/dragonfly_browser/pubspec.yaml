@@ -21,6 +21,7 @@ dependencies:
   syntax_highlight: ^0.4.0
   window_manager: ^0.4.2
   xml: ^6.5.0
+  dragonfly_css_parser: ^0.0.1
 
 dev_dependencies:
   flutter_test:
