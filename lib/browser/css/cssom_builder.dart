@@ -109,6 +109,26 @@ class CssomBuilder {
           newTheme.fontSize = declaration.value;
         } else if (declaration.property == "font-weight") {
           newTheme.fontWeight = declaration.value;
+        } else if (declaration.property == "display") {
+          newTheme.display = declaration.value;
+        } else if (declaration.property == "border-radius") {
+          newTheme.borderRadius = declaration.value;
+        } else if (declaration.property == "border-left") {
+          newTheme.borderLeft = declaration.value;
+        } else if (declaration.property == "border-right") {
+          newTheme.borderRight = declaration.value;
+        } else if (declaration.property == "border-top") {
+          newTheme.borderTop = declaration.value;
+        } else if (declaration.property == "border-bottom") {
+          newTheme.borderBottom = declaration.value;
+        } else if (declaration.property == "margin-left") {
+          newTheme.marginLeft = declaration.value;
+        } else if (declaration.property == "margin-right") {
+          newTheme.marginRight = declaration.value;
+        } else if (declaration.property == "margin-top") {
+          newTheme.marginTop = declaration.value;
+        } else if (declaration.property == "margin-bottom") {
+          newTheme.marginBottom = declaration.value;
         }
       }
 
@@ -162,18 +182,18 @@ class CssStyle {
         marginRight = "8px";
   CssStyle.h1()
       : fontWeight = "bold",
-        marginLeft = "0.67rem",
-        marginRight = "0.67rem",
+        marginTop = "0.67rem",
+        marginBottom = "0.67rem",
         fontSize = "2rem";
   CssStyle.h2()
       : fontWeight = "bold",
-        marginLeft = "0.83rem",
-        marginRight = "0.83rem",
+        marginTop = "0.83rem",
+        marginBottom = "0.83rem",
         fontSize = "1.5rem";
   CssStyle.h3()
       : fontWeight = "bold",
-        marginLeft = "1rem",
-        marginRight = "1rem",
+        marginTop = "1rem",
+        marginBottom = "1rem",
         fontSize = "1.17rem";
   CssStyle.a()
       : textColor = "#00F",
@@ -208,6 +228,12 @@ class CssStyle {
   String? textDecoration;
   String? textAlign;
   String? listStyleType;
+  String? display;
+  String? borderRadius;
+  String? borderLeft;
+  String? borderRight;
+  String? borderTop;
+  String? borderBottom;
 
   CssStyle copyWith({
     double? lineHeight,
@@ -219,30 +245,6 @@ class CssStyle {
       backgroundColor: backgroundColor ?? this.backgroundColor,
       textColor: textColor ?? this.textColor,
       // margin: margin ?? this.margin,
-    );
-  }
-
-  CssStyle clone() {
-    return CssStyle(
-      marginTop: marginTop,
-      marginBottom: marginBottom,
-      marginLeft: marginLeft,
-      marginRight: marginRight,
-      lineHeight: lineHeight,
-      backgroundColor: backgroundColor,
-      textColor: textColor,
-      fontSize: fontSize,
-      fontWeight: fontWeight,
-      textDecoration: textDecoration,
-      textAlign: textAlign,
-      listStyleType: listStyleType,
-      paddingTop: paddingTop,
-      paddingBottom: paddingBottom,
-      paddingLeft: paddingLeft,
-      paddingRight: paddingRight,
-      maxWidth: maxWidth,
-      maxHeight: maxHeight,
-      isCentered: isCentered,
     );
   }
 
@@ -267,6 +269,24 @@ class CssStyle {
     paddingLeft = newTheme.paddingLeft ?? paddingLeft;
     paddingRight = newTheme.paddingRight ?? paddingRight;
     maxWidth = newTheme.maxWidth ?? maxWidth;
+    display = newTheme.display ?? display;
+    borderRadius = newTheme.borderRadius ?? borderRadius;
+
+    borderLeft = newTheme.borderLeft ?? borderLeft;
+    borderRight = newTheme.borderRight ?? borderRight;
+    borderTop = newTheme.borderTop ?? borderTop;
+    borderBottom = newTheme.borderBottom ?? borderBottom;
+  }
+
+  void inheritFromParent(CssStyle newTheme) {
+    // inherited only if the rule is not set
+    lineHeight = (lineHeight == null) ? newTheme.lineHeight : lineHeight;
+    textColor = (textColor == null) ? newTheme.textColor : textColor;
+    textDecoration =
+        (textDecoration == null) ? newTheme.textDecoration : textDecoration;
+    textAlign = (textAlign == null) ? newTheme.textAlign : textAlign;
+    fontWeight = (fontWeight == null) ? newTheme.fontWeight : fontWeight;
+    fontSize = (fontSize == null) ? newTheme.fontSize : fontSize;
   }
 
   @override
@@ -287,6 +307,10 @@ paddingTop: $paddingTop
 textDecoration: $textDecoration
 textAlign: $textAlign
 maxWidth: $maxWidth
+borderLeft: $borderLeft
+borderRight: $borderRight
+borderTop: $borderTop
+borderBottom: $borderBottom
 """;
   }
 }

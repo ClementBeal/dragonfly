@@ -113,7 +113,7 @@ class DomWidget extends StatelessWidget {
         CssStyle.initial();
 
     if (parentStyle != null) {
-      style.merge(parentStyle!);
+      style.inheritFromParent(parentStyle!);
     }
 
     // the styles from the classes are not passed to the children
@@ -138,7 +138,7 @@ class DomWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.circle, size: 8),
-            ...children.map((e) => DomWidget(e)).toList(),
+            ...children.map((e) => DomWidget(e)),
           ],
         ),
       OlNode() => Flex(
@@ -265,10 +265,25 @@ class BlockNode extends StatelessWidget {
     // TODO : it works on my machine. Probably not on another one
     // the Mediaquery.devicePixelRatio returns 1 for me when it's 3...
     const pixelRatio = 3;
+    final display = style.display;
+    final fontSize = (style.fontSize != null)
+        // TODO : why we can use logical pixel here and not for margin?
+        ? FontSize(value: style.fontSize!).getValue(16, 0.0, 1)
+        : null;
 
     Widget bloc = Flex(
-      direction: Axis.vertical,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      direction: switch (display) {
+        "inline-block" => Axis.horizontal,
+        _ => Axis.vertical,
+      },
+      crossAxisAlignment: switch (display) {
+        "inline-block" => CrossAxisAlignment.start,
+        _ => CrossAxisAlignment.stretch,
+      },
+      mainAxisSize: switch (display) {
+        "inline-block" => MainAxisSize.min,
+        _ => MainAxisSize.max,
+      },
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         if (text != null) TextWidget(text: text, style: style),
@@ -277,11 +292,11 @@ class BlockNode extends StatelessWidget {
     );
 
     if (style.maxWidth != null) {
-      print("Sip");
       bloc = ConstrainedBox(
         constraints: BoxConstraints(
           maxWidth: (style.maxWidth != null)
-              ? FontSize(value: style.maxWidth!).getValue(16, 1)
+              ? FontSize(value: style.maxWidth!)
+                  .getValue(16, fontSize ?? 0.0, 1)
               : double.infinity,
         ),
         child: bloc,
@@ -295,16 +310,20 @@ class BlockNode extends StatelessWidget {
       bloc = Padding(
         padding: EdgeInsets.only(
           bottom: (style.paddingBottom != null && style.paddingBottom != "0")
-              ? FontSize(value: style.paddingBottom!).getValue(16, pixelRatio)
+              ? FontSize(value: style.paddingBottom!)
+                  .getValue(16, fontSize ?? 0.0, pixelRatio)
               : 0.0,
           left: (style.paddingLeft != null && style.paddingLeft != "0")
-              ? FontSize(value: style.paddingLeft!).getValue(16, pixelRatio)
+              ? FontSize(value: style.paddingLeft!)
+                  .getValue(16, fontSize ?? 0.0, pixelRatio)
               : 0.0,
           top: (style.paddingTop != null && style.paddingTop != "0")
-              ? FontSize(value: style.paddingTop!).getValue(16, pixelRatio)
+              ? FontSize(value: style.paddingTop!)
+                  .getValue(16, fontSize ?? 0.0, pixelRatio)
               : 0.0,
           right: (style.paddingRight != null && style.paddingRight != "0")
-              ? FontSize(value: style.paddingRight!).getValue(16, pixelRatio)
+              ? FontSize(value: style.paddingRight!)
+                  .getValue(16, fontSize ?? 0.0, pixelRatio)
               : 0.0,
         ),
         child: bloc,
@@ -324,19 +343,32 @@ class BlockNode extends StatelessWidget {
           child: bloc,
         );
       } else {
+        print("margin bottom -> ${style.marginBottom}");
         bloc = Container(
           margin: EdgeInsets.only(
-            bottom: (style.marginBottom != null && style.marginBottom != "0")
-                ? FontSize(value: style.marginBottom!).getValue(16, pixelRatio)
+            bottom: (style.marginBottom != null &&
+                    style.marginBottom != "0" &&
+                    style.marginBottom != "auto")
+                ? FontSize(value: style.marginBottom!)
+                    .getValue(16, fontSize ?? 0.0, pixelRatio)
                 : 0.0,
-            left: (style.marginLeft != null && style.marginLeft != "0")
-                ? FontSize(value: style.marginLeft!).getValue(16, pixelRatio)
+            left: (style.marginLeft != null &&
+                    style.marginLeft != "0" &&
+                    style.marginLeft != "auto")
+                ? FontSize(value: style.marginLeft!)
+                    .getValue(16, fontSize ?? 0.0, pixelRatio)
                 : 0.0,
-            top: (style.marginTop != null && style.marginTop != "0")
-                ? FontSize(value: style.marginTop!).getValue(16, pixelRatio)
+            top: (style.marginTop != null &&
+                    style.marginTop != "0" &&
+                    style.marginTop != "auto")
+                ? FontSize(value: style.marginTop!)
+                    .getValue(16, fontSize ?? 0.0, pixelRatio)
                 : 0.0,
-            right: (style.marginRight != null && style.marginRight != "0")
-                ? FontSize(value: style.marginRight!).getValue(16, pixelRatio)
+            right: (style.marginRight != null &&
+                    style.marginRight != "0" &&
+                    style.marginRight != "auto")
+                ? FontSize(value: style.marginRight!)
+                    .getValue(16, fontSize ?? 0.0, pixelRatio)
                 : 0.0,
           ),
           child: bloc,
@@ -344,17 +376,57 @@ class BlockNode extends StatelessWidget {
       }
     }
 
-    if (style.backgroundColor != null)
-      bloc = DecoratedBox(
-        decoration: BoxDecoration(
-          color: (style.backgroundColor != null)
-              ? HexColor.fromHex(style.backgroundColor!)
-              : null,
+    // if (style.backgroundColor != null || style.borderLeft!=null)
+    bloc = DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(
+          left: (style.borderLeft != null)
+              ? parseBorderSide(style.borderLeft!)
+              : BorderSide.none,
         ),
-        child: bloc,
-      );
+        borderRadius: (style.borderRadius != null)
+            ? BorderRadius.all(
+                Radius.circular(
+                  FontSize(value: style.borderRadius!)
+                      .getValue(16, fontSize ?? 0.0, 1),
+                ),
+              )
+            : null,
+        color: (style.backgroundColor != null)
+            ? HexColor.fromHex(style.backgroundColor!)
+            : null,
+      ),
+      child: bloc,
+    );
 
     return bloc;
+  }
+
+  BorderSide parseBorderSide(String borderString) {
+    final parts = borderString.split(' ');
+
+    final width = FontSize(value: parts[0]).getValue(16, 0, 1);
+    final style = parts[1];
+    final color = HexColor.fromHex(parts[2]);
+
+    BorderStyle borderStyle;
+    switch (style) {
+      case 'solid':
+        borderStyle = BorderStyle.solid;
+        break;
+      case 'none':
+        borderStyle = BorderStyle.none;
+        break;
+      default:
+        throw Exception('Unsupported border style: $style');
+    }
+
+    // Return the BorderSide
+    return BorderSide(
+      width: width,
+      style: borderStyle,
+      color: color,
+    );
   }
 }
 
@@ -381,7 +453,7 @@ class TextWidget extends StatelessWidget {
         height: style.lineHeight,
         fontSize: (style.fontSize != null)
             // TODO : why we can use logical pixel here and not for margin?
-            ? FontSize(value: style.fontSize!).getValue(16, 1)
+            ? FontSize(value: style.fontSize!).getValue(16, 0.0, 1)
             : null,
         decoration: (style.textDecoration == "underline")
             ? TextDecoration.underline

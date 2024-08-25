@@ -28,3 +28,24 @@ a {
   font-size: 2rem;
   font-weight: 700;
 }
+
+.btn {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.testimonials {
+  background-color: #f8f8f8;
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.testimonial {
+  padding: 2rem;
+  border-left: 5px solid #007bff;
+  margin-bottom: 2rem;
+}
