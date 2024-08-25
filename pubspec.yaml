@@ -1,31 +1,6 @@
 name: dragonfly
-description: "A new Flutter project."
-publish_to: 'none'
-version: 0.1.0
 
 environment:
-  sdk: ^3.6.0-149.3.beta
-
-dependencies:
-  collection: ^1.19.0
-  csslib: ^1.0.0
-  flutter:
-    sdk: flutter
-  flutter_bloc: ^8.1.6
-  flutter_svg: ^2.0.10+1
-  html: ^0.15.4
-  http: ^1.2.2
-  path: ^1.9.0
-  syntax_highlight: ^0.4.0
-  xml: ^6.5.0
-
+  sdk: '>=3.0.0 <4.0.0'
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^4.0.0
-
-flutter:
-  uses-material-design: true
-
-  assets:
-    - assets/languages/
+  melos: ^6.1.0
