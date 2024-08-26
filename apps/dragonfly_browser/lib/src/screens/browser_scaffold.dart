@@ -30,7 +30,7 @@ class LobbyScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   BrowserTabBar(),
-                  BrowserActionBar(),
+                  SizedBox(height: 50, child: BrowserActionBar()),
                   SizedBox(height: 50, child: FavoriteTabBar()),
                 ],
               ),
@@ -268,6 +268,7 @@ class _SearchBarState extends State<SearchBar> {
       child: TextField(
         controller: _searchController,
         style: const TextStyle(color: Colors.white),
+        textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
           filled: true,
           fillColor: const Color(0xff4f4d4f),
