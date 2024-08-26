@@ -119,6 +119,7 @@ class CssomBuilder {
 
   void _applyMargin(CssStyle style, String value) {
     final tokens = value.split(" ");
+
     if (tokens.length == 1 && value == "auto") {
       style.marginTop = value;
       style.marginBottom = value;
@@ -129,16 +130,47 @@ class CssomBuilder {
       style.marginBottom = value;
       style.marginLeft = value;
       style.marginRight = value;
+    } else if (tokens.length == 2) {
+      style.marginTop = tokens[0];
+      style.marginBottom = tokens[0];
+      style.marginLeft = tokens[1];
+      style.marginRight = tokens[1];
+    } else if (tokens.length == 3) {
+      style.marginTop = tokens[0];
+      style.marginLeft = tokens[1];
+      style.marginRight = tokens[1];
+      style.marginBottom = tokens[2];
+    } else if (tokens.length == 4) {
+      style.marginTop = tokens[0];
+      style.marginRight = tokens[1];
+      style.marginBottom = tokens[2];
+      style.marginLeft = tokens[3];
     }
   }
 
   void _applyPadding(CssStyle style, String value) {
     final tokens = value.split(" ");
-    if (tokens.length == 2) {
+
+    if (tokens.length == 1) {
+      style.paddingTop = value;
+      style.paddingBottom = value;
+      style.paddingLeft = value;
+      style.paddingRight = value;
+    } else if (tokens.length == 2) {
       style.paddingTop = tokens[0];
       style.paddingBottom = tokens[0];
       style.paddingLeft = tokens[1];
       style.paddingRight = tokens[1];
+    } else if (tokens.length == 3) {
+      style.paddingTop = tokens[0];
+      style.paddingLeft = tokens[1];
+      style.paddingRight = tokens[1];
+      style.paddingBottom = tokens[2];
+    } else if (tokens.length == 4) {
+      style.paddingTop = tokens[0];
+      style.paddingRight = tokens[1];
+      style.paddingBottom = tokens[2];
+      style.paddingLeft = tokens[3];
     }
   }
 }
