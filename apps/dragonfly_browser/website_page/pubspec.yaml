@@ -11,6 +11,7 @@ dependencies:
   shelf: ^1.4.0
   shelf_router: ^1.1.0
 
+  shelf_static: any
 dev_dependencies:
   http: ^1.1.0
   lints: ^4.0.0

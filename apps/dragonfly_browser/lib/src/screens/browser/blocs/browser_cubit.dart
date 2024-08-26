@@ -26,11 +26,14 @@ class BrowserCubit extends Cubit<Browser> {
   }
 
   void navigateToPage(String url) {
-    final updatedTab = state.currentTab;
-    print("Go to $url");
-    updatedTab?.navigateTo(url, _onUpdate);
+    if (state.currentTab != null) {
+      final updatedTab = state.currentTab;
+      updatedTab?.navigateTo(url, _onUpdate);
 
-    emit(state.copyWith());
+      emit(state.copyWith());
+    } else {
+      state.openNewTab(url);
+    }
   }
 
   void goBack() {

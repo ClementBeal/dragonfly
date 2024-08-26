@@ -1,12 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:collection/collection.dart';
-import 'package:dragonfly/browser/css/cssom_builder.dart';
-import 'package:dragonfly/browser/dom/html_node.dart';
-import 'package:dragonfly/browser/dom_builder.dart';
-import 'package:http/http.dart' as http;
-
 enum NavigationError {
   cantFindPage("Server not Found");
 
@@ -86,36 +80,6 @@ class Favicon {
     return null; // Not a Base64-encoded favicon
   }
 }
-
-// Future<Response> getHttp(Uri uri) async {
-//   try {
-//     final page = await http.get(
-//       uri,
-//       headers: {
-//         "User-Agent": "DragonFly/1.0",
-//       },
-//     );
-
-//     final dom = DomBuilder().parse(page.body);
-//     final title =
-//         dom.findSubtreesOfType<TitleNode>(dom).firstOrNull?.data as TitleNode;
-
-//     return Success(
-//       uri: uri,
-//       title: (title).title,
-//       favicon: null,
-//       content: dom,
-//       sourceCode: page.body,
-//     )..theme = CSSOM.initial();
-//   } catch (e) {
-//     print(e);
-//     return ErrorResponse(
-//       uri: uri,
-//       error: NavigationError.cantFindPage,
-//       title: NavigationError.cantFindPage.title,
-//     );
-//   }
-// }
 
 // Future<CSSOM> getCSS(Uri uri) async {
 //   final page = await http.get(

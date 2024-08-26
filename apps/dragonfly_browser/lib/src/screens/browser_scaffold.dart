@@ -1,14 +1,12 @@
 import 'dart:io';
 
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
-import 'package:dragonfly/browser/page.dart';
 import 'package:dragonfly/src/screens/browser/browser_screen.dart';
 import 'package:dragonfly/src/screens/favorites/favorite_bar.dart';
 import 'package:dragonfly/src/screens/history/history_screen.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Tab;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:window_manager/window_manager.dart';
 
 class LobbyScreen extends StatelessWidget {
@@ -55,42 +53,46 @@ class BrowserTabBar extends StatelessWidget {
       child: BlocBuilder<BrowserCubit, Browser>(
         builder: (context, state) {
           return Row(
+            mainAxisSize: MainAxisSize.max,
             children: [
-              // Tabs
               Expanded(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: state.tabs.length,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    final tab = state.tabs[index];
-                    final isActive = tab.guid == state.currentTabGuid;
+                child: Row(
+                  children: [
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: state.tabs.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        final tab = state.tabs[index];
+                        final isActive = tab.guid == state.currentTabGuid;
 
-                    return BrowserTab(
-                      tab: tab,
-                      isActive: isActive,
-                      onTap: () {
-                        context.read<BrowserCubit>().switchToTab(tab.guid);
+                        return BrowserTab(
+                          tab: tab,
+                          isActive: isActive,
+                          onTap: () {
+                            context.read<BrowserCubit>().switchToTab(tab.guid);
+                          },
+                          onClose: () {
+                            context.read<BrowserCubit>().closeTab(tab.guid);
+                          },
+                        );
                       },
-                      onClose: () {
-                        context.read<BrowserCubit>().closeTab(tab.guid);
-                      },
-                    );
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: InkWell(
-                  onTap: () => context.read<BrowserCubit>().openNewTab(),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(4.0),
                     ),
-                    padding: const EdgeInsets.all(8.0),
-                    child: const Icon(Icons.add, size: 20),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: InkWell(
+                        onTap: () => context.read<BrowserCubit>().openNewTab(),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            borderRadius: BorderRadius.circular(4.0),
+                          ),
+                          padding: const EdgeInsets.all(8.0),
+                          child: const Icon(Icons.add, size: 20),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const Align(
@@ -143,7 +145,7 @@ class BrowserTab extends StatelessWidget {
                 spacing: 8,
                 children: [
                   if (tab.currentPage?.status == PageStatus.loading)
-                    SizedBox.square(
+                    const SizedBox.square(
                       dimension: 15,
                       child: CircularProgressIndicator(),
                     ),
@@ -165,10 +167,11 @@ class BrowserTab extends StatelessWidget {
                   if (tab.currentPage != null)
                     Expanded(
                       child: Text(
-                        tab.currentPage!.url,
+                        tab.currentPage!.getTitle() ?? "No title",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
+                          color: Colors.white,
                           fontWeight:
                               isActive ? FontWeight.bold : FontWeight.normal,
                         ),

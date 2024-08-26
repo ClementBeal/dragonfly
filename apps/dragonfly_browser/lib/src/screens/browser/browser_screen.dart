@@ -1,9 +1,8 @@
-import 'package:dragonfly/browser/css/css_theme.dart';
-import 'package:dragonfly/browser/css/cssom_builder.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/browser/page.dart';
 import 'package:dragonfly/src/screens/browser/browser_theme.dart';
 import 'package:dragonfly/src/screens/browser/helpers/color_utils.dart';
+import 'package:dragonfly/src/screens/lobby/lobby_screen.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Element;
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,32 +34,26 @@ class BrowserScreen extends StatelessWidget {
         builder: (context, state) {
           final tab = state.currentTab;
 
-          if (tab == null) {
-            return const Center(
-              child: Text("Enter an URL"),
-            );
-          }
-
-          if (tab.currentPage == null) {
-            return SizedBox.shrink();
+          if (tab == null || tab.currentPage == null) {
+            return const LobbyScreen();
           }
 
           final currentPage = tab.currentPage!;
 
           return switch (currentPage.status) {
-            PageStatus.loading => Center(child: CircularProgressIndicator()),
-            PageStatus.error => Center(
+            PageStatus.loading => const Center(child: CircularProgressIndicator()),
+            PageStatus.error => const Center(
                 child: Text("Error"),
               ),
             PageStatus.success => SizedBox.expand(
                 child: SingleChildScrollView(
                   child: CSSOMProvider(
-                    cssom: CSSOM.initial(),
+                    cssom: CssomTree(rules: []),
                     child: (currentPage.document!.body != null)
                         ? DomWidget(
                             currentPage.document!.body!,
                           )
-                        : SizedBox.shrink(),
+                        : const SizedBox.shrink(),
                   ),
                 ),
               )
@@ -82,9 +75,8 @@ class DomWidget extends StatelessWidget {
     final tag = domNode.localName;
     final children = domNode.children;
     final style = switch (tag) {
-      null => CssStyle.initial(),
-      _ =>
-        (CSSOMProvider.of(context)!.cssom.find(tag)?.data ?? CssStyle.initial())
+      null => CssStyle(),
+      _ => (CSSOMProvider.of(context)!.cssom.find(tag)?.style ?? CssStyle())
     }
         .clone();
     if (parentStyle != null) {
@@ -96,7 +88,7 @@ class DomWidget extends StatelessWidget {
 
     for (var className in domNode.classes) {
       final newTheme =
-          CSSOMProvider.of(context)!.cssom.find(".$className")?.data;
+          CSSOMProvider.of(context)!.cssom.find(".$className")?.style;
       if (newTheme != null) {
         style.mergeClass(newTheme);
       }

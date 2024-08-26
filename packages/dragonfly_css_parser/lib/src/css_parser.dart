@@ -5,6 +5,9 @@ class CSSParserException implements Exception {
   String message;
 
   CSSParserException(this.message);
+
+  @override
+  String toString() => message;
 }
 
 class CssGrammar extends GrammarDefinition {

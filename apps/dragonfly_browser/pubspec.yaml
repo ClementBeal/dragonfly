@@ -17,7 +17,6 @@ dependencies:
   sqlite3: ^2.4.6
   syntax_highlight: ^0.4.0
   window_manager: ^0.4.2
-  dragonfly_css_parser: ^0.0.1
   dragonfly_browservault: ^0.0.1
   dragonfly_navigation: ^0.0.1
   intl: ^0.19.0
@@ -34,3 +33,5 @@ flutter:
 
   assets:
     - assets/languages/
+    - assets/lobby/
+    - assets/styles/

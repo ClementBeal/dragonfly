@@ -81,7 +81,7 @@ packages:
     source: path
     version: "1.0.0"
   dragonfly_css_parser:
-    dependency: "direct main"
+    dependency: "direct overridden"
     description:
       path: "../../packages/dragonfly_css_parser"
       relative: true

@@ -1,9 +1,9 @@
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
-import 'package:dragonfly/src/screens/lobby.dart';
+import 'package:dragonfly/src/screens/browser_scaffold.dart';
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
-import 'package:faker/faker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 import 'package:window_manager/window_manager.dart';
@@ -42,8 +42,30 @@ void main() async {
   runApp(const MainApp());
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  @override
+  void initState() {
+    super.initState();
+
+    loadCss();
+  }
+
+  Future<void> loadCss() async {
+    try {
+      final browserCSS =
+          await rootBundle.loadString("assets/styles/browser_style.css");
+      cssomBuilder.loadBrowserStyle(browserCSS);
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +74,7 @@ class MainApp extends StatelessWidget {
         BlocProvider(create: (context) => BrowserCubit()),
       ],
       child: const MaterialApp(
+        title: "Dragonfly",
         debugShowCheckedModeBanner: false,
         home: LobbyScreen(),
       ),

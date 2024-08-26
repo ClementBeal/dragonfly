@@ -1,3 +1,4 @@
+import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
@@ -15,23 +16,34 @@ class Page {
   late final String guid;
   final String url;
   final Document? document;
+  final CssomTree? cssom;
   final PageStatus status;
 
   Page(
       {required this.url,
       required this.document,
       required this.status,
-      String? guid}) {
+      String? guid,
+      required this.cssom}) {
     this.guid = guid ?? Uuid().v4();
   }
 
-  Page copyWith({Document? document, PageStatus? status}) {
+  Page copyWith({
+    Document? document,
+    PageStatus? status,
+    CssomTree? cssom,
+  }) {
     return Page(
       url: url,
       guid: guid,
       document: document ?? this.document,
+      cssom: cssom ?? this.cssom,
       status: status ?? this.status,
     );
+  }
+
+  String? getTitle() {
+    return document?.getElementsByTagName("title").firstOrNull?.text;
   }
 }
 
@@ -54,24 +66,33 @@ class Tab {
     _history.add(
       Page(
         document: null,
+        cssom: null,
         status: PageStatus.loading,
         url: url,
       ),
     );
+    _currentIndex++;
 
     final document = await getHttp(Uri.parse(url));
+    CssomTree? cssom;
+
+    if (document != null) {
+      final linkCssNode =
+          document.querySelectorAll('link[rel="stylesheet"]').firstOrNull;
+      if (linkCssNode != null) {
+        final href = linkCssNode.attributes["href"];
+        cssom = await getCss(Uri.parse(url).replace(path: href));
+      }
+    }
 
     _history.last = Page(
       document: document,
+      cssom: cssom,
       status: (document != null) ? PageStatus.success : PageStatus.error,
       url: url,
     );
 
-    print(_history);
-    _currentIndex++;
-    print(_currentIndex);
-    print(_history.last.document?.outerHtml ?? "lol");
-    print(_history.last.status);
+    onNavigationDone();
   }
 
   void goBack() {
@@ -162,3 +183,22 @@ Future<Document?> getHttp(Uri uri) async {
     return null;
   }
 }
+
+Future<CssomTree?> getCss(Uri uri) async {
+  try {
+    final page = await http.get(
+      uri,
+      headers: {
+        "User-Agent": "DragonFly/1.0",
+      },
+    );
+
+    return cssomBuilder.parse(page.body);
+  } catch (e) {
+    print(e);
+    // TODO : bad error handling but tired of that s***
+    return null;
+  }
+}
+
+final cssomBuilder = CssomBuilder();

@@ -1,8 +1,8 @@
-import 'package:dragonfly/browser/css/cssom_builder.dart';
+import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart';
 
 class CSSOMProvider extends InheritedWidget {
-  final CSSOM cssom;
+  final CssomTree cssom;
 
   const CSSOMProvider({
     super.key,

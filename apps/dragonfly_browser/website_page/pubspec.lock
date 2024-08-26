@@ -263,7 +263,7 @@ packages:
     source: hosted
     version: "1.1.4"
   shelf_static:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: shelf_static
       sha256: a41d3f53c4adf0f57480578c1d61d90342cd617de7fc8077b1304643c2d85c1e
