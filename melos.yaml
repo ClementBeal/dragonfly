@@ -8,3 +8,6 @@ packages:
 scripts:
   analyze:
     exec: dart analyze .
+
+  test:
+    exec: dart test

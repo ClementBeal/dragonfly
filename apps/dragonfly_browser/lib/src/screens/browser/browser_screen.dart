@@ -1,19 +1,14 @@
-import 'dart:ui';
-
 import 'package:dragonfly/browser/css/css_theme.dart';
 import 'package:dragonfly/browser/css/cssom_builder.dart';
-import 'package:dragonfly/browser/dom/html_node.dart';
-import 'package:dragonfly/browser/dom_builder.dart';
-import 'package:dragonfly/main.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/browser/page.dart';
 import 'package:dragonfly/src/screens/browser/browser_theme.dart';
-import 'package:dragonfly/src/screens/browser/errors/cant_find_page.dart';
 import 'package:dragonfly/src/screens/browser/helpers/color_utils.dart';
-import 'package:dragonfly/src/screens/browser/pages/file_special_page.dart';
-import 'package:flutter/material.dart';
+import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:flutter/material.dart' hide Element;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:html/dom.dart' hide Text;
 
 class BrowserScreen extends StatelessWidget {
   const BrowserScreen({super.key});
@@ -30,22 +25,15 @@ class BrowserScreen extends StatelessWidget {
               onPressed: () {
                 final state = context.read<BrowserCubit>().state;
                 final currentTab = state.currentTab;
-
-                // TODO : it will break
-                context.read<BrowserCubit>().addTabAndViewSourceCode(
-                    Uri.parse(
-                        "view-source:${currentTab!.currentResponse!.uri.toString()}"),
-                    (currentTab.currentResponse! as Success).sourceCode);
               },
               label: 'View Source',
             ),
           ],
         );
       },
-      child: BlocBuilder<BrowserCubit, BrowserState>(
+      child: BlocBuilder<BrowserCubit, Browser>(
         builder: (context, state) {
           final tab = state.currentTab;
-          final currentTabId = state.currentTabId;
 
           if (tab == null) {
             return const Center(
@@ -53,41 +41,29 @@ class BrowserScreen extends StatelessWidget {
             );
           }
 
-          return switch (tab.currentResponse) {
-            FileSuccess m => FileSpecialPage(uri: m.uri),
-            Success m => Builder(builder: (context) {
-                if (m.uri.scheme == "view-source") {
-                  return SingleChildScrollView(
-                      child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text.rich(htmlHighlighter.highlight(m.sourceCode)),
-                    ],
-                  ));
-                }
+          if (tab.currentPage == null) {
+            return SizedBox.shrink();
+          }
 
-                if (m.theme == null) {
-                  return const CircularProgressIndicator();
-                }
+          final currentPage = tab.currentPage!;
 
-                return SizedBox.expand(
-                  child: SingleChildScrollView(
-                    child: CSSOMProvider(
-                      cssom: m.theme!,
-                      child: DomWidget(m.content),
-                    ),
-                  ),
-                );
-              }),
-            Loading() => const Center(
-                child: CircularProgressIndicator(),
+          return switch (currentPage.status) {
+            PageStatus.loading => Center(child: CircularProgressIndicator()),
+            PageStatus.error => Center(
+                child: Text("Error"),
               ),
-            ErrorResponse m => switch (m.error) {
-                NavigationError.cantFindPage =>
-                  ServerNotFoundPage(tab: m, tabId: currentTabId),
-              },
-            null => const SizedBox.shrink(),
-            Empty() => const SizedBox.shrink(),
+            PageStatus.success => SizedBox.expand(
+                child: SingleChildScrollView(
+                  child: CSSOMProvider(
+                    cssom: CSSOM.initial(),
+                    child: (currentPage.document!.body != null)
+                        ? DomWidget(
+                            currentPage.document!.body!,
+                          )
+                        : SizedBox.shrink(),
+                  ),
+                ),
+              )
           };
         },
       ),
@@ -98,31 +74,19 @@ class BrowserScreen extends StatelessWidget {
 class DomWidget extends StatelessWidget {
   const DomWidget(this.domNode, {super.key, this.parentStyle});
 
-  final Tree domNode;
+  final Element domNode;
   final CssStyle? parentStyle;
 
   @override
   Widget build(BuildContext context) {
-    final data = domNode.data;
+    final tag = domNode.localName;
     final children = domNode.children;
-    final style = (CSSOMProvider.of(context)!
-                .cssom
-                .find(switch (data) {
-                  UlNode() => "ul",
-                  BodyNode() => "body",
-                  DivNode() => "div",
-                  H1Node() => "h1",
-                  H2Node() => "h2",
-                  H3Node() => "h3",
-                  ANode() => "a",
-                  PNode() => "p",
-                  BlockQuoteNode() => "blockquote",
-                  _ => "body",
-                })
-                ?.data ??
-            CssStyle.initial())
+    final style = switch (tag) {
+      null => CssStyle.initial(),
+      _ =>
+        (CSSOMProvider.of(context)!.cssom.find(tag)?.data ?? CssStyle.initial())
+    }
         .clone();
-
     if (parentStyle != null) {
       style.inheritFromParent(parentStyle!);
     }
@@ -130,7 +94,7 @@ class DomWidget extends StatelessWidget {
     // the styles from the classes are not passed to the children
     // final styleWithClasses = style.clone();
 
-    for (var className in data.classes) {
+    for (var className in domNode.classes) {
       final newTheme =
           CSSOMProvider.of(context)!.cssom.find(".$className")?.data;
       if (newTheme != null) {
@@ -138,18 +102,13 @@ class DomWidget extends StatelessWidget {
       }
     }
 
-    return switch (domNode.data) {
-      UnkownNode() => const SizedBox.shrink(),
-      HeadNode() => const SizedBox.shrink(),
-      TitleNode() => const SizedBox.shrink(),
-      LinkNode() => const SizedBox.shrink(),
-      ImgNode() => Builder(
+    return switch (tag) {
+      "img" => Builder(
           builder: (context) {
-            final image = Favicon(href: data.attributes["src"]!);
-            final alt = data.attributes["alt"];
-            final placeholder = data.attributes["placeholder"];
+            final image = Favicon(href: domNode.attributes["src"]!);
+            final alt = domNode.attributes["alt"];
+            final placeholder = domNode.attributes["placeholder"];
 
-            print(image.type);
             final currentTab = context.read<BrowserCubit>().state.currentTab;
 
             return switch (image.type) {
@@ -160,7 +119,7 @@ class DomWidget extends StatelessWidget {
                     ),
                   ),
                   child: (alt == null)
-                      ? Icon(
+                      ? const Icon(
                           Icons.image,
                           size: 22,
                         )
@@ -180,7 +139,7 @@ class DomWidget extends StatelessWidget {
                           return Text(placeholder ?? "No picture found");
                         },
                       )
-                    : Image.network(currentTab!.currentResponse!.uri
+                    : Image.network(Uri.parse(currentTab!.currentPage!.url)
                         .replace(path: image.href)
                         .toString()),
               FaviconType.svg => SvgPicture.memory(
@@ -191,7 +150,7 @@ class DomWidget extends StatelessWidget {
             };
           },
         ),
-      LiNode(text: var t) => Flex(
+      "li" => Flex(
           direction: Axis.vertical,
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -201,7 +160,7 @@ class DomWidget extends StatelessWidget {
             ...children.map((e) => DomWidget(e)),
           ],
         ),
-      OlNode() => Flex(
+      "ol" => Flex(
           direction: Axis.vertical,
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -212,44 +171,9 @@ class DomWidget extends StatelessWidget {
                   ))
               .toList(),
         ),
-      ANode aNode => AWidget(t: aNode, style: style, children: children),
-      INode(text: var t) ||
-      BNode(text: var t) ||
-      EmNode(text: var t) ||
-      StrongNode(text: var t) ||
-      BlockQuoteNode(text: var t) ||
-      H1Node(text: var t) ||
-      H2Node(text: var t) ||
-      H3Node(text: var t) ||
-      H4Node(text: var t) ||
-      H5Node(text: var t) ||
-      H6Node(text: var t) ||
-      PNode(text: var t) =>
-        BlockNode(
-          text: t,
-          style: style,
-          children: children
-              .map(
-                (e) => DomWidget(
-                  e,
-                  parentStyle: style,
-                ),
-              )
-              .toList(),
-        ),
-      SectionNode() ||
-      DivNode() ||
-      HeaderNode() ||
-      PageNode() ||
-      UlNode() ||
-      FooterNode() ||
-      HtmlNode() ||
-      BodyNode() ||
-      MainNode() ||
-      PreNode() ||
-      NavNode() =>
-        BlockNode(
-          text: null,
+      "a" => AWidget(domNode: domNode, style: style, children: children),
+      _ => BlockNode(
+          node: domNode,
           style: style,
           children: children
               .map(
@@ -267,14 +191,14 @@ class DomWidget extends StatelessWidget {
 class AWidget extends StatelessWidget {
   const AWidget({
     super.key,
-    required this.t,
+    required this.domNode,
     required this.style,
     required this.children,
   });
 
-  final ANode t;
+  final Element domNode;
   final CssStyle style;
-  final List<Tree> children;
+  final List<Element> children;
 
   @override
   Widget build(BuildContext context) {
@@ -282,7 +206,7 @@ class AWidget extends StatelessWidget {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () {
-          final href = t.attributes["href"]!;
+          final href = domNode.attributes["href"]!;
 
           Uri uri;
           if (href.startsWith('/') ||
@@ -293,20 +217,18 @@ class AWidget extends StatelessWidget {
                     .read<BrowserCubit>()
                     .state
                     .currentTab!
-                    .history
-                    .last
-                    .uri
-                    .toString())
+                    .currentPage!
+                    .url)
                 .resolve(href);
           } else {
             // Assume absolute URI
             uri = Uri.parse(href);
           }
 
-          context.read<BrowserCubit>().visitUri(uri);
+          context.read<BrowserCubit>().navigateToPage(uri.toString());
         },
         child: BlockNode(
-          text: t.text,
+          node: domNode,
           style: style,
           children: children.map((e) => DomWidget(e)).toList(),
         ),
@@ -317,10 +239,13 @@ class AWidget extends StatelessWidget {
 
 class BlockNode extends StatelessWidget {
   const BlockNode(
-      {super.key, required this.style, this.text, this.children = const []});
+      {super.key,
+      required this.style,
+      required this.node,
+      this.children = const []});
 
   final CssStyle style;
-  final String? text;
+  final Element node;
   final List<Widget> children;
 
   @override
@@ -334,7 +259,12 @@ class BlockNode extends StatelessWidget {
         ? FontSize(value: style.fontSize!).getValue(16, 0.0, 1)
         : null;
 
-    // if (style.backgroundColor != null || style.borderLeft!=null)
+    final text = node.nodes
+        .where((node) => node.nodeType == Node.TEXT_NODE)
+        .map((node) => node.text)
+        .join();
+    final textIsEmpty = text.trim().isEmpty;
+
     final bloc = DecoratedBox(
       decoration: BoxDecoration(
         border: Border(
@@ -388,7 +318,7 @@ class BlockNode extends StatelessWidget {
           child: switch (display) {
             "grid" => GridView.count(
                 shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 crossAxisSpacing: (style.gap != null)
                     ? FontSize(value: style.gap!).getValue(16, 16, 1)
                     : 0,
@@ -397,7 +327,7 @@ class BlockNode extends StatelessWidget {
                     : 0,
                 crossAxisCount: 3,
                 children: <Widget>[
-                  if (text != null) TextWidget(text: text, style: style),
+                  if (!textIsEmpty) TextWidget(text: text, style: style),
                   ...children,
                 ],
               ),
@@ -424,7 +354,7 @@ class BlockNode extends StatelessWidget {
                   _ => MainAxisAlignment.start,
                 },
                 children: [
-                  if (text != null) TextWidget(text: text, style: style),
+                  if (!textIsEmpty) TextWidget(text: text, style: style),
                   ...children,
                 ],
               ),

@@ -13,7 +13,7 @@ class FileSpecialPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (identifyFileType(uri)) {
       FileType.image => DecoratedBox(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.black87,
           ),
           child: Center(
@@ -25,7 +25,7 @@ class FileSpecialPage extends StatelessWidget {
           ),
         ),
       FileType.txt => TextFileReader(filepath: uri.toFilePath()),
-      _ => Text('Unsupported file type'),
+      _ => const Text('Unsupported file type'),
     };
   }
 

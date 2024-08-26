@@ -85,148 +85,47 @@ class Favicon {
     }
     return null; // Not a Base64-encoded favicon
   }
-
-  // ... additional methods you might want:
-  // - ImageProvider? get imageProvider  (returns a provider for Flutter Image widget)
-  // - String? get fileExtension
-  // ...
 }
 
-class Tab {
-  final List<Response> history;
-  int currentPageId;
-  String sourceCode;
+// Future<Response> getHttp(Uri uri) async {
+//   try {
+//     final page = await http.get(
+//       uri,
+//       headers: {
+//         "User-Agent": "DragonFly/1.0",
+//       },
+//     );
 
-  Tab({
-    required this.history,
-    this.currentPageId = 0,
-    this.sourceCode = "",
-  });
+//     final dom = DomBuilder().parse(page.body);
+//     final title =
+//         dom.findSubtreesOfType<TitleNode>(dom).firstOrNull?.data as TitleNode;
 
-  bool isLoading() => history.last is Loading;
-  Response? get currentResponse => getCurrentPage();
-  Favicon? get favicon => history.whereType<Success>().firstOrNull?.favicon;
+//     return Success(
+//       uri: uri,
+//       title: (title).title,
+//       favicon: null,
+//       content: dom,
+//       sourceCode: page.body,
+//     )..theme = CSSOM.initial();
+//   } catch (e) {
+//     print(e);
+//     return ErrorResponse(
+//       uri: uri,
+//       error: NavigationError.cantFindPage,
+//       title: NavigationError.cantFindPage.title,
+//     );
+//   }
+// }
 
-  void addPage(Response response) {
-    history.add(response);
-    currentPageId++;
-  }
+// Future<CSSOM> getCSS(Uri uri) async {
+//   final page = await http.get(
+//     uri,
+//     headers: {
+//       "User-Agent": "DragonFly/1.0",
+//     },
+//   );
 
-  void refresh() {
-    history.last = Loading(uri: history.last.uri);
-  }
+//   final theme = CssomBuilder().parse(page.body);
 
-  void setLastPage(Response response) {
-    history.last = response;
-  }
-
-  Response? getCurrentPage() {
-    if (history.isEmpty || history.length < currentPageId) return null;
-    return history[currentPageId];
-  }
-
-  void nextPage() {
-    currentPageId++;
-  }
-
-  bool get canNavigateNext => history.length > currentPageId + 1;
-  bool get canNavigatePrevious => currentPageId - 1 >= 0;
-
-  void previousPage() {
-    currentPageId--;
-  }
-}
-
-sealed class Response {
-  final Uri uri;
-  final String? title;
-
-  Response({
-    required this.uri,
-    required this.title,
-  });
-}
-
-class Success extends Response {
-  Success({
-    required super.uri,
-    required super.title,
-    required this.content,
-    required this.favicon,
-    required this.sourceCode,
-  });
-
-  final Tree content;
-  CSSOM? theme;
-  final Favicon? favicon;
-  final String sourceCode;
-}
-
-class Loading extends Response {
-  Loading({
-    required super.uri,
-  }) : super(title: 'Loading...');
-}
-
-class Empty extends Response {
-  Empty({
-    required super.uri,
-  }) : super(title: '');
-}
-
-class ErrorResponse extends Response {
-  final NavigationError error;
-
-  ErrorResponse({
-    required super.uri,
-    required this.error,
-    required super.title,
-  });
-}
-
-class FileSuccess extends Response {
-  FileSuccess({required super.uri, required super.title});
-}
-
-Future<Response> getHttp(Uri uri) async {
-  try {
-    final page = await http.get(
-      uri,
-      headers: {
-        "User-Agent": "DragonFly/1.0",
-      },
-    );
-
-    final dom = DomBuilder().parse(page.body);
-    final title =
-        dom.findSubtreesOfType<TitleNode>(dom).firstOrNull?.data as TitleNode;
-
-    return Success(
-      uri: uri,
-      title: (title).title,
-      favicon: null,
-      content: dom,
-      sourceCode: page.body,
-    )..theme = CSSOM.initial();
-  } catch (e) {
-    print(e);
-    return ErrorResponse(
-      uri: uri,
-      error: NavigationError.cantFindPage,
-      title: NavigationError.cantFindPage.title,
-    );
-  }
-}
-
-Future<CSSOM> getCSS(Uri uri) async {
-  final page = await http.get(
-    uri,
-    headers: {
-      "User-Agent": "DragonFly/1.0",
-    },
-  );
-
-  final theme = CssomBuilder().parse(page.body);
-
-  return theme;
-}
+//   return theme;
+// }

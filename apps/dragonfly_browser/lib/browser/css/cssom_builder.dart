@@ -20,7 +20,8 @@ class CSSOM {
         ..addChild(CSSOM("blockquote", CssStyle.blockquote()))
         ..addChild(CSSOM("h1", CssStyle.h1()))
         ..addChild(CSSOM("h2", CssStyle.h2()))
-        ..addChild(CSSOM("h3", CssStyle.h3())),
+        ..addChild(CSSOM("h3", CssStyle.h3()))
+        ..addChild(CSSOM("strong", CssStyle.strong())),
     );
 
   // Add a child node
@@ -257,6 +258,7 @@ class CssStyle {
         paddingLeft = "40px",
         paddingRight = "40px";
   CssStyle.div();
+  CssStyle.strong() : fontWeight = "bold";
 
   double? lineHeight;
   String? backgroundColor;

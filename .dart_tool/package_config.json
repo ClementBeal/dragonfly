@@ -62,6 +62,12 @@
       "languageVersion": "2.18"
     },
     {
+      "name": "csslib",
+      "rootUri": "file:///home/clement/.pub-cache/hosted/pub.dev/csslib-1.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
       "name": "file",
       "rootUri": "file:///home/clement/.pub-cache/hosted/pub.dev/file-7.0.0",
       "packageUri": "lib/",
@@ -78,6 +84,12 @@
       "rootUri": "file:///home/clement/.pub-cache/hosted/pub.dev/graphs-2.3.2",
       "packageUri": "lib/",
       "languageVersion": "3.4"
+    },
+    {
+      "name": "html",
+      "rootUri": "file:///home/clement/.pub-cache/hosted/pub.dev/html-0.15.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
     },
     {
       "name": "http",
@@ -260,7 +272,7 @@
       "languageVersion": "3.0"
     }
   ],
-  "generated": "2024-08-25T16:31:36.313583Z",
+  "generated": "2024-08-26T06:08:40.643524Z",
   "generator": "pub",
   "generatorVersion": "3.6.0-149.3.beta",
   "flutterRoot": "file:///home/clement/dev-tools/flutter",

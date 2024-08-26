@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/browser/page.dart';
 import 'package:dragonfly/src/screens/browser/browser_screen.dart';
+import 'package:dragonfly/src/screens/favorites/favorite_bar.dart';
 import 'package:dragonfly/src/screens/history/history_screen.dart';
+import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Tab;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -16,9 +18,26 @@ class LobbyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Material(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          BrowserTabBar(),
-          BrowserActionBar(),
+          IconTheme(
+            data: IconThemeData(
+              color: Colors.white,
+            ),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Colors.black87,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  BrowserTabBar(),
+                  BrowserActionBar(),
+                  SizedBox(height: 50, child: FavoriteTabBar()),
+                ],
+              ),
+            ),
+          ),
           Expanded(child: BrowserScreen())
         ],
       ),
@@ -33,7 +52,7 @@ class BrowserTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 48,
-      child: BlocBuilder<BrowserCubit, BrowserState>(
+      child: BlocBuilder<BrowserCubit, Browser>(
         builder: (context, state) {
           return Row(
             children: [
@@ -45,16 +64,16 @@ class BrowserTabBar extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) {
                     final tab = state.tabs[index];
-                    final isActive = index == state.currentTabId;
+                    final isActive = tab.guid == state.currentTabGuid;
 
                     return BrowserTab(
                       tab: tab,
                       isActive: isActive,
                       onTap: () {
-                        context.read<BrowserCubit>().changeTab(index);
+                        context.read<BrowserCubit>().switchToTab(tab.guid);
                       },
                       onClose: () {
-                        context.read<BrowserCubit>().closeTab(index);
+                        context.read<BrowserCubit>().closeTab(tab.guid);
                       },
                     );
                   },
@@ -63,7 +82,7 @@ class BrowserTabBar extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: InkWell(
-                  onTap: () => context.read<BrowserCubit>().addTab(),
+                  onTap: () => context.read<BrowserCubit>().openNewTab(),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
@@ -74,7 +93,7 @@ class BrowserTabBar extends StatelessWidget {
                   ),
                 ),
               ),
-              Align(
+              const Align(
                   alignment: Alignment.centerRight,
                   child: WindowControlWidget()),
             ],
@@ -123,23 +142,30 @@ class BrowserTab extends StatelessWidget {
               child: Row(
                 spacing: 8,
                 children: [
-                  switch (tab.favicon?.type) {
-                    FaviconType.unknown || null => const SizedBox.shrink(),
-                    FaviconType.url =>
-                      Image.network(tab.favicon!.href, height: 22, width: 22),
-                    FaviconType.png ||
-                    FaviconType.ico ||
-                    FaviconType.jpeg ||
-                    FaviconType.webp ||
-                    FaviconType.gif =>
-                      Image.memory(tab.favicon!.decodeBase64()!),
-                    FaviconType.svg =>
-                      SvgPicture.memory(tab.favicon!.decodeBase64()!),
-                  },
-                  if (tab.currentResponse?.title != null)
+                  if (tab.currentPage?.status == PageStatus.loading)
+                    SizedBox.square(
+                      dimension: 15,
+                      child: CircularProgressIndicator(),
+                    ),
+                  // switch (tab.favicon?.type) {
+                  // FaviconType.unknown || null => const SizedBox.shrink(),
+                  // FaviconType.url =>
+                  // Image.network(tab.favicon!.href, height: 22, width: 22),
+                  // FaviconType.png ||
+                  // FaviconType.ico ||
+                  // FaviconType.jpeg ||
+                  // FaviconType.webp ||
+                  // FaviconType.gif =>
+                  // Image.memory(tab.favicon!.decodeBase64()!),
+                  // FaviconType.svg =>
+                  // SvgPicture.memory(tab.favicon!.decodeBase64()!),
+                  // TODO: Handle this case.
+                  // Object() => throw UnimplementedError(),
+                  // },
+                  if (tab.currentPage != null)
                     Expanded(
                       child: Text(
-                        tab.currentResponse!.title!,
+                        tab.currentPage!.url,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -179,21 +205,21 @@ class BrowserActionBar extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            BlocBuilder<BrowserCubit, BrowserState>(
+            BlocBuilder<BrowserCubit, Browser>(
               builder: (context, state) => IconButton(
-                onPressed: (state.currentTab?.canNavigatePrevious ?? false)
+                onPressed: (state.currentTab?.canGoBack() ?? false)
                     ? () {
-                        context.read<BrowserCubit>().navigatePrevious();
+                        context.read<BrowserCubit>().goBack();
                       }
                     : null,
                 icon: const Icon(Icons.arrow_back),
               ),
             ),
-            BlocBuilder<BrowserCubit, BrowserState>(
+            BlocBuilder<BrowserCubit, Browser>(
               builder: (context, state) => IconButton(
-                onPressed: (state.currentTab?.canNavigateNext ?? false)
+                onPressed: (state.currentTab?.canGoForward() ?? false)
                     ? () {
-                        context.read<BrowserCubit>().navigateNext();
+                        context.read<BrowserCubit>().goForward();
                       }
                     : null,
                 icon: const Icon(Icons.arrow_forward),
@@ -201,7 +227,7 @@ class BrowserActionBar extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                context.read<BrowserCubit>().refreshCurrentTab();
+                context.read<BrowserCubit>().refresh();
               },
               icon: const Icon(Icons.refresh),
             ),
@@ -232,39 +258,47 @@ class _SearchBarState extends State<SearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<BrowserCubit, BrowserState>(
+    return BlocListener<BrowserCubit, Browser>(
       listener: (context, state) {
-        _searchController.text =
-            state.currentTab?.currentResponse?.uri.toString() ?? "no uri";
+        _searchController.text = state.currentTab?.currentPage?.url ?? "no uri";
       },
       child: TextField(
         controller: _searchController,
+        style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            prefix: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(onPressed: () {}, icon: const Icon(Icons.lock_open)),
-              ],
+          filled: true,
+          fillColor: const Color(0xff4f4d4f),
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(8),
             ),
-            suffix: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton.filled(
-                  onPressed: () {
-                    var uri = Uri.parse(_searchController.text);
+          ),
+          prefix: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(onPressed: () {}, icon: const Icon(Icons.lock_open)),
+            ],
+          ),
+          suffix: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton.filled(
+                onPressed: () {
+                  var uri = Uri.parse(_searchController.text);
 
-                    context.read<BrowserCubit>().visitUri(uri);
-                  },
-                  icon: const Icon(Icons.arrow_forward),
-                ),
-                const Chip(label: Text("100%")),
-                IconButton(
-                    onPressed: () {}, icon: const Icon(Icons.star_border)),
-              ],
-            )),
+                  context.read<BrowserCubit>().navigateToPage(uri.toString());
+                },
+                icon: const Icon(Icons.arrow_forward),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.star_border),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -281,7 +315,7 @@ class SettingsBar extends StatelessWidget {
         // Handle menu item selection here
         switch (item) {
           case 'New Tab':
-            context.read<BrowserCubit>().addTab();
+            context.read<BrowserCubit>().openNewTab();
             break;
           case 'Bookmarks':
             // TODO: Implement bookmarks action
@@ -297,7 +331,6 @@ class SettingsBar extends StatelessWidget {
             break;
           case 'Quit':
             exit(0);
-            break;
         }
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -305,7 +338,7 @@ class SettingsBar extends StatelessWidget {
           value: 'New Tab',
           child: Text('New Tab'),
         ),
-        PopupMenuDivider(),
+        const PopupMenuDivider(),
         const PopupMenuItem<String>(
           value: 'Bookmarks',
           child: Text('Bookmarks'),
@@ -322,7 +355,7 @@ class SettingsBar extends StatelessWidget {
           value: 'Settings',
           child: Text('Settings'),
         ),
-        PopupMenuDivider(),
+        const PopupMenuDivider(),
         const PopupMenuItem<String>(
           value: 'Quit',
           child: Text('Quit'),

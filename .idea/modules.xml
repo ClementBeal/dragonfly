@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/apps/dragonfly_browser/melos_dragonfly.iml" filepath="$PROJECT_DIR$/apps/dragonfly_browser/melos_dragonfly.iml" />
+      <module fileurl="file://$PROJECT_DIR$/packages/dragonfly_browservault/melos_dragonfly_browservault.iml" filepath="$PROJECT_DIR$/packages/dragonfly_browservault/melos_dragonfly_browservault.iml" />
       <module fileurl="file://$PROJECT_DIR$/packages/dragonfly_css_parser/melos_dragonfly_css_parser.iml" filepath="$PROJECT_DIR$/packages/dragonfly_css_parser/melos_dragonfly_css_parser.iml" />
+      <module fileurl="file://$PROJECT_DIR$/packages/dragonfly_navigation/melos_dragonfly_navigation.iml" filepath="$PROJECT_DIR$/packages/dragonfly_navigation/melos_dragonfly_navigation.iml" />
       <module fileurl="file://$PROJECT_DIR$/apps/dragonfly_browser/website_page/melos_website_page.iml" filepath="$PROJECT_DIR$/apps/dragonfly_browser/website_page/melos_website_page.iml" />
       <module fileurl="file://$PROJECT_DIR$/melos_my_project.iml" filepath="$PROJECT_DIR$/melos_my_project.iml" />
     </modules>
