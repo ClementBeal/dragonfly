@@ -255,6 +255,7 @@ class BlockNode extends StatelessWidget {
     final fontSizeStyle = style.fontSize ??
         CSSOMProvider.of(context)!.cssom.find("html")!.style.fontSize ??
         "12px";
+
     // TODO : why we can use logical pixel here and not for margin?
     final fontSize = FontSize(value: fontSizeStyle).getValue(16, 16.0, 1);
     final text = node.nodes
@@ -275,7 +276,7 @@ class BlockNode extends StatelessWidget {
             ? BorderRadius.all(
                 Radius.circular(
                   FontSize(value: style.borderRadius!)
-                      .getValue(16, fontSize ?? 0.0, 1),
+                      .getValue(16, fontSize, 1),
                 ),
               )
             : null,
@@ -287,30 +288,28 @@ class BlockNode extends StatelessWidget {
         padding: EdgeInsets.only(
           bottom: (style.paddingBottom != null && style.paddingBottom != "0")
               ? FontSize(value: style.paddingBottom!)
-                  .getValue(16, fontSize ?? 0.0, pixelRatio)
+                  .getValue(16, fontSize, pixelRatio)
               : 0.0,
           left: (style.paddingLeft != null && style.paddingLeft != "0")
               ? FontSize(value: style.paddingLeft!)
-                  .getValue(16, fontSize ?? 0.0, pixelRatio)
+                  .getValue(16, fontSize, pixelRatio)
               : 0.0,
           top: (style.paddingTop != null && style.paddingTop != "0")
               ? FontSize(value: style.paddingTop!)
-                  .getValue(16, fontSize ?? 0.0, pixelRatio)
+                  .getValue(16, fontSize, pixelRatio)
               : 0.0,
           right: (style.paddingRight != null && style.paddingRight != "0")
               ? FontSize(value: style.paddingRight!)
-                  .getValue(16, fontSize ?? 0.0, pixelRatio)
+                  .getValue(16, fontSize, pixelRatio)
               : 0.0,
         ),
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: (style.maxWidth != null)
-                ? FontSize(value: style.maxWidth!)
-                    .getValue(16, fontSize ?? 0.0, 1)
+                ? FontSize(value: style.maxWidth!).getValue(16, fontSize, 1)
                 : double.infinity,
             minHeight: (style.minHeight != null)
-                ? FontSize(value: style.minHeight!)
-                    .getValue(16, fontSize ?? 0.0, 1)
+                ? FontSize(value: style.minHeight!).getValue(16, fontSize, 1)
                 : 0.0,
           ),
           child: switch (display) {
@@ -386,25 +385,25 @@ class BlockNode extends StatelessWidget {
                     style.marginBottom != "0" &&
                     style.marginBottom != "auto")
                 ? FontSize(value: style.marginBottom!)
-                    .getValue(16, fontSize ?? 0.0, pixelRatio)
+                    .getValue(16, fontSize, pixelRatio)
                 : 0.0,
             left: (style.marginLeft != null &&
                     style.marginLeft != "0" &&
                     style.marginLeft != "auto")
                 ? FontSize(value: style.marginLeft!)
-                    .getValue(16, fontSize ?? 0.0, pixelRatio)
+                    .getValue(16, fontSize, pixelRatio)
                 : 0.0,
             top: (style.marginTop != null &&
                     style.marginTop != "0" &&
                     style.marginTop != "auto")
                 ? FontSize(value: style.marginTop!)
-                    .getValue(16, fontSize ?? 0.0, pixelRatio)
+                    .getValue(16, fontSize, pixelRatio)
                 : 0.0,
             right: (style.marginRight != null &&
                     style.marginRight != "0" &&
                     style.marginRight != "auto")
                 ? FontSize(value: style.marginRight!)
-                    .getValue(16, fontSize ?? 0.0, pixelRatio)
+                    .getValue(16, fontSize, pixelRatio)
                 : 0.0,
           ),
           child: bloc,
@@ -462,7 +461,6 @@ class TextWidget extends StatelessWidget {
     final htmlNode = CSSOMProvider.of(context)!.cssom.find("html")!;
     final fontFamily =
         (style.fontFamily ?? htmlNode.style.fontFamily ?? "").split(",");
-    print(style.textColor);
 
     return Text(
       text!,
