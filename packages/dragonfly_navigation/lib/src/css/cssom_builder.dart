@@ -24,6 +24,13 @@ class CssomTree extends CssomNode {
       ruleEditer(rule);
     }
   }
+
+  // Method to clone the CssomTree
+  CssomTree clone() {
+    // Clone each CSSRule in the list
+    List<CSSRule> clonedRules = rules.map((rule) => rule.clone()).toList();
+    return CssomTree(rules: clonedRules);
+  }
 }
 
 class CSSRule extends CssomNode {
@@ -31,6 +38,14 @@ class CSSRule extends CssomNode {
   final CssStyle style;
 
   CSSRule({required this.selector, required this.style});
+
+  // Method to clone the CSSRule
+  CSSRule clone() {
+    return CSSRule(
+      selector: selector,
+      style: style.clone(), // Assuming CssStyle has a clone method
+    );
+  }
 }
 
 class CssomBuilder {
@@ -46,7 +61,7 @@ class CssomBuilder {
   /// otherwise, it create it from scratch
   CssomTree parse(String css) {
     final document = CssParser().parse(css);
-    final tree = browserStyle ?? CssomTree(rules: []);
+    final tree = browserStyle?.clone() ?? CssomTree(rules: []);
 
     for (var rule in document.rules) {
       final selector = rule.selector;
