@@ -37,8 +37,6 @@ class CssomBuilder {
 
   void loadBrowserStyle(String css) {
     browserStyle = parse(css);
-
-    print(browserStyle!.rules.length);
   }
 
   /// First, we parse a CSS file and extract the rules (e.g: body {margin: 8px; })

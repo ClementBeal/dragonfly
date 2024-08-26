@@ -1,18 +1,14 @@
-a:link,
-a:visited {
-  color: #267dcf;
-  text-decoration: underline;
-  cursor: auto;
-}
-a:link:active,
-a:visited:active {
-  color: #1c5d99;
+/*
+ THe HTML is a custom one
+ I don't know if it's a godo idea to store the font size here 
+*/
+html {
+  font-size: 16px;
+  color: #000000;
 }
 
 address {
   display: block;
-}
-address {
   font-style: italic;
 }
 
@@ -122,7 +118,7 @@ embed:focus {
   outline: none;
 }
 
-fieldset {
+/* fieldset {
   display: block;
   margin-start: 2px;
   margin-end: 2px;
@@ -130,8 +126,8 @@ fieldset {
   padding-start: 0.75em;
   padding-end: 0.75em;
   padding-after: 0.625em;
-  border: 2px groove (internal value);
-}
+  border: 2px groove black;
+} */
 
 figcaption {
   display: block;
@@ -224,7 +220,7 @@ header {
 hgroup {
   display: block;
 }
-
+/*
 hr {
   display: block;
   margin-before: 0.5em;
@@ -233,11 +229,12 @@ hr {
   margin-end: auto;
   border-style: inset;
   border-width: 1px;
-}
+} */
 
 html {
   display: block;
 }
+
 html:focus {
   outline: none;
 }
@@ -249,9 +246,9 @@ i {
 iframe:focus {
   outline: none;
 }
-iframe[seamless] {
+/* iframe[seamless] {
   display: block;
-}
+} */
 
 img {
   display: inline-block;
@@ -332,11 +329,12 @@ p {
 param {
   display: none;
 }
+
 pre {
   display: block;
   font-family: monospace;
   white-space: pre;
-  margin: 1em 0;
+  /* margin: 1em 0; */
 }
 
 q {
@@ -400,6 +398,7 @@ table {
   border-spacing: 2px;
   border-color: gray;
 }
+
 tbody {
   display: table-row-group;
   vertical-align: middle;

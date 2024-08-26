@@ -61,7 +61,12 @@ class _MainAppState extends State<MainApp> {
     try {
       final browserCSS =
           await rootBundle.loadString("assets/styles/browser_style.css");
+
+      // print(browserCSS);
       cssomBuilder.loadBrowserStyle(browserCSS);
+      print(cssomBuilder.browserStyle!.find("body")?.selector);
+      print(cssomBuilder.browserStyle!.find("body")?.style);
+      // print(cssomBuilder.browserStyle!.rules);
     } catch (e) {
       print(e);
     }

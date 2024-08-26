@@ -10,7 +10,7 @@ void main() {
       final result = cssParser.parse(css);
 
       expect(result.rules.length, 1);
-      expect(result.rules[0].selector, "body");
+      expect(result.rules[0].selector, "a");
       expect(result.rules[0].declarations.isEmpty, true);
     });
   });

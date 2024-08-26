@@ -41,17 +41,18 @@ class BrowserScreen extends StatelessWidget {
           final currentPage = tab.currentPage!;
 
           return switch (currentPage.status) {
-            PageStatus.loading => const Center(child: CircularProgressIndicator()),
+            PageStatus.loading =>
+              const Center(child: CircularProgressIndicator()),
             PageStatus.error => const Center(
                 child: Text("Error"),
               ),
             PageStatus.success => SizedBox.expand(
                 child: SingleChildScrollView(
                   child: CSSOMProvider(
-                    cssom: CssomTree(rules: []),
-                    child: (currentPage.document!.body != null)
+                    cssom: currentPage.cssom ?? cssomBuilder.browserStyle!,
+                    child: (currentPage.document!.documentElement != null)
                         ? DomWidget(
-                            currentPage.document!.body!,
+                            currentPage.document!.documentElement!,
                           )
                         : const SizedBox.shrink(),
                   ),
@@ -79,6 +80,7 @@ class DomWidget extends StatelessWidget {
       _ => (CSSOMProvider.of(context)!.cssom.find(tag)?.style ?? CssStyle())
     }
         .clone();
+
     if (parentStyle != null) {
       style.inheritFromParent(parentStyle!);
     }
@@ -92,6 +94,10 @@ class DomWidget extends StatelessWidget {
       if (newTheme != null) {
         style.mergeClass(newTheme);
       }
+    }
+
+    if (style.display == "none") {
+      return SizedBox.shrink();
     }
 
     return switch (tag) {
@@ -246,11 +252,11 @@ class BlockNode extends StatelessWidget {
     // the Mediaquery.devicePixelRatio returns 1 for me when it's 3...
     const pixelRatio = 3;
     final display = style.display;
-    final fontSize = (style.fontSize != null)
-        // TODO : why we can use logical pixel here and not for margin?
-        ? FontSize(value: style.fontSize!).getValue(16, 0.0, 1)
-        : null;
-
+    final fontSizeStyle = style.fontSize ??
+        CSSOMProvider.of(context)!.cssom.find("html")!.style.fontSize ??
+        "12px";
+    // TODO : why we can use logical pixel here and not for margin?
+    final fontSize = FontSize(value: fontSizeStyle).getValue(16, 16.0, 1);
     final text = node.nodes
         .where((node) => node.nodeType == Node.TEXT_NODE)
         .map((node) => node.text)
@@ -319,7 +325,12 @@ class BlockNode extends StatelessWidget {
                     : 0,
                 crossAxisCount: 3,
                 children: <Widget>[
-                  if (!textIsEmpty) TextWidget(text: text, style: style),
+                  if (!textIsEmpty)
+                    TextWidget(
+                      text: text,
+                      style: style,
+                      fontSize: 12,
+                    ),
                   ...children,
                 ],
               ),
@@ -346,7 +357,8 @@ class BlockNode extends StatelessWidget {
                   _ => MainAxisAlignment.start,
                 },
                 children: [
-                  if (!textIsEmpty) TextWidget(text: text, style: style),
+                  if (!textIsEmpty)
+                    TextWidget(text: text, style: style, fontSize: fontSize),
                   ...children,
                 ],
               ),
@@ -438,13 +450,17 @@ class TextWidget extends StatelessWidget {
     super.key,
     required this.text,
     required this.style,
+    required this.fontSize,
   });
 
   final String? text;
   final CssStyle style;
+  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
+    final htmlNode = CSSOMProvider.of(context)!.cssom.find("html")!;
+
     return Text(
       text!,
       textAlign: switch (style.textAlign) {
@@ -454,10 +470,7 @@ class TextWidget extends StatelessWidget {
       },
       style: TextStyle(
         height: style.lineHeight,
-        fontSize: (style.fontSize != null)
-            // TODO : why we can use logical pixel here and not for margin?
-            ? FontSize(value: style.fontSize!).getValue(16, 0.0, 1)
-            : null,
+        fontSize: fontSize,
         decoration: (style.textDecoration == "underline")
             ? TextDecoration.underline
             : null,
@@ -466,9 +479,10 @@ class TextWidget extends StatelessWidget {
           "400" => FontWeight.w400,
           _ => null,
         },
+        // color: Colors.black,
         color: (style.textColor != null)
             ? HexColor.fromHex(style.textColor!)
-            : null,
+            : HexColor.fromHex(htmlNode.style.textColor!),
       ),
     );
   }

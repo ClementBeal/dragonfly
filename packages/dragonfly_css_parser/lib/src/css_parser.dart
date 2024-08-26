@@ -20,7 +20,7 @@ class CssGrammar extends GrammarDefinition {
       (whitespaceOptional() & ref0(rules) & whitespaceOptional()).pick(1);
 
   Parser rules() => ref0(rule).star();
-  Parser rule() => (ref0(selector) & ref0(declarations));
+  Parser rule() => (ref0(selector) & ref0(declarations) & whitespaceOptional());
 
   Parser declarations() =>
       char("{") &
@@ -31,19 +31,26 @@ class CssGrammar extends GrammarDefinition {
 
   Parser declaration() =>
       ref0(property) & ref0(colon) & ref0(propertyValue) & ref0(semicolon);
+
   Parser property() => ref0(identifier) & ref0(whitespaceOptional);
-  Parser propertyValue() => digit().plus().flatten();
+  Parser propertyValue() =>
+      (digit() | letter() | char('-') | char('.') | char('#')).plus().flatten();
 
   Parser colon() => char(':') & ref0(whitespaceOptional);
   Parser semicolon() => char(';') & ref0(whitespaceOptional);
 
-  Parser selector() => ref0(identifier) & ref0(whitespaceOptional);
-  Parser whitespaceOptional() =>
-      (whitespace() | comment() | multiLineComment()).star();
+  Parser selector() =>
+      ref0(identifier) & pseudoClass().optional() & ref0(whitespaceOptional);
+  Parser pseudoClass() => colon() & (letter()).plus();
 
   Parser identifier() =>
       (char('.') | letter() | char('-') | digit()).plus().flatten();
 
+  /*
+    White spac
+  */
+  Parser whitespaceOptional() =>
+      (whitespace() | comment() | multiLineComment()).star();
   Parser comment() => string("//") & pattern("\n").neg().star();
   Parser multiLineComment() =>
       string("/*") &
@@ -84,7 +91,6 @@ class CssEvaluator extends CssGrammar {
   @override
   Parser declaration() => super.declaration().map(
         (value) {
-          print(value[2]);
           return Declaration(value[0], value[2]);
         },
       );
