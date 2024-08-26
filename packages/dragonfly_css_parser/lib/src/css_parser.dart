@@ -30,24 +30,62 @@ class CssGrammar extends GrammarDefinition {
       char("}");
 
   Parser declaration() =>
-      ref0(property) & ref0(colon) & ref0(propertyValue) & ref0(semicolon);
+      ref0(property) &
+      ref0(colon) &
+      (ref0(propertyValue) & whitespaceOptional()).plus().flatten() &
+      ref0(semicolon);
 
   Parser property() => ref0(identifier) & ref0(whitespaceOptional);
-  Parser propertyValue() =>
-      (digit() | letter() | char('-') | char('.') | char('#')).plus().flatten();
+
+  Parser propertyValue() => ref0(propertyList).plus().flatten();
+
+  Parser propertyList() =>
+      ref0(fontFamilyValue) |
+      ref0(propertyKeyWord) |
+      ref0(propertyLength) |
+      ref0(propertyColor) |
+      ref0(propertyNumber);
+
+  Parser fontFamilyValue() {
+    return (ref0(quoteString).map((value) => value[1]) | ref0(unquotedFont))
+        .plusSeparated(char(',').trim())
+        .flatten();
+  }
+
+  Parser quotedFont() => ref0(quoteString);
+  Parser unquotedFont() => ref0(identifier);
+
+  Parser quoteString() {
+    final quote = char('"');
+    final quotedContent = any().starLazy(quote).flatten();
+    return quote & quotedContent & quote;
+  }
+
+  /*
+    Property value here
+  */
+
+  Parser propertyKeyWord() => (letter() | char('-')).plus();
+  Parser propertyLength() => ref0(decimalNumber) | ref0(lengthUnit);
+  Parser lengthUnit() =>
+      string('px') | string('rem') | string('em') | string('%');
+  Parser propertyColor() => ref0(propertyKeyWord) | ref0(hexColor);
+  Parser propertyNumber() => ref0(decimalNumber) | digit().plus();
 
   Parser colon() => char(':') & ref0(whitespaceOptional);
   Parser semicolon() => char(';') & ref0(whitespaceOptional);
 
   Parser selector() =>
-      ref0(identifier) & pseudoClass().optional() & ref0(whitespaceOptional);
+      ref0(selectorIdentifier) &
+      pseudoClass().optional() &
+      ref0(whitespaceOptional);
   Parser pseudoClass() => colon() & (letter()).plus();
-
-  Parser identifier() =>
-      (char('.') | letter() | char('-') | digit()).plus().flatten();
+  Parser selectorIdentifier() =>
+      char('*') | ref0(identifier) | ref0(classSelector);
+  Parser classSelector() => (char('.') & ref0(identifier)).flatten();
 
   /*
-    White spac
+    White space
   */
   Parser whitespaceOptional() =>
       (whitespace() | comment() | multiLineComment()).star();
@@ -56,6 +94,17 @@ class CssGrammar extends GrammarDefinition {
       string("/*") &
       (ref0(multiLineComment) | string('*/').neg()).star() &
       string("*/");
+
+  /* 
+    Specials  
+  */
+  Parser identifier() =>
+      (letter() | char('-') | char('_') | digit()).plus().flatten();
+  Parser hexColor() =>
+      string('#') &
+      (pattern('0-9a-fA-F').times(3) | pattern('0-9a-fA-F').times(6));
+  Parser decimalNumber() => ref0(digit).star() & char('.') & ref0(digit).star();
+  Parser number() => ref0(digit).plus();
 }
 
 class CssEvaluator extends CssGrammar {
@@ -72,7 +121,6 @@ class CssEvaluator extends CssGrammar {
         (value) {
           return Rule(value[0], value[1]);
         },
-        // value[1]),
       );
 
   @override

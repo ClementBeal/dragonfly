@@ -8,6 +8,11 @@ packages:
 scripts:
   analyze:
     exec: dart analyze .
-
   test:
     exec: dart test
+
+  
+  browser_website:
+    run: melos exec dart bin/server.dart
+
+  

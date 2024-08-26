@@ -125,6 +125,8 @@ class CssomBuilder {
           newStyle.alignItems = declaration.value;
         } else if (declaration.property == "min-height") {
           newStyle.minHeight = declaration.value;
+        } else if (declaration.property == "font-family") {
+          newStyle.fontFamily = declaration.value;
         }
       }
 
@@ -175,6 +177,7 @@ class CssStyle {
     this.justifyContent,
     this.alignItems,
     this.minHeight,
+    this.fontFamily,
   });
 
   double? lineHeight;
@@ -207,6 +210,7 @@ class CssStyle {
   String? justifyContent;
   String? alignItems;
   String? minHeight;
+  String? fontFamily;
 
   CssStyle copyWith({
     double? lineHeight,
@@ -227,6 +231,7 @@ class CssStyle {
     textAlign = newTheme.textAlign ?? textAlign;
     fontWeight = newTheme.fontWeight ?? fontWeight;
     fontSize = newTheme.fontSize ?? fontSize;
+    fontFamily = newTheme.fontFamily ?? fontFamily;
   }
 
   void mergeClass(CssStyle newTheme) {
@@ -269,6 +274,7 @@ class CssStyle {
     textAlign = (textAlign == null) ? newTheme.textAlign : textAlign;
     fontWeight = (fontWeight == null) ? newTheme.fontWeight : fontWeight;
     fontSize = (fontSize == null) ? newTheme.fontSize : fontSize;
+    fontFamily = (fontFamily == null) ? newTheme.fontFamily : fontFamily;
   }
 
   @override
@@ -298,6 +304,7 @@ border: $border
 justifyContent: $justifyContent
 alignItmes: $alignItems
 minHeight: $minHeight
+fontFamily: $fontFamily
 """;
   }
 
@@ -333,6 +340,7 @@ minHeight: $minHeight
       justifyContent: justifyContent,
       alignItems: alignItems,
       minHeight: minHeight,
+      fontFamily: fontFamily,
     );
   }
 }

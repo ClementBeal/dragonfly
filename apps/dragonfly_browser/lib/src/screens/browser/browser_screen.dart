@@ -460,6 +460,9 @@ class TextWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final htmlNode = CSSOMProvider.of(context)!.cssom.find("html")!;
+    final fontFamily =
+        (style.fontFamily ?? htmlNode.style.fontFamily ?? "").split(",");
+    print(style.textColor);
 
     return Text(
       text!,
@@ -471,6 +474,8 @@ class TextWidget extends StatelessWidget {
       style: TextStyle(
         height: style.lineHeight,
         fontSize: fontSize,
+        fontFamily: fontFamily[0],
+        fontFamilyFallback: fontFamily.sublist(1),
         decoration: (style.textDecoration == "underline")
             ? TextDecoration.underline
             : null,

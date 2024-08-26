@@ -52,47 +52,7 @@ class BrowserCubit extends Cubit<Browser> {
     emit(state.copyWith());
   }
 
-  void refresh({int? tabId}) {}
-
-  // Future<void> _loadLinks(List<LinkNode> links, int tabId) async {
-  //   final tab = state.tabs[tabId];
-
-  //   for (var link in links) {
-  //     if (link.attributes["rel"] == "stylesheet") {
-  //       final href = link.attributes["href"]!;
-
-  //       String? fixedUrl;
-
-  //       // if (href)
-
-  //       final theme =
-  //           await getCSS(tab.currentResponse!.uri.replace(path: href));
-
-  //       (state.tabs[tabId].currentResponse as Success).theme = theme;
-  //       emit(state.copyWith(tabs: state.tabs));
-  //     }
-  //   }
-  // }
-
-  // void addTabAndViewSourceCode(Uri uri, String sourceCode) {
-  //   final newTabs = [
-  //     ...state.tabs,
-  //     Tab(
-  //       history: [
-  //         Success(
-  //           uri: uri,
-  //           favicon: null,
-  //           title: uri.replace(scheme: "").toString(),
-  //           content: Tree(UnkownNode()),
-  //           sourceCode: sourceCode,
-  //         )
-  //       ],
-  //     )
-  //   ];
-
-  //   emit(state.copyWith(
-  //     tabs: newTabs,
-  //     currentTabId: newTabs.length - 1,
-  //   ));
-  // }
+  void refresh() {
+    state.currentTab?.refresh(_onUpdate);
+  }
 }

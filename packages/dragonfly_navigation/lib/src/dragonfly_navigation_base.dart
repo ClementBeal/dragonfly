@@ -95,6 +95,38 @@ class Tab {
     onNavigationDone();
   }
 
+  Future<void> refresh(Function() onNavigationDone) async {
+    final url = _history.last.url;
+
+    _history.last = Page(
+      document: null,
+      cssom: null,
+      status: PageStatus.loading,
+      url: url,
+    );
+
+    final document = await getHttp(Uri.parse(url));
+    CssomTree? cssom;
+
+    if (document != null) {
+      final linkCssNode =
+          document.querySelectorAll('link[rel="stylesheet"]').firstOrNull;
+      if (linkCssNode != null) {
+        final href = linkCssNode.attributes["href"];
+        cssom = await getCss(Uri.parse(url).replace(path: href));
+      }
+    }
+
+    _history.last = Page(
+      document: document,
+      cssom: cssom,
+      status: (document != null) ? PageStatus.success : PageStatus.error,
+      url: url,
+    );
+
+    onNavigationDone();
+  }
+
   void goBack() {
     if (canGoBack()) {
       _currentIndex--;

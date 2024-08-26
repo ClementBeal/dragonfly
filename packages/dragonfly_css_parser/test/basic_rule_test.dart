@@ -23,6 +23,18 @@ void main() {
       expect(result.rules[0].declarations[0].property, "margin");
       expect(result.rules[0].declarations[0].value, "0");
     });
+
+    test('Rule with a number in the selector', () {
+      final css = "h1 { margin: 0; }";
+      final result = cssParser.parse(css);
+
+      expect(result.rules.length, 1);
+      expect(result.rules[0].selector, "h1");
+      expect(result.rules[0].declarations.length, 1);
+      expect(result.rules[0].declarations[0].property, "margin");
+      expect(result.rules[0].declarations[0].value, "0");
+    });
+
     test('Rule with multiple declarations', () {
       final css = "body { margin: 0; margin-top: 0; }";
       final result = cssParser.parse(css);

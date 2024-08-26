@@ -263,7 +263,7 @@ class _SearchBarState extends State<SearchBar> {
   Widget build(BuildContext context) {
     return BlocListener<BrowserCubit, Browser>(
       listener: (context, state) {
-        _searchController.text = state.currentTab?.currentPage?.url ?? "no uri";
+        _searchController.text = state.currentTab?.currentPage?.url ?? "";
       },
       child: TextField(
         controller: _searchController,
