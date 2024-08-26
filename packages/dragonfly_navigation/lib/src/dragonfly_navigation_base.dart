@@ -1,14 +1,9 @@
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_navigation/src/html/dom.dart';
 import 'package:html/dom.dart';
-import 'package:html/parser.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
-
-class DomBuilder {
-  static Document parse(String html) {
-    return HtmlParser(html).parse();
-  }
-}
 
 enum PageStatus { loading, error, success }
 

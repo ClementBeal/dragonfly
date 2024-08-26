@@ -1,13 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-enum NavigationError {
-  cantFindPage("Server not Found");
-
-  const NavigationError(this.title);
-  final String title;
-}
-
 enum FaviconType {
   unknown,
   url,
@@ -80,16 +73,3 @@ class Favicon {
     return null; // Not a Base64-encoded favicon
   }
 }
-
-// Future<CSSOM> getCSS(Uri uri) async {
-//   final page = await http.get(
-//     uri,
-//     headers: {
-//       "User-Agent": "DragonFly/1.0",
-//     },
-//   );
-
-//   final theme = CssomBuilder().parse(page.body);
-
-//   return theme;
-// }
