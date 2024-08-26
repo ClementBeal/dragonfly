@@ -14,15 +14,23 @@ class LobbyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Material(
+    return Material(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          IconTheme(
-            data: IconThemeData(
-              color: Colors.white,
+          IconButtonTheme(
+            data: IconButtonThemeData(
+              style: ButtonStyle(
+                iconColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.disabled)) {
+                    return Colors
+                        .grey.shade800; // Color when the icon is disabled
+                  }
+                  return Colors.white; // Color when the icon is not disabled
+                }),
+              ),
             ),
-            child: DecoratedBox(
+            child: const DecoratedBox(
               decoration: BoxDecoration(
                 color: Colors.black87,
               ),
@@ -36,7 +44,7 @@ class LobbyScreen extends StatelessWidget {
               ),
             ),
           ),
-          Expanded(child: BrowserScreen())
+          const Expanded(child: BrowserScreen())
         ],
       ),
     );
