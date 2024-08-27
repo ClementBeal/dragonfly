@@ -19,6 +19,27 @@ class FileExplorerPageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        color: Colors.black87,
+      ),
+      child: FileExplorerCard(tab: tab, page: page),
+    );
+  }
+}
+
+class FileExplorerCard extends StatelessWidget {
+  const FileExplorerCard({
+    super.key,
+    required this.page,
+    required this.tab,
+  });
+
+  final FileExplorerPage page;
+  final Tab tab;
+
+  @override
+  Widget build(BuildContext context) {
     // TODO : may not work on Windows
     var parentDirectory = Directory(page.url).parent;
     final canGoToParent = parentDirectory.path != ".";
@@ -27,91 +48,82 @@ class FileExplorerPageScreen extends StatelessWidget {
         ) !=
         null;
 
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: Colors.black87,
-      ),
-      child: SingleChildScrollView(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1200),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: Column(
-                  children: [
-                    Text(
-                      "Index of ${Uri.parse(Directory(page.url).path).toFilePath()}",
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        if (canGoToParent)
-                          TextButton.icon(
-                            icon: Icon(Icons.arrow_upward_rounded),
-                            onPressed: () {
-                              context.read<BrowserCubit>().navigateToPage(
-                                    parentDirectory.uri.toFilePath(),
-                                  );
-                            },
-                            label: const Text(
-                              "Up to higher level directory",
-                            ),
-                          )
-                        else
-                          SizedBox.shrink(),
-                        if (hasHiddenFile)
-                          BlocBuilder<FileExplorerCubit, FileExplorerState>(
-                            // buildWhen: (previous, current) =>
-                            //     previous.showHiddenFiles[tab.guid] !=
-                            //     current.showHiddenFiles[tab.guid],
-                            builder: (context, state) => Row(
-                              children: [
-                                Checkbox(
-                                  value:
-                                      state.showHiddenFiles[tab.guid] ?? false,
-                                  onChanged: (value) {
+    return SingleChildScrollView(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Column(
+                children: [
+                  Text(
+                    "Index of ${Uri.parse(Directory(page.url).path).toFilePath()}",
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (canGoToParent)
+                        TextButton.icon(
+                          icon: Icon(Icons.arrow_upward_rounded),
+                          onPressed: () {
+                            context.read<BrowserCubit>().navigateToPage(
+                                  parentDirectory.uri.toFilePath(),
+                                );
+                          },
+                          label: const Text(
+                            "Up to higher level directory",
+                          ),
+                        )
+                      else
+                        SizedBox.shrink(),
+                      if (hasHiddenFile)
+                        BlocBuilder<FileExplorerCubit, FileExplorerState>(
+                          builder: (context, state) => Row(
+                            children: [
+                              Checkbox(
+                                value: state.showHiddenFiles[tab.guid] ?? false,
+                                onChanged: (value) {
+                                  context
+                                      .read<FileExplorerCubit>()
+                                      .toggleShowHiddenFiles(tab.guid);
+                                },
+                              ),
+                              MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: GestureDetector(
+                                  onTap: () {
                                     context
                                         .read<FileExplorerCubit>()
                                         .toggleShowHiddenFiles(tab.guid);
                                   },
+                                  child:
+                                      (state.showHiddenFiles[tab.guid] ?? false)
+                                          ? Text("Do not show hidden files")
+                                          : Text("Show hidden files"),
                                 ),
-                                MouseRegion(
-                                  cursor: SystemMouseCursors.click,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      context
-                                          .read<FileExplorerCubit>()
-                                          .toggleShowHiddenFiles(tab.guid);
-                                    },
-                                    child: (state.showHiddenFiles[tab.guid] ??
-                                            false)
-                                        ? Text("Do not show hidden files")
-                                        : Text("Show hidden files"),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                      ],
-                    ),
-                    BlocBuilder<FileExplorerCubit, FileExplorerState>(
-                        builder: (context, state) {
-                      var results = page.result;
+                              ),
+                            ],
+                          ),
+                        )
+                    ],
+                  ),
+                  BlocBuilder<FileExplorerCubit, FileExplorerState>(
+                      builder: (context, state) {
+                    var results = page.result;
 
-                      if ((state.showHiddenFiles[tab.guid] ?? false) == false) {
-                        results = results
-                            .whereNot((f) => f.name.startsWith("."))
-                            .toList();
-                      }
+                    if ((state.showHiddenFiles[tab.guid] ?? false) == false) {
+                      results = results
+                          .whereNot((f) => f.name.startsWith("."))
+                          .toList();
+                    }
 
-                      return ExplorerResultListView(
-                        explorerResults: results,
-                      );
-                    }),
-                  ],
-                ),
+                    return ExplorerResultListView(
+                      explorerResults: results,
+                    );
+                  }),
+                ],
               ),
             ),
           ),
@@ -149,7 +161,6 @@ class ExplorerResultListView extends StatelessWidget {
               fit: FlexFit.tight,
               child: Row(
                 spacing: 4,
-                // mainAxisSize: MainAxisSize.min,
                 children: [
                   FileSystemEntityIcon(result: e),
                   TextButton(
@@ -163,7 +174,7 @@ class ExplorerResultListView extends StatelessWidget {
                         launchUrl(e.path);
                       } else {
                         context.read<BrowserCubit>().navigateToPage(
-                              e.path.toString(),
+                              e.path.toFilePath(),
                             );
                       }
                     },

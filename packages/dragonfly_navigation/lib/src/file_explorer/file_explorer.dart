@@ -38,6 +38,9 @@ Future<List<ExplorationResult>> exploreDirectory(Uri path) async {
   final a = fileSystemEntities.map((entity) async {
     final stat = await entity.stat();
 
+    print(entity.path);
+    print(Uri.parse(entity.path).toFilePath());
+
     return ExplorationResult(
       name: p.basename(entity.path),
       path: Uri.parse(entity.path),

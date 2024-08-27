@@ -145,7 +145,11 @@ class Tab {
           url: url,
         );
       } else {
-        _history.last = MediaPage(true, url: url, status: PageStatus.success);
+        _history.last = MediaPage(
+          true,
+          url: Uri.parse(url).toFilePath(),
+          status: PageStatus.success,
+        );
       }
     }
 
