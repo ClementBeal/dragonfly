@@ -4,12 +4,11 @@ version: 1.0.0
 # repository: https://github.com/my_org/my_repo
 
 environment:
-  sdk: ^3.6.0-149.3.beta
+  sdk: ">=3.1.0 <4.0.0"
 
 # Add regular dependencies here.
 dependencies:
   sqlite3: ^2.4.6
-
 
 dev_dependencies:
   lints: ^4.0.0
