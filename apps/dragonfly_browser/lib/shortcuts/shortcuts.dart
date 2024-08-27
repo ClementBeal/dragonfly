@@ -5,3 +5,5 @@ class NewTabIntent extends Intent {}
 class SwitchTabIntent extends Intent {}
 
 class CloseTabIntent extends Intent {}
+
+class OpenHistoryIntent extends Intent {}

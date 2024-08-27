@@ -25,6 +25,8 @@ class LobbyScreen extends StatelessWidget {
               SwitchTabIntent(),
           LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyW):
               CloseTabIntent(),
+          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyH):
+              OpenHistoryIntent(),
         },
         child: Actions(
           actions: <Type, Action<Intent>>{
@@ -39,6 +41,10 @@ class LobbyScreen extends StatelessWidget {
             CloseTabIntent: CallbackAction<CloseTabIntent>(
               onInvoke: (CloseTabIntent intent) =>
                   context.read<BrowserCubit>().closeCurrentTab(),
+            ),
+            OpenHistoryIntent: CallbackAction<OpenHistoryIntent>(
+              onInvoke: (OpenHistoryIntent intent) =>
+                  showHistoryScreen(context),
             ),
           },
           child: Column(
