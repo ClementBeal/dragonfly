@@ -23,6 +23,8 @@ class LobbyScreen extends StatelessWidget {
               NewTabIntent(),
           LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.tab):
               SwitchTabIntent(),
+          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyW):
+              CloseTabIntent(),
         },
         child: Actions(
           actions: <Type, Action<Intent>>{
@@ -33,6 +35,10 @@ class LobbyScreen extends StatelessWidget {
             SwitchTabIntent: CallbackAction<SwitchTabIntent>(
               onInvoke: (SwitchTabIntent intent) =>
                   context.read<BrowserCubit>().switchToNextTab(),
+            ),
+            CloseTabIntent: CallbackAction<CloseTabIntent>(
+              onInvoke: (CloseTabIntent intent) =>
+                  context.read<BrowserCubit>().closeCurrentTab(),
             ),
           },
           child: Column(

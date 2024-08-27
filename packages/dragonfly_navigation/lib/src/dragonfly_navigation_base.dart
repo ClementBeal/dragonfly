@@ -184,7 +184,7 @@ class Browser {
         (e) => e.guid == currentTabGuid,
       );
 
-      currentTabGuid = tabs.isEmpty ? null : tabs[tabId].guid;
+      currentTabGuid = tabs.isEmpty ? null : tabs[tabId - 1].guid;
     }
   }
 
