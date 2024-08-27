@@ -1,4 +1,5 @@
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
+import 'package:dragonfly/src/screens/browser/pages/cubit/file_explorer_cubit.dart';
 import 'package:dragonfly/src/screens/browser_scaffold.dart';
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:flutter/material.dart';
@@ -73,6 +74,7 @@ class _MainAppState extends State<MainApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => BrowserCubit()),
+        BlocProvider(create: (context) => FileExplorerCubit()),
       ],
       child: const MaterialApp(
         title: "Dragonfly",

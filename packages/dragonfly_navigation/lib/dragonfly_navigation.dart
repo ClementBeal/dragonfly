@@ -4,8 +4,18 @@
 library;
 
 export 'src/dragonfly_navigation_base.dart'
-    show Browser, Page, Tab, PageStatus, cssomBuilder;
+    show
+        Browser,
+        HtmlPage,
+        Tab,
+        PageStatus,
+        cssomBuilder,
+        Page,
+        FileExplorerPage;
 export 'src/css/css_theme.dart' show FontSize, FontSizeType;
 export 'src/css/cssom_builder.dart'
     show CSSRule, CssomBuilder, CssomNode, CssomTree;
 export 'src/css/css_style.dart' show CssStyle;
+
+export 'src/file_explorer/file_explorer.dart'
+    show exploreDirectory, ExplorationResult, FileType;
