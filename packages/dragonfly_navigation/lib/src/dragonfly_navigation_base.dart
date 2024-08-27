@@ -1,4 +1,5 @@
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_navigation/src/file_explorer/file_explorer.dart';
 import 'package:dragonfly_navigation/src/html/dom.dart';
 import 'package:html/dom.dart';
 
@@ -7,28 +8,50 @@ import 'package:uuid/uuid.dart';
 
 enum PageStatus { loading, error, success }
 
-class Page {
+sealed class Page {
   late final String guid;
   final String url;
-  final Document? document;
-  final CssomTree? cssom;
   final PageStatus status;
 
-  Page(
-      {required this.url,
-      required this.document,
-      required this.status,
-      String? guid,
-      required this.cssom}) {
+  Page({
+    required this.url,
+    required this.status,
+    String? guid,
+  }) {
     this.guid = guid ?? Uuid().v4();
   }
 
-  Page copyWith({
+  String? getTitle();
+}
+
+class FileExplorerPage extends Page {
+  FileExplorerPage(this.result, {required super.url, required super.status});
+
+  final List<ExplorationResult> result;
+
+  @override
+  String? getTitle() {
+    return "Index of ${url.toString()}";
+  }
+}
+
+class HtmlPage extends Page {
+  final Document? document;
+  final CssomTree? cssom;
+
+  HtmlPage(
+      {required super.url,
+      required super.status,
+      super.guid,
+      required this.document,
+      required this.cssom});
+
+  HtmlPage copyWith({
     Document? document,
     PageStatus? status,
     CssomTree? cssom,
   }) {
-    return Page(
+    return HtmlPage(
       url: url,
       guid: guid,
       document: document ?? this.document,
@@ -37,6 +60,7 @@ class Page {
     );
   }
 
+  @override
   String? getTitle() {
     return document?.getElementsByTagName("title").firstOrNull?.text;
   }
@@ -58,34 +82,55 @@ class Tab {
       _history.removeRange(_currentIndex + 1, _history.length);
     }
 
-    _history.add(
-      Page(
-        document: null,
-        cssom: null,
-        status: PageStatus.loading,
-        url: url,
-      ),
-    );
-    _currentIndex++;
+    final scheme = Uri.parse(url).scheme;
 
-    final document = await getHttp(Uri.parse(url));
-    CssomTree? cssom;
+    if (scheme == "http" || scheme == "https") {
+      _history.add(
+        HtmlPage(
+          document: null,
+          cssom: null,
+          status: PageStatus.loading,
+          url: url,
+        ),
+      );
+      _currentIndex++;
 
-    if (document != null) {
-      final linkCssNode =
-          document.querySelectorAll('link[rel="stylesheet"]').firstOrNull;
-      if (linkCssNode != null) {
-        final href = linkCssNode.attributes["href"];
-        cssom = await getCss(Uri.parse(url).replace(path: href));
+      final document = await getHttp(Uri.parse(url));
+      CssomTree? cssom;
+
+      if (document != null) {
+        final linkCssNode =
+            document.querySelectorAll('link[rel="stylesheet"]').firstOrNull;
+        if (linkCssNode != null) {
+          final href = linkCssNode.attributes["href"];
+          cssom = await getCss(Uri.parse(url).replace(path: href));
+        }
       }
-    }
 
-    _history.last = Page(
-      document: document,
-      cssom: cssom,
-      status: (document != null) ? PageStatus.success : PageStatus.error,
-      url: url,
-    );
+      _history.last = HtmlPage(
+        document: document,
+        cssom: cssom,
+        status: (document != null) ? PageStatus.success : PageStatus.error,
+        url: url,
+      );
+    } else {
+      _history.add(
+        FileExplorerPage(
+          [],
+          status: PageStatus.loading,
+          url: url,
+        ),
+      );
+      _currentIndex++;
+
+      final result = await exploreDirectory(Uri.parse(url));
+
+      _history.last = FileExplorerPage(
+        result,
+        status: PageStatus.success,
+        url: url,
+      );
+    }
 
     onNavigationDone();
   }
@@ -93,31 +138,48 @@ class Tab {
   Future<void> refresh(Function() onNavigationDone) async {
     final url = _history.last.url;
 
-    _history.last = Page(
-      document: null,
-      cssom: null,
-      status: PageStatus.loading,
-      url: url,
-    );
+    // TO DO -> use correct function
+    final scheme = Uri.parse(url).scheme;
 
-    final document = await getHttp(Uri.parse(url));
-    CssomTree? cssom;
+    if (scheme == "http" || scheme == "https") {
+      _history.last = HtmlPage(
+        document: null,
+        cssom: null,
+        status: PageStatus.loading,
+        url: url,
+      );
 
-    if (document != null) {
-      final linkCssNode =
-          document.querySelectorAll('link[rel="stylesheet"]').firstOrNull;
-      if (linkCssNode != null) {
-        final href = linkCssNode.attributes["href"];
-        cssom = await getCss(Uri.parse(url).replace(path: href));
+      final document = await getHttp(Uri.parse(url));
+      CssomTree? cssom;
+
+      if (document != null) {
+        final linkCssNode =
+            document.querySelectorAll('link[rel="stylesheet"]').firstOrNull;
+        if (linkCssNode != null) {
+          final href = linkCssNode.attributes["href"];
+          cssom = await getCss(Uri.parse(url).replace(path: href));
+        }
       }
-    }
 
-    _history.last = Page(
-      document: document,
-      cssom: cssom,
-      status: (document != null) ? PageStatus.success : PageStatus.error,
-      url: url,
-    );
+      _history.last = HtmlPage(
+        document: document,
+        cssom: cssom,
+        status: (document != null) ? PageStatus.success : PageStatus.error,
+        url: url,
+      );
+    } else if (scheme == "file") {
+      _history.last = FileExplorerPage(
+        [],
+        status: PageStatus.loading,
+        url: url,
+      );
+
+      _history.last = FileExplorerPage(
+        await exploreDirectory(Uri.parse(url)),
+        status: PageStatus.success,
+        url: url,
+      );
+    }
 
     onNavigationDone();
   }

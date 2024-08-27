@@ -2,8 +2,10 @@ import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/browser/page.dart';
 import 'package:dragonfly/src/screens/browser/browser_theme.dart';
 import 'package:dragonfly/src/screens/browser/helpers/color_utils.dart';
+import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
 import 'package:dragonfly/src/screens/lobby/lobby_screen.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_navigation/src/dragonfly_navigation_base.dart';
 import 'package:flutter/material.dart' hide Element;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -47,17 +49,22 @@ class BrowserScreen extends StatelessWidget {
                 child: Text("Error"),
               ),
             PageStatus.success => SizedBox.expand(
-                child: SingleChildScrollView(
-                  child: CSSOMProvider(
-                    cssom: currentPage.cssom ?? cssomBuilder.browserStyle!,
-                    child: (currentPage.document!.documentElement != null)
-                        ? DomWidget(
-                            currentPage.document!.documentElement!,
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-                ),
-              )
+                child: switch (currentPage) {
+                  FileExplorerPage p => FileExplorerPageScreen(
+                      page: p,
+                    ),
+                  HtmlPage() => SingleChildScrollView(
+                      child: CSSOMProvider(
+                        cssom: currentPage.cssom ?? cssomBuilder.browserStyle!,
+                        child: (currentPage.document!.documentElement != null)
+                            ? DomWidget(
+                                currentPage.document!.documentElement!,
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                    ),
+                },
+              ),
           };
         },
       ),
