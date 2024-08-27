@@ -306,6 +306,11 @@ class _SearchBarState extends State<SearchBar> {
         controller: _searchController,
         style: const TextStyle(color: Colors.white),
         textAlignVertical: TextAlignVertical.center,
+        onEditingComplete: () {
+          var uri = Uri.parse(_searchController.text);
+
+          context.read<BrowserCubit>().navigateToPage(uri.toString());
+        },
         decoration: InputDecoration(
           filled: true,
           fillColor: const Color(0xff4f4d4f),
