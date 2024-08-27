@@ -181,7 +181,7 @@ class _AudioMediaPageState extends State<AudioMediaPage> {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.black,
       ),
       child: Center(
@@ -221,7 +221,7 @@ class _AudioMediaPageState extends State<AudioMediaPage> {
                     ),
                     Text(
                       "${_formatDuration(_currentPosition)} / ${_formatDuration(_duration)}",
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                       ),
@@ -241,7 +241,7 @@ class _AudioMediaPageState extends State<AudioMediaPage> {
                                       _isMuted = !_isMuted;
                                     });
                                   },
-                            icon: Icon(Icons.volume_mute)),
+                            icon: const Icon(Icons.volume_mute)),
                         Slider(
                           value: (_isMuted) ? 0.0 : _volume,
                           min: 0.0,

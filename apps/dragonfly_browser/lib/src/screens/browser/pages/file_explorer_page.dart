@@ -66,7 +66,7 @@ class FileExplorerCard extends StatelessWidget {
                     children: [
                       if (canGoToParent)
                         TextButton.icon(
-                          icon: Icon(Icons.arrow_upward_rounded),
+                          icon: const Icon(Icons.arrow_upward_rounded),
                           onPressed: () {
                             context.read<BrowserCubit>().navigateToPage(
                                   parentDirectory.uri.toFilePath(),
@@ -77,7 +77,7 @@ class FileExplorerCard extends StatelessWidget {
                           ),
                         )
                       else
-                        SizedBox.shrink(),
+                        const SizedBox.shrink(),
                       if (hasHiddenFile)
                         BlocBuilder<FileExplorerCubit, FileExplorerState>(
                           builder: (context, state) => Row(
@@ -100,8 +100,8 @@ class FileExplorerCard extends StatelessWidget {
                                   },
                                   child:
                                       (state.showHiddenFiles[tab.guid] ?? false)
-                                          ? Text("Do not show hidden files")
-                                          : Text("Show hidden files"),
+                                          ? const Text("Do not show hidden files")
+                                          : const Text("Show hidden files"),
                                 ),
                               ),
                             ],

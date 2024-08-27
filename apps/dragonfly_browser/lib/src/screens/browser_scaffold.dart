@@ -161,7 +161,7 @@ class BrowserTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tooltip(
       message: tab.currentPage!.getTitle(),
-      waitDuration: Duration(milliseconds: 300),
+      waitDuration: const Duration(milliseconds: 300),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 250, minWidth: 100),
         child: MouseRegion(
