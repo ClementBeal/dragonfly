@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:dragonfly/src/constants/file_constants.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/favorites/favorite_bar.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
@@ -24,78 +25,154 @@ class FileExplorerPageScreen extends StatelessWidget {
       ),
       child: SingleChildScrollView(
         child: Center(
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Column(
-                children: [
-                  Text(
-                    "Index of ${page.url}",
-                  ),
-                  if (canGoToParent)
-                    TextButton(
-                      onPressed: () {
-                        context.read<BrowserCubit>().navigateToPage(
-                              parentDirectory.uri.toFilePath(),
-                            );
-                      },
-                      child: const Text(
-                        "Up to higher level directory",
-                      ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 1200),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  children: [
+                    Text(
+                      "Index of ${Uri.parse(Directory(page.url).path).toFilePath()}",
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
-                  DataTable(
-                    dataTextStyle: const TextStyle(
-                        // color: Colors.white,
+                    if (canGoToParent)
+                      TextButton(
+                        onPressed: () {
+                          context.read<BrowserCubit>().navigateToPage(
+                                parentDirectory.uri.toFilePath(),
+                              );
+                        },
+                        child: const Text(
+                          "Up to higher level directory",
                         ),
-                    columns: [
-                      const DataColumn(label: Text("Name")),
-                      const DataColumn(label: Text("Size")),
-                      const DataColumn(label: Text("Last Modified")),
-                    ],
-                    rows: page.result
-                        .map(
-                          (e) => DataRow(
-                            cells: [
-                              DataCell(
-                                Row(
-                                  spacing: 4,
-                                  children: [
-                                    Icon(
-                                      (e.fileType == FileType.file)
-                                          ? Icons.file_copy
-                                          : Icons.folder,
-                                      size: 12,
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        context
-                                            .read<BrowserCubit>()
-                                            .navigateToPage(
-                                              e.path.toString(),
-                                            );
-                                      },
-                                      child: Text(e.name),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              if (e.fileType == FileType.file)
-                                DataCell(Text(formatBytes(e.size)))
-                              else
-                                const DataCell(Text("")),
-                              DataCell(Text(e.lastModified.toString())),
+                      ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: 1 + page.result.length,
+                      itemBuilder: (context, index) {
+                        if (index == 0) {
+                          return const Row(
+                            children: [
+                              Flexible(
+                                  flex: 5,
+                                  fit: FlexFit.tight,
+                                  child: Text("Name")),
+                              Flexible(
+                                  flex: 1,
+                                  fit: FlexFit.tight,
+                                  child: Text("Size")),
+                              Flexible(
+                                  flex: 2,
+                                  fit: FlexFit.tight,
+                                  child: Text("Last Modified")),
                             ],
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ],
+                          );
+                        }
+
+                        final e = page.result[index - 1];
+
+                        return Row(
+                          children: [
+                            Flexible(
+                              flex: 5,
+                              fit: FlexFit.tight,
+                              child: Row(
+                                spacing: 4,
+                                // mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  FileSystemEntityIcon(result: e),
+                                  TextButton(
+                                    onPressed: () {
+                                      context
+                                          .read<BrowserCubit>()
+                                          .navigateToPage(
+                                            e.path.toString(),
+                                          );
+                                    },
+                                    child: Text(e.name),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Flexible(
+                              flex: 1,
+                              fit: FlexFit.tight,
+                              child: (e.fileType == FileType.file)
+                                  ? Text(formatBytes(e.size))
+                                  : const Text(""),
+                            ),
+                            Flexible(
+                              flex: 2,
+                              fit: FlexFit.tight,
+                              child: Text(
+                                e.lastModified.toString(),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
     );
+  }
+}
+
+class FileSystemEntityIcon extends StatelessWidget {
+  const FileSystemEntityIcon({
+    super.key,
+    required this.result,
+  });
+
+  final ExplorationResult result;
+
+  @override
+  Widget build(BuildContext context) {
+    const iconSize = 18.0;
+
+    if ((result.fileType == FileType.file)) {
+      final extension = result.name.split(".").last;
+
+      if (audioExtensions.contains(extension)) {
+        return Icon(
+          Icons.audiotrack,
+          size: iconSize,
+          color: Colors.green.shade600,
+        );
+      } else if (videoExtensions.contains(extension)) {
+        return Icon(
+          Icons.movie_outlined,
+          size: iconSize,
+          color: Colors.orange.shade800,
+        );
+      } else if (imageExtensions.contains(extension)) {
+        return Icon(
+          Icons.image,
+          size: iconSize,
+          color: Colors.blue.shade600,
+        );
+      }
+
+      return const Icon(
+        Icons.file_copy,
+        size: iconSize,
+      );
+    } else if (result.fileType == FileType.directory) {
+      return Icon(
+        Icons.folder,
+        size: iconSize,
+        color: Colors.yellow.shade700,
+      );
+    }
+
+    return SizedBox.shrink();
   }
 }
 
