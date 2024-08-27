@@ -7,6 +7,7 @@ import 'package:dragonfly/src/screens/favorites/favorite_bar.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class FileExplorerPageScreen extends StatelessWidget {
   const FileExplorerPageScreen({super.key, required this.page});
@@ -84,12 +85,16 @@ class FileExplorerPageScreen extends StatelessWidget {
                                 children: [
                                   FileSystemEntityIcon(result: e),
                                   TextButton(
-                                    onPressed: () {
-                                      context
-                                          .read<BrowserCubit>()
-                                          .navigateToPage(
-                                            e.path.toString(),
-                                          );
+                                    onPressed: () async {
+                                      if (e.fileType == FileType.file) {
+                                        launchUrl(e.path);
+                                      } else {
+                                        context
+                                            .read<BrowserCubit>()
+                                            .navigateToPage(
+                                              e.path.toString(),
+                                            );
+                                      }
                                     },
                                     child: Text(e.name),
                                   ),
