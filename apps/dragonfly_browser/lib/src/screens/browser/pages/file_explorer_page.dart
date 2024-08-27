@@ -154,7 +154,12 @@ class ExplorerResultListView extends StatelessWidget {
                   FileSystemEntityIcon(result: e),
                   TextButton(
                     onPressed: () async {
-                      if (e.fileType == FileType.file) {
+                      final extension = e.path.toFilePath().split(".").last;
+
+                      if (e.fileType == FileType.file &&
+                          !audioExtensions.contains(extension) &&
+                          !videoExtensions.contains(extension) &&
+                          !imageExtensions.contains(extension)) {
                         launchUrl(e.path);
                       } else {
                         context.read<BrowserCubit>().navigateToPage(

@@ -3,6 +3,7 @@ import 'package:dragonfly/browser/page.dart';
 import 'package:dragonfly/src/screens/browser/browser_theme.dart';
 import 'package:dragonfly/src/screens/browser/helpers/color_utils.dart';
 import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
+import 'package:dragonfly/src/screens/browser/pages/media_page/media_page_screen.dart';
 import 'package:dragonfly/src/screens/lobby/lobby_screen.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Element;
@@ -63,6 +64,8 @@ class BrowserScreen extends StatelessWidget {
                             : const SizedBox.shrink(),
                       ),
                     ),
+                  // TODO: Handle this case.
+                  MediaPage p => MediaPageScreen(page: p),
                 },
               ),
           };

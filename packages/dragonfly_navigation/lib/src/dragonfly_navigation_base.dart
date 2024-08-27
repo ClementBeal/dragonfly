@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
-import 'package:dragonfly_navigation/src/file_explorer/file_explorer.dart';
 import 'package:dragonfly_navigation/src/html/dom.dart';
 import 'package:html/dom.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
 enum PageStatus { loading, error, success }
@@ -32,6 +34,17 @@ class FileExplorerPage extends Page {
   @override
   String? getTitle() {
     return "Index of ${url.toString()}";
+  }
+}
+
+class MediaPage extends Page {
+  MediaPage(this.isLocalMedia, {required super.url, required super.status});
+
+  final bool isLocalMedia;
+
+  @override
+  String? getTitle() {
+    return p.basename(url);
   }
 }
 
@@ -123,13 +136,17 @@ class Tab {
       );
       _currentIndex++;
 
-      final result = await exploreDirectory(Uri.parse(url));
+      if (!File(url).existsSync()) {
+        final result = await exploreDirectory(Uri.parse(url));
 
-      _history.last = FileExplorerPage(
-        result,
-        status: PageStatus.success,
-        url: url,
-      );
+        _history.last = FileExplorerPage(
+          result,
+          status: PageStatus.success,
+          url: url,
+        );
+      } else {
+        _history.last = MediaPage(true, url: url, status: PageStatus.success);
+      }
     }
 
     onNavigationDone();
