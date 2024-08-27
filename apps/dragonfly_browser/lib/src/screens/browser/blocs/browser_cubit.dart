@@ -55,4 +55,19 @@ class BrowserCubit extends Cubit<Browser> {
   void refresh() {
     state.currentTab?.refresh(_onUpdate);
   }
+
+  void switchToNextTab() {
+    final currentTab = state.currentTab;
+
+    if (currentTab == null) {
+      return;
+    }
+
+    final index = state.tabs.indexOf(currentTab);
+    final nextTab = (index + 1 >= state.tabs.length)
+        ? state.tabs.first
+        : state.tabs[index + 1];
+
+    emit(state.copyWith(currentTabGuid: nextTab.guid));
+  }
 }

@@ -17,10 +17,6 @@ main {
   padding: 20px;
 }
 
-li {
-  list-style-type: disc;
-  margin-left: 40px;
-}
 blockquote {
   background: #eee;
   border-left: 10px solid #ccc;

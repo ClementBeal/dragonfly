@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:dragonfly/shortcuts/shortcuts.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/browser/browser_screen.dart';
 import 'package:dragonfly/src/screens/favorites/favorite_bar.dart';
 import 'package:dragonfly/src/screens/history/history_screen.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Tab;
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -15,37 +17,58 @@ class LobbyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          IconButtonTheme(
-            data: IconButtonThemeData(
-              style: ButtonStyle(
-                iconColor: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.disabled)) {
-                    return Colors
-                        .grey.shade800; // Color when the icon is disabled
-                  }
-                  return Colors.white; // Color when the icon is not disabled
-                }),
-              ),
+      child: Shortcuts(
+        shortcuts: <LogicalKeySet, Intent>{
+          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyT):
+              NewTabIntent(),
+          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.tab):
+              SwitchTabIntent(),
+        },
+        child: Actions(
+          actions: <Type, Action<Intent>>{
+            NewTabIntent: CallbackAction<NewTabIntent>(
+              onInvoke: (NewTabIntent intent) =>
+                  context.read<BrowserCubit>().openNewTab(),
             ),
-            child: const DecoratedBox(
-              decoration: BoxDecoration(
-                color: Colors.black87,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  BrowserTabBar(),
-                  SizedBox(height: 50, child: BrowserActionBar()),
-                  SizedBox(height: 50, child: FavoriteTabBar()),
-                ],
-              ),
+            SwitchTabIntent: CallbackAction<SwitchTabIntent>(
+              onInvoke: (SwitchTabIntent intent) =>
+                  context.read<BrowserCubit>().switchToNextTab(),
             ),
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              IconButtonTheme(
+                data: IconButtonThemeData(
+                  style: ButtonStyle(
+                    iconColor: WidgetStateProperty.resolveWith((states) {
+                      if (states.contains(WidgetState.disabled)) {
+                        return Colors
+                            .grey.shade800; // Color when the icon is disabled
+                      }
+                      return Colors
+                          .white; // Color when the icon is not disabled
+                    }),
+                  ),
+                ),
+                child: const DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.black87,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      BrowserTabBar(),
+                      SizedBox(height: 50, child: BrowserActionBar()),
+                      SizedBox(height: 50, child: FavoriteTabBar()),
+                    ],
+                  ),
+                ),
+              ),
+              const Expanded(child: BrowserScreen())
+            ],
           ),
-          const Expanded(child: BrowserScreen())
-        ],
+        ),
       ),
     );
   }
