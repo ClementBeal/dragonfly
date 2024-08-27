@@ -96,62 +96,20 @@ class FileExplorerPageScreen extends StatelessWidget {
                           )
                       ],
                     ),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: 1 + page.result.length,
-                      itemBuilder: (context, index) {
-                        if (index == 0) {
-                          return const HeaderRow();
-                        }
+                    BlocBuilder<FileExplorerCubit, FileExplorerState>(
+                        builder: (context, state) {
+                      var results = page.result;
 
-                        final e = page.result[index - 1];
+                      if ((state.showHiddenFiles[tab.guid] ?? false) == false) {
+                        results = results
+                            .whereNot((f) => f.name.startsWith("."))
+                            .toList();
+                      }
 
-                        return Row(
-                          children: [
-                            Flexible(
-                              flex: 5,
-                              fit: FlexFit.tight,
-                              child: Row(
-                                spacing: 4,
-                                // mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  FileSystemEntityIcon(result: e),
-                                  TextButton(
-                                    onPressed: () async {
-                                      if (e.fileType == FileType.file) {
-                                        launchUrl(e.path);
-                                      } else {
-                                        context
-                                            .read<BrowserCubit>()
-                                            .navigateToPage(
-                                              e.path.toString(),
-                                            );
-                                      }
-                                    },
-                                    child: Text(e.name),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Flexible(
-                              flex: 1,
-                              fit: FlexFit.tight,
-                              child: (e.fileType == FileType.file)
-                                  ? Text(formatBytes(e.size))
-                                  : const Text(""),
-                            ),
-                            Flexible(
-                              flex: 2,
-                              fit: FlexFit.tight,
-                              child: Text(
-                                e.lastModified.toString(),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+                      return ExplorerResultListView(
+                        explorerResults: results,
+                      );
+                    }),
                   ],
                 ),
               ),
@@ -159,6 +117,73 @@ class FileExplorerPageScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class ExplorerResultListView extends StatelessWidget {
+  const ExplorerResultListView({
+    super.key,
+    required this.explorerResults,
+  });
+
+  final List<ExplorationResult> explorerResults;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 1 + explorerResults.length,
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return const HeaderRow();
+        }
+
+        final e = explorerResults[index - 1];
+
+        return Row(
+          children: [
+            Flexible(
+              flex: 5,
+              fit: FlexFit.tight,
+              child: Row(
+                spacing: 4,
+                // mainAxisSize: MainAxisSize.min,
+                children: [
+                  FileSystemEntityIcon(result: e),
+                  TextButton(
+                    onPressed: () async {
+                      if (e.fileType == FileType.file) {
+                        launchUrl(e.path);
+                      } else {
+                        context.read<BrowserCubit>().navigateToPage(
+                              e.path.toString(),
+                            );
+                      }
+                    },
+                    child: Text(e.name),
+                  ),
+                ],
+              ),
+            ),
+            Flexible(
+              flex: 1,
+              fit: FlexFit.tight,
+              child: (e.fileType == FileType.file)
+                  ? Text(formatBytes(e.size))
+                  : const Text(""),
+            ),
+            Flexible(
+              flex: 2,
+              fit: FlexFit.tight,
+              child: Text(
+                e.lastModified.toString(),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
