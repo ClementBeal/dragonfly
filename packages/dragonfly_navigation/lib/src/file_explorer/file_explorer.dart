@@ -29,7 +29,6 @@ Future<List<ExplorationResult>> exploreDirectory(Uri path) async {
   final isDirectory = await directory.exists();
 
   if (!isDirectory) {
-    print(path);
     throw Exception("Cannot explore a file : ${path.toString()}");
   }
 

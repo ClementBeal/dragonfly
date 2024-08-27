@@ -159,73 +159,77 @@ class BrowserTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 250, minWidth: 100),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-          child: GestureDetector(
-            onTap: onTap,
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: isActive ? Colors.blue : Colors.transparent,
-                    width: 2.0,
+    return Tooltip(
+      message: tab.currentPage!.getTitle(),
+      waitDuration: const Duration(milliseconds: 300),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 250, minWidth: 100),
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: GestureDetector(
+              onTap: onTap,
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: isActive ? Colors.blue : Colors.transparent,
+                      width: 2.0,
+                    ),
                   ),
                 ),
-              ),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Row(
-                spacing: 8,
-                children: [
-                  if (tab.currentPage?.status == PageStatus.loading)
-                    const SizedBox.square(
-                      dimension: 15,
-                      child: CircularProgressIndicator(),
-                    ),
-                  // switch (tab.favicon?.type) {
-                  // FaviconType.unknown || null => const SizedBox.shrink(),
-                  // FaviconType.url =>
-                  // Image.network(tab.favicon!.href, height: 22, width: 22),
-                  // FaviconType.png ||
-                  // FaviconType.ico ||
-                  // FaviconType.jpeg ||
-                  // FaviconType.webp ||
-                  // FaviconType.gif =>
-                  // Image.memory(tab.favicon!.decodeBase64()!),
-                  // FaviconType.svg =>
-                  // SvgPicture.memory(tab.favicon!.decodeBase64()!),
-                  // TODO: Handle this case.
-                  // Object() => throw UnimplementedError(),
-                  // },
-                  if (tab.currentPage != null)
-                    Expanded(
-                      child: Text(
-                        tab.currentPage!.getTitle() ?? "No title",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight:
-                              isActive ? FontWeight.bold : FontWeight.normal,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Row(
+                  spacing: 8,
+                  children: [
+                    if (tab.currentPage?.status == PageStatus.loading)
+                      const SizedBox.square(
+                        dimension: 15,
+                        child: CircularProgressIndicator(),
+                      ),
+                    // switch (tab.favicon?.type) {
+                    // FaviconType.unknown || null => const SizedBox.shrink(),
+                    // FaviconType.url =>
+                    // Image.network(tab.favicon!.href, height: 22, width: 22),
+                    // FaviconType.png ||
+                    // FaviconType.ico ||
+                    // FaviconType.jpeg ||
+                    // FaviconType.webp ||
+                    // FaviconType.gif =>
+                    // Image.memory(tab.favicon!.decodeBase64()!),
+                    // FaviconType.svg =>
+                    // SvgPicture.memory(tab.favicon!.decodeBase64()!),
+                    // TODO: Handle this case.
+                    // Object() => throw UnimplementedError(),
+                    // },
+                    if (tab.currentPage != null)
+                      Expanded(
+                        child: Text(
+                          tab.currentPage!.getTitle() ?? "No title",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight:
+                                isActive ? FontWeight.bold : FontWeight.normal,
+                          ),
                         ),
                       ),
-                    ),
 
-                  // Close button
-                  IconButton(
-                    onPressed: onClose,
-                    icon: const Icon(Icons.close, size: 16.0),
-                    constraints: const BoxConstraints(
-                      maxWidth: 16.0,
-                      maxHeight: 16.0,
+                    // Close button
+                    IconButton(
+                      onPressed: onClose,
+                      icon: const Icon(Icons.close, size: 16.0),
+                      constraints: const BoxConstraints(
+                        maxWidth: 16.0,
+                        maxHeight: 16.0,
+                      ),
+                      padding: EdgeInsets.zero,
                     ),
-                    padding: EdgeInsets.zero,
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

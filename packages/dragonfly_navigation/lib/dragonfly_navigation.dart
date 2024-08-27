@@ -7,6 +7,7 @@ export 'src/dragonfly_navigation_base.dart'
     show
         Browser,
         HtmlPage,
+        MediaPage,
         Tab,
         PageStatus,
         cssomBuilder,
