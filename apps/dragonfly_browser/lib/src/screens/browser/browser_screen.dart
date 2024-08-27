@@ -51,6 +51,7 @@ class BrowserScreen extends StatelessWidget {
                 child: switch (currentPage) {
                   FileExplorerPage p => FileExplorerPageScreen(
                       page: p,
+                      tab: tab,
                     ),
                   HtmlPage() => SingleChildScrollView(
                       child: CSSOMProvider(

@@ -1,23 +1,31 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:dragonfly/src/constants/file_constants.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
+import 'package:dragonfly/src/screens/browser/pages/cubit/file_explorer_cubit.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Tab;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class FileExplorerPageScreen extends StatelessWidget {
-  const FileExplorerPageScreen({super.key, required this.page});
+  const FileExplorerPageScreen(
+      {super.key, required this.page, required this.tab});
 
   final FileExplorerPage page;
+  final Tab tab;
 
   @override
   Widget build(BuildContext context) {
     // TODO : may not work on Windows
     var parentDirectory = Directory(page.url).parent;
     final canGoToParent = parentDirectory.path != ".";
+    final hasHiddenFile = page.result.firstWhereOrNull(
+          (element) => element.name.startsWith("."),
+        ) !=
+        null;
 
     return DecoratedBox(
       decoration: const BoxDecoration(
@@ -36,18 +44,58 @@ class FileExplorerPageScreen extends StatelessWidget {
                       "Index of ${Uri.parse(Directory(page.url).path).toFilePath()}",
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
-                    if (canGoToParent)
-                      TextButton.icon(
-                        icon: Icon(Icons.arrow_upward_rounded),
-                        onPressed: () {
-                          context.read<BrowserCubit>().navigateToPage(
-                                parentDirectory.uri.toFilePath(),
-                              );
-                        },
-                        label: const Text(
-                          "Up to higher level directory",
-                        ),
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (canGoToParent)
+                          TextButton.icon(
+                            icon: Icon(Icons.arrow_upward_rounded),
+                            onPressed: () {
+                              context.read<BrowserCubit>().navigateToPage(
+                                    parentDirectory.uri.toFilePath(),
+                                  );
+                            },
+                            label: const Text(
+                              "Up to higher level directory",
+                            ),
+                          )
+                        else
+                          SizedBox.shrink(),
+                        if (hasHiddenFile)
+                          BlocBuilder<FileExplorerCubit, FileExplorerState>(
+                            // buildWhen: (previous, current) =>
+                            //     previous.showHiddenFiles[tab.guid] !=
+                            //     current.showHiddenFiles[tab.guid],
+                            builder: (context, state) => Row(
+                              children: [
+                                Checkbox(
+                                  value:
+                                      state.showHiddenFiles[tab.guid] ?? false,
+                                  onChanged: (value) {
+                                    context
+                                        .read<FileExplorerCubit>()
+                                        .toggleShowHiddenFiles(tab.guid);
+                                  },
+                                ),
+                                MouseRegion(
+                                  cursor: SystemMouseCursors.click,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      context
+                                          .read<FileExplorerCubit>()
+                                          .toggleShowHiddenFiles(tab.guid);
+                                    },
+                                    child: (state.showHiddenFiles[tab.guid] ??
+                                            false)
+                                        ? Text("Do not show hidden files")
+                                        : Text("Show hidden files"),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                      ],
+                    ),
                     ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
