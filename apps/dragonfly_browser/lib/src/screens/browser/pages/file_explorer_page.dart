@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:dragonfly/src/constants/file_constants.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
-import 'package:dragonfly/src/screens/favorites/favorite_bar.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,7 +26,7 @@ class FileExplorerPageScreen extends StatelessWidget {
       child: SingleChildScrollView(
         child: Center(
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 1200),
+            constraints: const BoxConstraints(maxWidth: 1200),
             child: Card(
               child: Padding(
                 padding: const EdgeInsets.all(32.0),
@@ -38,38 +37,24 @@ class FileExplorerPageScreen extends StatelessWidget {
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     if (canGoToParent)
-                      TextButton(
+                      TextButton.icon(
+                        icon: Icon(Icons.arrow_upward_rounded),
                         onPressed: () {
                           context.read<BrowserCubit>().navigateToPage(
                                 parentDirectory.uri.toFilePath(),
                               );
                         },
-                        child: const Text(
+                        label: const Text(
                           "Up to higher level directory",
                         ),
                       ),
                     ListView.builder(
                       shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: 1 + page.result.length,
                       itemBuilder: (context, index) {
                         if (index == 0) {
-                          return const Row(
-                            children: [
-                              Flexible(
-                                  flex: 5,
-                                  fit: FlexFit.tight,
-                                  child: Text("Name")),
-                              Flexible(
-                                  flex: 1,
-                                  fit: FlexFit.tight,
-                                  child: Text("Size")),
-                              Flexible(
-                                  flex: 2,
-                                  fit: FlexFit.tight,
-                                  child: Text("Last Modified")),
-                            ],
-                          );
+                          return const HeaderRow();
                         }
 
                         final e = page.result[index - 1];
@@ -130,6 +115,46 @@ class FileExplorerPageScreen extends StatelessWidget {
   }
 }
 
+class HeaderRow extends StatelessWidget {
+  const HeaderRow({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const style = TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 18,
+    );
+
+    return const Row(
+      children: [
+        Flexible(
+            flex: 5,
+            fit: FlexFit.tight,
+            child: Text(
+              "Name",
+              style: style,
+            )),
+        Flexible(
+            flex: 1,
+            fit: FlexFit.tight,
+            child: Text(
+              "Size",
+              style: style,
+            )),
+        Flexible(
+            flex: 2,
+            fit: FlexFit.tight,
+            child: Text(
+              "Last Modified",
+              style: style,
+            )),
+      ],
+    );
+  }
+}
+
 class FileSystemEntityIcon extends StatelessWidget {
   const FileSystemEntityIcon({
     super.key,
@@ -177,7 +202,7 @@ class FileSystemEntityIcon extends StatelessWidget {
       );
     }
 
-    return SizedBox.shrink();
+    return const SizedBox.shrink();
   }
 }
 
@@ -185,5 +210,5 @@ String formatBytes(int bytes, {int decimals = 2}) {
   if (bytes <= 0) return "0 B";
   const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
   var i = (log(bytes) / log(1024)).floor();
-  return ((bytes / pow(1024, i)).toStringAsFixed(decimals)) + ' ' + suffixes[i];
+  return '${(bytes / pow(1024, i)).toStringAsFixed(decimals)} ${suffixes[i]}';
 }

@@ -5,7 +5,6 @@ import 'package:dragonfly/src/screens/browser/helpers/color_utils.dart';
 import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
 import 'package:dragonfly/src/screens/lobby/lobby_screen.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
-import 'package:dragonfly_navigation/src/dragonfly_navigation_base.dart';
 import 'package:flutter/material.dart' hide Element;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -104,7 +103,7 @@ class DomWidget extends StatelessWidget {
     }
 
     if (style.display == "none") {
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     }
 
     return switch (tag) {
