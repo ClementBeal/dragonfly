@@ -1,4 +1,4 @@
-import 'package:dragonfly/src/screens/developer_tools/tools/network_tool_screen.dart';
+import 'package:dragonfly/src/screens/developer_tools/tools/network/network_tool_screen.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
