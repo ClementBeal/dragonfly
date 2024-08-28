@@ -28,7 +28,9 @@ class BrowserInterfaceState {
           RedockableInterface.searchBar,
           RedockableInterface.bookmarks,
         ],
-        leftDocks: [RedockableInterface.devtools],
+        leftDocks: [
+          RedockableInterface.tabBar,
+        ],
         bottomDocks: [],
         rightDocks: [
           RedockableInterface.devtools,

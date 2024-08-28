@@ -1,6 +1,6 @@
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/browser/pages/cubit/file_explorer_cubit.dart';
-import 'package:dragonfly/src/screens/browser_scaffold.dart';
+import 'package:dragonfly/src/screens/scaffold/browser_scaffold.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:flutter/material.dart';

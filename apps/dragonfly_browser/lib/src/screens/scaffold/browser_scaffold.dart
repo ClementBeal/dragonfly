@@ -7,6 +7,7 @@ import 'package:dragonfly/src/screens/developer_tools/developer_tools_screen.dar
 import 'package:dragonfly/src/screens/favorites/favorite_bar.dart';
 import 'package:dragonfly/src/screens/history/history_screen.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
+import 'package:dragonfly/src/screens/scaffold/widgets/tab_bar.dart';
 import 'package:dragonfly/src/widgets/docking.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Tab;
@@ -70,7 +71,7 @@ class LobbyScreen extends StatelessWidget {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: state.topDocks
-                      .map((e) => getWidgetFromRedockableInterface(e))
+                      .map((e) => getWidgetFromRedockableInterface(e, true))
                       .toList(),
                 ),
                 // left center right
@@ -79,7 +80,8 @@ class LobbyScreen extends StatelessWidget {
                     children: [
                       Row(
                         children: state.leftDocks
-                            .map((e) => getWidgetFromRedockableInterface(e))
+                            .map((e) =>
+                                getWidgetFromRedockableInterface(e, false))
                             .toList(),
                       ),
                       Expanded(
@@ -105,7 +107,8 @@ class LobbyScreen extends StatelessWidget {
                       // right
                       Row(
                         children: state.rightDocks
-                            .map((e) => getWidgetFromRedockableInterface(e))
+                            .map((e) =>
+                                getWidgetFromRedockableInterface(e, false))
                             .toList(),
                       ),
                     ],
@@ -114,7 +117,7 @@ class LobbyScreen extends StatelessWidget {
                 // bottom
                 Column(
                   children: state.bottomDocks
-                      .map((e) => getWidgetFromRedockableInterface(e))
+                      .map((e) => getWidgetFromRedockableInterface(e, true))
                       .toList(),
                 ),
               ],
@@ -125,173 +128,14 @@ class LobbyScreen extends StatelessWidget {
     );
   }
 
-  Widget getWidgetFromRedockableInterface(RedockableInterface e) {
+  Widget getWidgetFromRedockableInterface(
+      RedockableInterface e, bool isInsideColumn) {
     return switch (e) {
       RedockableInterface.devtools => const DeveloperToolsScreen(),
-      RedockableInterface.tabBar => BrowserTabBar(),
+      RedockableInterface.tabBar => BrowserTabBar(isInsideColumn),
       RedockableInterface.searchBar => BrowserActionBar(),
       RedockableInterface.bookmarks => FavoriteTabBar(),
     };
-  }
-}
-
-class BrowserTabBar extends StatelessWidget {
-  const BrowserTabBar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
-      child: BlocBuilder<BrowserCubit, Browser>(
-        builder: (context, state) {
-          return Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: state.tabs.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        final tab = state.tabs[index];
-                        final isActive = tab.guid == state.currentTabGuid;
-
-                        return BrowserTab(
-                          tab: tab,
-                          isActive: isActive,
-                          onTap: () {
-                            context.read<BrowserCubit>().switchToTab(tab.guid);
-                          },
-                          onClose: () {
-                            context.read<BrowserCubit>().closeTab(tab.guid);
-                          },
-                        );
-                      },
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: IconButton.filled(
-                        onPressed: () =>
-                            context.read<BrowserCubit>().openNewTab(),
-                        style: ButtonStyle(
-                          shape: WidgetStatePropertyAll(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          ),
-                        ),
-                        icon: const Icon(Icons.add, size: 20),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Align(
-                  alignment: Alignment.centerRight,
-                  child: WindowControlWidget()),
-            ],
-          );
-        },
-      ),
-    );
-  }
-}
-
-class BrowserTab extends StatelessWidget {
-  final Tab tab;
-  final bool isActive;
-  final VoidCallback onTap;
-  final VoidCallback onClose;
-
-  const BrowserTab({
-    super.key,
-    required this.tab,
-    required this.isActive,
-    required this.onTap,
-    required this.onClose,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: tab.currentPage?.getTitle() ?? "",
-      waitDuration: const Duration(milliseconds: 300),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 250, minWidth: 100),
-        child: MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: GestureDetector(
-              onTap: onTap,
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: isActive ? Colors.blue : Colors.transparent,
-                      width: 2.0,
-                    ),
-                  ),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Row(
-                  spacing: 8,
-                  children: [
-                    if (tab.currentPage?.status == PageStatus.loading)
-                      const SizedBox.square(
-                        dimension: 15,
-                        child: CircularProgressIndicator(),
-                      ),
-                    // switch (tab.favicon?.type) {
-                    // FaviconType.unknown || null => const SizedBox.shrink(),
-                    // FaviconType.url =>
-                    // Image.network(tab.favicon!.href, height: 22, width: 22),
-                    // FaviconType.png ||
-                    // FaviconType.ico ||
-                    // FaviconType.jpeg ||
-                    // FaviconType.webp ||
-                    // FaviconType.gif =>
-                    // Image.memory(tab.favicon!.decodeBase64()!),
-                    // FaviconType.svg =>
-                    // SvgPicture.memory(tab.favicon!.decodeBase64()!),
-                    // TODO: Handle this case.
-                    // Object() => throw UnimplementedError(),
-                    // },
-                    if (tab.currentPage != null)
-                      Expanded(
-                        child: Text(
-                          tab.currentPage!.getTitle() ?? "No title",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight:
-                                isActive ? FontWeight.bold : FontWeight.normal,
-                          ),
-                        ),
-                      ),
-
-                    // Close button
-                    IconButton(
-                      onPressed: onClose,
-                      icon: const Icon(Icons.close, size: 16.0),
-                      constraints: const BoxConstraints(
-                        maxWidth: 16.0,
-                        maxHeight: 16.0,
-                      ),
-                      padding: EdgeInsets.zero,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
 
