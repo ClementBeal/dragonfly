@@ -27,24 +27,32 @@ class LobbyScreen extends StatelessWidget {
               CloseTabIntent(),
           LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyH):
               OpenHistoryIntent(),
+          LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
+              NavigationBackwardIntent(),
+          LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
+              NavigationForwardIntent(),
         },
         child: Actions(
           actions: <Type, Action<Intent>>{
             NewTabIntent: CallbackAction<NewTabIntent>(
-              onInvoke: (NewTabIntent intent) =>
-                  context.read<BrowserCubit>().openNewTab(),
+              onInvoke: (intent) => context.read<BrowserCubit>().openNewTab(),
             ),
             SwitchTabIntent: CallbackAction<SwitchTabIntent>(
-              onInvoke: (SwitchTabIntent intent) =>
+              onInvoke: (intent) =>
                   context.read<BrowserCubit>().switchToNextTab(),
             ),
             CloseTabIntent: CallbackAction<CloseTabIntent>(
-              onInvoke: (CloseTabIntent intent) =>
+              onInvoke: (intent) =>
                   context.read<BrowserCubit>().closeCurrentTab(),
             ),
             OpenHistoryIntent: CallbackAction<OpenHistoryIntent>(
-              onInvoke: (OpenHistoryIntent intent) =>
-                  showHistoryScreen(context),
+              onInvoke: (intent) => showHistoryScreen(context),
+            ),
+            NavigationBackwardIntent: CallbackAction<NavigationBackwardIntent>(
+              onInvoke: (intent) => context.read<BrowserCubit>().goBack(),
+            ),
+            NavigationForwardIntent: CallbackAction<NavigationForwardIntent>(
+              onInvoke: (intent) => context.read<BrowserCubit>().goForward(),
             ),
           },
           child: Column(
