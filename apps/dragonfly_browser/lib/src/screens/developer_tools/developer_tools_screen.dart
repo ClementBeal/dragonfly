@@ -1,4 +1,7 @@
+import 'package:dragonfly/src/screens/favorites/favorite_bar.dart';
+import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 enum DeveloperTool { network }
 
@@ -30,8 +33,18 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: [
-                IconButton(onPressed: () {}, icon: Icon(Icons.close)),
-                VerticalDivider(),
+                GestureDetector(
+                  onTap: () {
+                    context.read<BrowserInterfaceCubit>().closeDevTools();
+                  },
+                  child: Center(
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.red.shade600,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8),
                 IconWithTool(
                   icon: Icons.sync_alt_outlined,
                   label: "Network",
