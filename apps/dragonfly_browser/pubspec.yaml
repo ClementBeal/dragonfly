@@ -30,6 +30,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  icons_launcher: ^2.1.7
 
 flutter:
   uses-material-design: true
@@ -38,3 +39,19 @@ flutter:
     - assets/languages/
     - assets/lobby/
     - assets/styles/
+
+icons_launcher:
+  image_path: "assets/dragonfly_icon.png"
+  platforms:
+    android:
+      enable: true
+    ios:
+      enable: true
+    macos:
+      enable: true
+    windows:
+      enable: true
+    linux:
+      enable: true
+    web:
+      enable: true
