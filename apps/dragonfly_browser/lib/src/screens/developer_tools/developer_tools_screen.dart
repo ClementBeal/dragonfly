@@ -17,63 +17,72 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border(
-          left: BorderSide(
-            width: 2,
-            color: Theme.of(context).colorScheme.secondaryContainer,
+    return BlocBuilder<BrowserInterfaceCubit, BrowserInterfaceState>(
+      builder: (context, state) {
+        if (!state.showDevtools) return SizedBox.shrink();
+
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(
+                width: 2,
+                color: Theme.of(context).colorScheme.secondaryContainer,
+              ),
+            ),
           ),
-        ),
-      ),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 40,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
+          child: SizedBox(
+            width: 200,
+            child: Column(
               children: [
-                GestureDetector(
-                  onTap: () {
-                    context.read<BrowserInterfaceCubit>().closeDevTools();
-                  },
-                  child: Center(
-                    child: Icon(
-                      Icons.close,
-                      color: Colors.red.shade600,
-                    ),
+                SizedBox(
+                  height: 40,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          context.read<BrowserInterfaceCubit>().closeDevTools();
+                        },
+                        child: Center(
+                          child: Icon(
+                            Icons.close,
+                            color: Colors.red.shade600,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onLongPress: () {
+                          context
+                              .read<BrowserInterfaceCubit>()
+                              .startToRedockInterface(
+                                RedockableInterface.devtools,
+                              );
+                        },
+                        onLongPressUp: () {
+                          context
+                              .read<BrowserInterfaceCubit>()
+                              .endToRedockInterface();
+                        },
+                        child: Icon(
+                          Icons.pan_tool_alt,
+                          // color: Colors.red.shade600,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      IconWithTool(
+                        icon: Icons.sync_alt_outlined,
+                        label: "Network",
+                        isSelected: selectedTool == DeveloperTool.network,
+                      ),
+                    ],
                   ),
                 ),
-                GestureDetector(
-                  onLongPress: () {
-                    context
-                        .read<BrowserInterfaceCubit>()
-                        .startToRedockInterface(
-                          RedockableInterface.devtools,
-                        );
-                  },
-                  onLongPressUp: () {
-                    context
-                        .read<BrowserInterfaceCubit>()
-                        .endToRedockInterface();
-                  },
-                  child: Icon(
-                    Icons.pan_tool_alt,
-                    // color: Colors.red.shade600,
-                  ),
-                ),
-                SizedBox(width: 8),
-                IconWithTool(
-                  icon: Icons.sync_alt_outlined,
-                  label: "Network",
-                  isSelected: selectedTool == DeveloperTool.network,
-                ),
+                Expanded(child: NetworkToolScreen()),
               ],
             ),
           ),
-          Expanded(child: NetworkToolScreen()),
-        ],
-      ),
+        );
+      },
     );
   }
 }

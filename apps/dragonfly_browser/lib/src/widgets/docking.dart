@@ -1,12 +1,16 @@
+import 'package:dragonfly/src/screens/developer_tools/developer_tools_screen.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class DockingArea extends StatelessWidget {
-  final Widget? child;
+class DockingArea extends StatefulWidget {
+  const DockingArea({super.key});
 
-  const DockingArea({super.key, this.child});
+  @override
+  State<DockingArea> createState() => _DockingAreaState();
+}
 
+class _DockingAreaState extends State<DockingArea> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<BrowserInterfaceCubit, BrowserInterfaceState>(
@@ -18,7 +22,7 @@ class DockingArea extends StatelessWidget {
             crossFadeState: (isDocking)
                 ? CrossFadeState.showFirst
                 : CrossFadeState.showSecond,
-            secondChild: SizedBox.shrink(),
+            secondChild: const SizedBox.shrink(),
             firstChild: Container(
               width: 60,
               height: 60,
@@ -35,13 +39,12 @@ class DockingArea extends StatelessWidget {
                       )
                     : null,
               ),
-              child: child ??
-                  Center(
-                    child: Icon(
-                      Icons.add,
-                      color: isDocking ? Colors.white : Colors.blue.shade600,
-                    ),
-                  ),
+              child: Center(
+                child: Icon(
+                  Icons.add,
+                  color: isDocking ? Colors.white : Colors.blue.shade600,
+                ),
+              ),
             ),
           ),
         );

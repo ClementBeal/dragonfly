@@ -63,68 +63,75 @@ class LobbyScreen extends StatelessWidget {
                   context.read<BrowserInterfaceCubit>().toggleDevTools(),
             )
           },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              IconButtonTheme(
-                data: IconButtonThemeData(
-                  style: ButtonStyle(
-                    iconColor: WidgetStateProperty.resolveWith((states) {
-                      if (states.contains(WidgetState.disabled)) {
-                        return Colors
-                            .grey.shade800; // Color when the icon is disabled
-                      }
-                      return Colors
-                          .white; // Color when the icon is not disabled
-                    }),
-                  ),
+          child: BlocBuilder<BrowserInterfaceCubit, BrowserInterfaceState>(
+            builder: (context, state) => Column(
+              children: [
+                // top
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: state.topDocks
+                      .map((e) => getWidgetFromRedockableInterface(e))
+                      .toList(),
                 ),
-                child: const DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Colors.black87,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      BrowserTabBar(),
-                      SizedBox(height: 50, child: BrowserActionBar()),
-                      SizedBox(height: 50, child: FavoriteTabBar()),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                child:
-                    BlocBuilder<BrowserInterfaceCubit, BrowserInterfaceState>(
-                  builder: (context, state) => Stack(
+                // left center right
+                Expanded(
+                  child: Row(
                     children: [
                       Row(
-                        children: [
-                          Expanded(child: BrowserScreen()),
-                          if (state.showDevtools)
-                            SizedBox(width: 400, child: DeveloperToolsScreen()),
-                        ],
+                        children: state.leftDocks
+                            .map((e) => getWidgetFromRedockableInterface(e))
+                            .toList(),
                       ),
-                      Align(
-                          alignment: Alignment.topCenter, child: DockingArea()),
-                      Align(
-                          alignment: Alignment.centerLeft,
-                          child: DockingArea()),
-                      Align(
-                          alignment: Alignment.centerRight,
-                          child: DockingArea()),
-                      Align(
-                          alignment: Alignment.bottomCenter,
-                          child: DockingArea()),
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            BrowserScreen(),
+                            Align(
+                              alignment: Alignment.topCenter,
+                              child: DockingArea(),
+                            ),
+                            Align(
+                                alignment: Alignment.centerLeft,
+                                child: DockingArea()),
+                            Align(
+                                alignment: Alignment.centerRight,
+                                child: DockingArea()),
+                            Align(
+                                alignment: Alignment.bottomCenter,
+                                child: DockingArea()),
+                          ],
+                        ),
+                      ),
+                      // right
+                      Row(
+                        children: state.rightDocks
+                            .map((e) => getWidgetFromRedockableInterface(e))
+                            .toList(),
+                      ),
                     ],
                   ),
                 ),
-              ),
-            ],
+                // bottom
+                Column(
+                  children: state.bottomDocks
+                      .map((e) => getWidgetFromRedockableInterface(e))
+                      .toList(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  Widget getWidgetFromRedockableInterface(RedockableInterface e) {
+    return switch (e) {
+      RedockableInterface.devtools => const DeveloperToolsScreen(),
+      RedockableInterface.tabBar => BrowserTabBar(),
+      RedockableInterface.searchBar => SearchBar(),
+      RedockableInterface.bookmarks => FavoriteTabBar(),
+    };
   }
 }
 
@@ -350,51 +357,54 @@ class _SearchBarState extends State<SearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<BrowserCubit, Browser>(
-      listener: (context, state) {
-        _searchController.text = state.currentTab?.currentPage?.url ?? "";
-      },
-      child: TextField(
-        controller: _searchController,
-        style: const TextStyle(color: Colors.white),
-        textAlignVertical: TextAlignVertical.center,
-        onEditingComplete: () {
-          var uri = Uri.parse(_searchController.text);
-
-          context.read<BrowserCubit>().navigateToPage(uri.toString());
+    return SizedBox(
+      height: 50,
+      child: BlocListener<BrowserCubit, Browser>(
+        listener: (context, state) {
+          _searchController.text = state.currentTab?.currentPage?.url ?? "";
         },
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: const Color(0xff4f4d4f),
-          border: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(8),
-            ),
-          ),
-          prefix: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(onPressed: () {}, icon: const Icon(Icons.lock_open)),
-            ],
-          ),
-          suffix: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton.filled(
-                onPressed: () {
-                  var uri = Uri.parse(_searchController.text);
+        child: TextField(
+          controller: _searchController,
+          style: const TextStyle(color: Colors.white),
+          textAlignVertical: TextAlignVertical.center,
+          onEditingComplete: () {
+            var uri = Uri.parse(_searchController.text);
 
-                  context.read<BrowserCubit>().navigateToPage(uri.toString());
-                },
-                icon: const Icon(Icons.arrow_forward),
+            context.read<BrowserCubit>().navigateToPage(uri.toString());
+          },
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: const Color(0xff4f4d4f),
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(8),
               ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.star_border),
-              ),
-            ],
+            ),
+            prefix: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(onPressed: () {}, icon: const Icon(Icons.lock_open)),
+              ],
+            ),
+            suffix: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton.filled(
+                  onPressed: () {
+                    var uri = Uri.parse(_searchController.text);
+
+                    context.read<BrowserCubit>().navigateToPage(uri.toString());
+                  },
+                  icon: const Icon(Icons.arrow_forward),
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.star_border),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -40,19 +40,22 @@ class _FavoriteTabBarState extends State<FavoriteTabBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Row(
-        spacing: 16,
-        children: _favorites
-            .where(
-              (e) => e.parentId == null,
-            )
-            .map((favorite) => FavoriteChip(
-                  favorite: favorite,
-                  allFavorites: _favorites,
-                ))
-            .toList(),
+    return SizedBox(
+      height: 50,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Row(
+          spacing: 16,
+          children: _favorites
+              .where(
+                (e) => e.parentId == null,
+              )
+              .map((favorite) => FavoriteChip(
+                    favorite: favorite,
+                    allFavorites: _favorites,
+                  ))
+              .toList(),
+        ),
       ),
     );
   }
