@@ -174,7 +174,7 @@ class BrowserTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: tab.currentPage!.getTitle(),
+      message: tab.currentPage?.getTitle() ?? "",
       waitDuration: const Duration(milliseconds: 300),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 250, minWidth: 100),
