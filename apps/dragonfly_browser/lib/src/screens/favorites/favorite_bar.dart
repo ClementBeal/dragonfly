@@ -94,8 +94,8 @@ class _FavoriteChipState extends State<FavoriteChip> {
         onExit: (event) => setState(() => _isHovered = false),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: (_isHovered) ? const Color(0xff444244) : null,
-          ),
+              // color: (_isHovered) ? Theme.of(context).primaryColor : null,
+              ),
           child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: switch (widget.favorite.isFolder) {
@@ -106,8 +106,9 @@ class _FavoriteChipState extends State<FavoriteChip> {
                         )
                         .map(
                           (e) => DecoratedBox(
-                            decoration:
-                                const BoxDecoration(color: Color(0xff444244)),
+                            decoration: const BoxDecoration(
+                                // color: Color(0xff444244),
+                                ),
                             child: ConstrainedBox(
                               constraints: BoxConstraints(
                                 minWidth:
@@ -151,9 +152,9 @@ class _FavoriteChipState extends State<FavoriteChip> {
                         const Icon(Icons.folder_open),
                       Text(
                         widget.favorite.name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                        ),
+                        // style: const TextStyle(
+                        //   color: Colors.white,
+                        // ),
                       ),
                     ],
                   ),
@@ -183,9 +184,9 @@ class FavoriteIconName extends StatelessWidget {
         if (favorite.isFolder) const Icon(Icons.folder_open),
         Text(
           favorite.name,
-          style: const TextStyle(
-            color: Colors.white,
-          ),
+          // style: const TextStyle(
+          //   color: Colors.white,
+          // ),
         ),
       ],
     );

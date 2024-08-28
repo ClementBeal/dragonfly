@@ -78,9 +78,14 @@ class _MainAppState extends State<MainApp> {
         BlocProvider(create: (context) => FileExplorerCubit()),
         BlocProvider(create: (context) => BrowserInterfaceCubit()),
       ],
-      child: const MaterialApp(
+      child: MaterialApp(
         title: "Dragonfly",
         debugShowCheckedModeBanner: false,
+        theme: ThemeData(colorSchemeSeed: Colors.cyanAccent),
+        darkTheme: ThemeData(
+          colorSchemeSeed: Colors.cyanAccent,
+          brightness: Brightness.dark,
+        ),
         home: LobbyScreen(),
       ),
     );

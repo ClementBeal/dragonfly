@@ -129,7 +129,7 @@ class LobbyScreen extends StatelessWidget {
     return switch (e) {
       RedockableInterface.devtools => const DeveloperToolsScreen(),
       RedockableInterface.tabBar => BrowserTabBar(),
-      RedockableInterface.searchBar => SearchBar(),
+      RedockableInterface.searchBar => BrowserActionBar(),
       RedockableInterface.bookmarks => FavoriteTabBar(),
     };
   }
@@ -172,16 +172,17 @@ class BrowserTabBar extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: InkWell(
-                        onTap: () => context.read<BrowserCubit>().openNewTab(),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
-                            borderRadius: BorderRadius.circular(4.0),
+                      child: IconButton.filled(
+                        onPressed: () =>
+                            context.read<BrowserCubit>().openNewTab(),
+                        style: ButtonStyle(
+                          shape: WidgetStatePropertyAll(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
                           ),
-                          padding: const EdgeInsets.all(8.0),
-                          child: const Icon(Icons.add, size: 20),
                         ),
+                        icon: const Icon(Icons.add, size: 20),
                       ),
                     ),
                   ],
@@ -374,7 +375,7 @@ class _SearchBarState extends State<SearchBar> {
           },
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xff4f4d4f),
+            // fillColor: const Color(0xff4f4d4f),
             border: const OutlineInputBorder(
               borderRadius: BorderRadius.all(
                 Radius.circular(8),
