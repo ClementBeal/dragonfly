@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:dragonfly/shortcuts/shortcuts.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/browser/browser_screen.dart';
+import 'package:dragonfly/src/screens/developer_tools/developer_tools_screen.dart';
 import 'package:dragonfly/src/screens/favorites/favorite_bar.dart';
 import 'package:dragonfly/src/screens/history/history_screen.dart';
+import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Tab;
 import 'package:flutter/services.dart';
@@ -31,6 +33,7 @@ class LobbyScreen extends StatelessWidget {
               NavigationBackwardIntent(),
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
               NavigationForwardIntent(),
+          LogicalKeySet(LogicalKeyboardKey.f12): ToggleDevToolsIntent(),
         },
         child: Actions(
           actions: <Type, Action<Intent>>{
@@ -54,6 +57,10 @@ class LobbyScreen extends StatelessWidget {
             NavigationForwardIntent: CallbackAction<NavigationForwardIntent>(
               onInvoke: (intent) => context.read<BrowserCubit>().goForward(),
             ),
+            ToggleDevToolsIntent: CallbackAction<ToggleDevToolsIntent>(
+              onInvoke: (intent) =>
+                  context.read<BrowserInterfaceCubit>().toggleDevTools(),
+            )
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -85,7 +92,18 @@ class LobbyScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const Expanded(child: BrowserScreen())
+              Expanded(
+                child:
+                    BlocBuilder<BrowserInterfaceCubit, BrowserInterfaceState>(
+                  builder: (context, state) => Row(
+                    children: [
+                      Expanded(child: BrowserScreen()),
+                      if (state.showDevtools)
+                        SizedBox(width: 400, child: DeveloperToolsScreen()),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),

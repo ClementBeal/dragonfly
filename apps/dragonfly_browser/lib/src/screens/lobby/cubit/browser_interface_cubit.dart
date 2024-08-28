@@ -25,4 +25,8 @@ class BrowserInterfaceCubit extends Cubit<BrowserInterfaceState> {
   void closeDevTools() {
     emit(state.copyWith(showDevtools: false));
   }
+
+  void toggleDevTools() {
+    emit(state.copyWith(showDevtools: !state.showDevtools));
+  }
 }
