@@ -25,20 +25,34 @@ class LobbyScreen extends StatelessWidget {
               SwitchTabIntent(),
           LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyW):
               CloseTabIntent(),
+          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyH):
+              OpenHistoryIntent(),
+          LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
+              NavigationBackwardIntent(),
+          LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
+              NavigationForwardIntent(),
         },
         child: Actions(
           actions: <Type, Action<Intent>>{
             NewTabIntent: CallbackAction<NewTabIntent>(
-              onInvoke: (NewTabIntent intent) =>
-                  context.read<BrowserCubit>().openNewTab(),
+              onInvoke: (intent) => context.read<BrowserCubit>().openNewTab(),
             ),
             SwitchTabIntent: CallbackAction<SwitchTabIntent>(
-              onInvoke: (SwitchTabIntent intent) =>
+              onInvoke: (intent) =>
                   context.read<BrowserCubit>().switchToNextTab(),
             ),
             CloseTabIntent: CallbackAction<CloseTabIntent>(
-              onInvoke: (CloseTabIntent intent) =>
+              onInvoke: (intent) =>
                   context.read<BrowserCubit>().closeCurrentTab(),
+            ),
+            OpenHistoryIntent: CallbackAction<OpenHistoryIntent>(
+              onInvoke: (intent) => showHistoryScreen(context),
+            ),
+            NavigationBackwardIntent: CallbackAction<NavigationBackwardIntent>(
+              onInvoke: (intent) => context.read<BrowserCubit>().goBack(),
+            ),
+            NavigationForwardIntent: CallbackAction<NavigationForwardIntent>(
+              onInvoke: (intent) => context.read<BrowserCubit>().goForward(),
             ),
           },
           child: Column(
@@ -160,7 +174,7 @@ class BrowserTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: tab.currentPage!.getTitle(),
+      message: tab.currentPage?.getTitle() ?? "",
       waitDuration: const Duration(milliseconds: 300),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 250, minWidth: 100),
