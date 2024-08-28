@@ -7,6 +7,7 @@ import 'package:dragonfly/src/screens/developer_tools/developer_tools_screen.dar
 import 'package:dragonfly/src/screens/favorites/favorite_bar.dart';
 import 'package:dragonfly/src/screens/history/history_screen.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
+import 'package:dragonfly/src/widgets/docking.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Tab;
 import 'package:flutter/services.dart';
@@ -95,11 +96,26 @@ class LobbyScreen extends StatelessWidget {
               Expanded(
                 child:
                     BlocBuilder<BrowserInterfaceCubit, BrowserInterfaceState>(
-                  builder: (context, state) => Row(
+                  builder: (context, state) => Stack(
                     children: [
-                      Expanded(child: BrowserScreen()),
-                      if (state.showDevtools)
-                        SizedBox(width: 400, child: DeveloperToolsScreen()),
+                      Row(
+                        children: [
+                          Expanded(child: BrowserScreen()),
+                          if (state.showDevtools)
+                            SizedBox(width: 400, child: DeveloperToolsScreen()),
+                        ],
+                      ),
+                      Align(
+                          alignment: Alignment.topCenter, child: DockingArea()),
+                      Align(
+                          alignment: Alignment.centerLeft,
+                          child: DockingArea()),
+                      Align(
+                          alignment: Alignment.centerRight,
+                          child: DockingArea()),
+                      Align(
+                          alignment: Alignment.bottomCenter,
+                          child: DockingArea()),
                     ],
                   ),
                 ),

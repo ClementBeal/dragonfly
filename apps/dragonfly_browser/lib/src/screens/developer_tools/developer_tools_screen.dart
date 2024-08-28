@@ -44,6 +44,24 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
                     ),
                   ),
                 ),
+                GestureDetector(
+                  onLongPress: () {
+                    context
+                        .read<BrowserInterfaceCubit>()
+                        .startToRedockInterface(
+                          RedockableInterface.devtools,
+                        );
+                  },
+                  onLongPressUp: () {
+                    context
+                        .read<BrowserInterfaceCubit>()
+                        .endToRedockInterface();
+                  },
+                  child: Icon(
+                    Icons.pan_tool_alt,
+                    // color: Colors.red.shade600,
+                  ),
+                ),
                 SizedBox(width: 8),
                 IconWithTool(
                   icon: Icons.sync_alt_outlined,

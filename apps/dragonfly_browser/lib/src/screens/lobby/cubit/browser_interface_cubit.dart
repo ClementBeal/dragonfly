@@ -1,13 +1,31 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+enum RedockableInterface { devtools }
 
 class BrowserInterfaceState {
   final bool showDevtools;
+  final RedockableInterface? currentRedockingInterface;
 
-  BrowserInterfaceState({required this.showDevtools});
+  BrowserInterfaceState({
+    required this.showDevtools,
+    this.currentRedockingInterface,
+  });
 
-  BrowserInterfaceState copyWith({bool? showDevtools}) {
+  factory BrowserInterfaceState.initial() => BrowserInterfaceState(
+        showDevtools: false,
+        currentRedockingInterface: null,
+      );
+
+  BrowserInterfaceState copyWith({
+    bool? showDevtools,
+    RedockableInterface? Function()? currentRedockingInterface,
+  }) {
     return BrowserInterfaceState(
       showDevtools: showDevtools ?? this.showDevtools,
+      currentRedockingInterface: (currentRedockingInterface != null)
+          ? currentRedockingInterface()
+          : this.currentRedockingInterface,
     );
   }
 }
@@ -15,7 +33,7 @@ class BrowserInterfaceState {
 class BrowserInterfaceCubit extends Cubit<BrowserInterfaceState> {
   BrowserInterfaceCubit()
       : super(
-          BrowserInterfaceState(showDevtools: false),
+          BrowserInterfaceState.initial(),
         );
 
   void openDevTools() {
@@ -28,5 +46,21 @@ class BrowserInterfaceCubit extends Cubit<BrowserInterfaceState> {
 
   void toggleDevTools() {
     emit(state.copyWith(showDevtools: !state.showDevtools));
+  }
+
+  void startToRedockInterface(RedockableInterface interface) {
+    emit(
+      state.copyWith(
+        currentRedockingInterface: () => interface,
+      ),
+    );
+  }
+
+  void endToRedockInterface() {
+    emit(
+      state.copyWith(
+        currentRedockingInterface: () => null,
+      ),
+    );
   }
 }
