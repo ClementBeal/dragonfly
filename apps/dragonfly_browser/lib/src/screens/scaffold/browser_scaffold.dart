@@ -9,6 +9,8 @@ import 'package:dragonfly/src/screens/history/history_screen.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
 import 'package:dragonfly/src/screens/scaffold/widgets/tab_bar.dart';
 import 'package:dragonfly/src/widgets/docking.dart';
+import 'package:dragonfly/utils/extensions/list.dart';
+import 'package:dragonfly/utils/list.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Tab;
 import 'package:flutter/services.dart';
@@ -72,6 +74,10 @@ class LobbyScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: state.topDocks
                       .map((e) => getWidgetFromRedockableInterface(e, true))
+                      .intersperseOuter(
+                        () => const DockingArea(
+                            isInsideColumn: false, dock: Dock.top),
+                      )
                       .toList(),
                 ),
                 // left center right
@@ -82,41 +88,29 @@ class LobbyScreen extends StatelessWidget {
                         children: state.leftDocks
                             .map((e) =>
                                 getWidgetFromRedockableInterface(e, false))
+                            .intersperseOuter(
+                              () => const DockingArea(
+                                  isInsideColumn: false, dock: Dock.left),
+                            )
                             .toList(),
                       ),
                       const Expanded(
                         child: Stack(
                           children: [
                             BrowserScreen(),
-                            Align(
-                              alignment: Alignment.topCenter,
-                              child: DockingArea(
-                                isInsideColumn: true,
-                                dock: Dock.top,
-                              ),
-                            ),
-                            Align(
-                                alignment: Alignment.centerLeft,
-                                child: DockingArea(
-                                    isInsideColumn: false, dock: Dock.left)),
-                            Align(
-                                alignment: Alignment.centerRight,
-                                child: DockingArea(
-                                    isInsideColumn: false, dock: Dock.right)),
-                            Align(
-                                alignment: Alignment.bottomCenter,
-                                child: DockingArea(
-                                    isInsideColumn: true, dock: Dock.bottom)),
                           ],
                         ),
                       ),
                       // right
                       Row(
-                        children: state.rightDocks
-                            .map((e) =>
-                                getWidgetFromRedockableInterface(e, false))
-                            .toList(),
-                      ),
+                          children: state.rightDocks
+                              .map((e) =>
+                                  getWidgetFromRedockableInterface(e, false))
+                              .intersperseOuter(
+                                () => const DockingArea(
+                                    isInsideColumn: false, dock: Dock.right),
+                              )
+                              .toList()),
                     ],
                   ),
                 ),
@@ -124,6 +118,10 @@ class LobbyScreen extends StatelessWidget {
                 Column(
                   children: state.bottomDocks
                       .map((e) => getWidgetFromRedockableInterface(e, true))
+                      .intersperseOuter(
+                        () => const DockingArea(
+                            isInsideColumn: true, dock: Dock.bottom),
+                      )
                       .toList(),
                 ),
               ],
