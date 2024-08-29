@@ -75,7 +75,7 @@ class HtmlPage extends Page {
 
   @override
   String? getTitle() {
-    return document?.getElementsByTagName("title").firstOrNull?.text;
+    return document?.getElementsByTagName("title").firstOrNull?.text.trim();
   }
 }
 

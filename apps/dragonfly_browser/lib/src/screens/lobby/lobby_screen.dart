@@ -6,9 +6,9 @@ class LobbyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.black87.withAlpha(200),
-      ),
+      decoration: const BoxDecoration(
+          // color: Colors.black87.withAlpha(200),
+          ),
       child: Center(
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -21,7 +21,7 @@ class LobbyScreen extends StatelessWidget {
               "Dragonfly",
               style: TextStyle(
                 fontSize: 32,
-                color: Colors.white,
+                // color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),
