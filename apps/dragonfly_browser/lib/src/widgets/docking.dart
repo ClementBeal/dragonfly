@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DockingArea extends StatefulWidget {
-  const DockingArea({super.key, required this.isInsideColumn});
+  const DockingArea(
+      {super.key, required this.isInsideColumn, required this.dock});
 
   final bool isInsideColumn;
+  final Dock dock;
 
   @override
   State<DockingArea> createState() => _DockingAreaState();
@@ -17,46 +19,50 @@ class _DockingAreaState extends State<DockingArea> {
 
   @override
   Widget build(BuildContext context) {
-    return DragTarget<RedockableInterface>(
-      onAcceptWithDetails: (details) {
-        setState(() {
-          _possibleInterface = details.data;
-        });
-      },
-      onMove: (details) {
-        setState(() {
-          _possibleInterface = details.data;
-        });
-      },
-      onLeave: (data) {
-        setState(() {
-          _possibleInterface = null;
-        });
-      },
-      builder: (context, candidateData, rejectedData) =>
-          BlocBuilder<BrowserInterfaceCubit, BrowserInterfaceState>(
-        builder: (context, state) {
-          return (_possibleInterface != null)
-              ? BrowserTabBar(widget.isInsideColumn)
-              : Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.blue.shade600.withOpacity(0.4),
-                    border: Border.all(
-                      width: 4,
-                      color: Colors.blue.shade600,
+    return BlocBuilder<BrowserInterfaceCubit, BrowserInterfaceState>(
+      builder: (context, state) => Visibility(
+        visible: state.currentRedockingInterface != null,
+        child: DragTarget<RedockableInterface>(
+          onAcceptWithDetails: (details) {
+            context
+                .read<BrowserInterfaceCubit>()
+                .addToDock(widget.dock, details.data);
+            setState(() {
+              _possibleInterface = null;
+            });
+          },
+          onMove: (details) {
+            setState(() {
+              _possibleInterface = details.data;
+            });
+          },
+          onLeave: (data) {
+            setState(() {
+              _possibleInterface = null;
+            });
+          },
+          builder: (context, candidateData, rejectedData) =>
+              (_possibleInterface != null)
+                  ? BrowserTabBar(widget.isInsideColumn)
+                  : Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.blue.shade600.withOpacity(0.4),
+                        border: Border.all(
+                          width: 4,
+                          color: Colors.blue.shade600,
+                        ),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.add,
+                          color: Colors.blue.shade600,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      Icons.add,
-                      color: Colors.blue.shade600,
-                    ),
-                  ),
-                );
-        },
+        ),
       ),
     );
   }

@@ -2,6 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 enum RedockableInterface { devtools, tabBar, searchBar, bookmarks }
 
+enum Dock { top, bottom, left, right }
+
 class BrowserInterfaceState {
   final bool showDevtools;
   final RedockableInterface? currentRedockingInterface;
@@ -87,5 +89,22 @@ class BrowserInterfaceCubit extends Cubit<BrowserInterfaceState> {
         currentRedockingInterface: () => null,
       ),
     );
+  }
+
+  void addToDock(Dock dock, RedockableInterface interface) {
+    switch (dock) {
+      case Dock.top:
+        state.topDocks.add(interface);
+
+      case Dock.bottom:
+        state.bottomDocks.add(interface);
+
+      case Dock.left:
+        state.leftDocks.add(interface);
+
+      case Dock.right:
+        state.rightDocks.add(interface);
+    }
+    emit(state.copyWith());
   }
 }
