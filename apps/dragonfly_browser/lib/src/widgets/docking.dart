@@ -1,7 +1,20 @@
+import 'package:dragonfly/src/screens/developer_tools/developer_tools_screen.dart';
+import 'package:dragonfly/src/screens/favorites/favorite_bar.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
+import 'package:dragonfly/src/screens/scaffold/browser_scaffold.dart';
 import 'package:dragonfly/src/screens/scaffold/widgets/tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+Widget getWidgetFromRedockableInterface(
+    RedockableInterface e, bool isInsideColumn) {
+  return switch (e) {
+    RedockableInterface.devtools => const DeveloperToolsScreen(),
+    RedockableInterface.tabBar => BrowserTabBar(isInsideColumn),
+    RedockableInterface.searchBar => const BrowserActionBar(),
+    RedockableInterface.bookmarks => const FavoriteTabBar(),
+  };
+}
 
 class DockingArea extends StatefulWidget {
   const DockingArea(
@@ -42,53 +55,50 @@ class _DockingAreaState extends State<DockingArea> {
             });
           },
           builder: (context, candidateData, rejectedData) =>
-              (_possibleInterface != null)
-                  ? BrowserTabBar(widget.isInsideColumn)
-                  : Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.blue.shade600.withOpacity(0.4),
-                        border: Border.all(
-                          width: 4,
-                          color: Colors.blue.shade600,
-                        ),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.add,
-                          color: Colors.blue.shade600,
-                        ),
-                      ),
-                    ),
+              switch (_possibleInterface) {
+            null => Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.blue.shade600.withOpacity(0.4),
+                  border: Border.all(
+                    width: 4,
+                    color: Colors.blue.shade600,
+                  ),
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.add,
+                    color: Colors.blue.shade600,
+                  ),
+                ),
+              ),
+            _ => getWidgetFromRedockableInterface(
+                _possibleInterface!, widget.isInsideColumn),
+          },
         ),
       ),
     );
   }
 }
 
-class RedockableWidget extends StatefulWidget {
+class RedockableWidget extends StatelessWidget {
   final RedockableInterface interface;
+  final int position;
   final Widget child;
 
   const RedockableWidget({
     super.key,
     required this.child,
+    required this.position,
     required this.interface,
   });
 
   @override
-  State<RedockableWidget> createState() => _RedockableWidgetState();
-}
-
-class _RedockableWidgetState extends State<RedockableWidget> {
-  bool isDragging = false;
-
-  @override
   Widget build(BuildContext context) {
     return LongPressDraggable<RedockableInterface>(
-      data: widget.interface,
+      data: interface,
       feedback: Material(
         color: Colors.transparent,
         child: CircleAvatar(
@@ -103,9 +113,7 @@ class _RedockableWidgetState extends State<RedockableWidget> {
       dragAnchorStrategy: pointerDragAnchorStrategy,
       childWhenDragging: const SizedBox.shrink(),
       onDragStarted: () {
-        context
-            .read<BrowserInterfaceCubit>()
-            .startToRedockInterface(widget.interface);
+        context.read<BrowserInterfaceCubit>().startToRedockInterface(interface);
       },
       onDraggableCanceled: (velocity, offset) {
         context.read<BrowserInterfaceCubit>().endToRedockInterface();
@@ -116,7 +124,7 @@ class _RedockableWidgetState extends State<RedockableWidget> {
       onDragCompleted: () {
         context.read<BrowserInterfaceCubit>().endToRedockInterface();
       },
-      child: widget.child,
+      child: child,
     );
   }
 }

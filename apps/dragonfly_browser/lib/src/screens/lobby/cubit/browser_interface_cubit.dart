@@ -1,12 +1,16 @@
+import 'package:collection/collection.dart';
+import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 enum RedockableInterface { devtools, tabBar, searchBar, bookmarks }
+
+typedef RedockingData = (RedockableInterface interface, int index);
 
 enum Dock { top, bottom, left, right }
 
 class BrowserInterfaceState {
   final bool showDevtools;
-  final RedockableInterface? currentRedockingDock;
+  final RedockingData? currentRedockingDock;
   final List<RedockableInterface> topDocks;
   final List<RedockableInterface> leftDocks;
   final List<RedockableInterface> bottomDocks;
@@ -38,7 +42,7 @@ class BrowserInterfaceState {
 
   BrowserInterfaceState copyWith({
     bool? showDevtools,
-    RedockableInterface? Function()? currentRedockingDock,
+    RedockingData? Function()? currentRedockingDock,
     List<RedockableInterface>? topDocks,
     List<RedockableInterface>? leftDocks,
     List<RedockableInterface>? bottomDocks,
@@ -76,9 +80,22 @@ class BrowserInterfaceCubit extends Cubit<BrowserInterfaceState> {
   }
 
   void startToRedockInterface(RedockableInterface interface) {
+    final a = state.topDocks.indexWhere((e) => e == interface);
+    final b = state.leftDocks.indexWhere((e) => e == interface);
+    final c = state.bottomDocks.indexWhere((e) => e == interface);
+    final d = state.rightDocks.indexWhere((e) => e == interface);
+
+    final index = (a >= 0)
+        ? a
+        : (b >= 0)
+            ? b
+            : (c >= 0)
+                ? c
+                : d;
+
     emit(
       state.copyWith(
-        currentRedockingDock: () => interface,
+        currentRedockingDock: () => (interface, index),
       ),
     );
   }
@@ -97,18 +114,36 @@ class BrowserInterfaceCubit extends Cubit<BrowserInterfaceState> {
     state.leftDocks.remove(interface);
     state.rightDocks.remove(interface);
 
+    var index = state.currentRedockingDock!.$2 - 1;
+
     switch (dock) {
       case Dock.top:
-        state.topDocks.add(interface);
+        if (state.topDocks.length >= index) {
+          state.topDocks.add(interface);
+        } else {
+          state.topDocks.insert(index, interface);
+        }
 
       case Dock.bottom:
-        state.bottomDocks.add(interface);
+        if (state.bottomDocks.length >= index) {
+          state.bottomDocks.add(interface);
+        } else {
+          state.bottomDocks.insert(index, interface);
+        }
 
       case Dock.left:
-        state.leftDocks.add(interface);
+        if (state.leftDocks.length >= index) {
+          state.leftDocks.add(interface);
+        } else {
+          state.leftDocks.insert(index, interface);
+        }
 
       case Dock.right:
-        state.rightDocks.add(interface);
+        if (state.rightDocks.length >= index) {
+          state.rightDocks.add(interface);
+        } else {
+          state.rightDocks.insert(index, interface);
+        }
     }
     emit(state.copyWith());
   }

@@ -1,16 +1,13 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:dragonfly/shortcuts/shortcuts.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/browser/browser_screen.dart';
-import 'package:dragonfly/src/screens/developer_tools/developer_tools_screen.dart';
-import 'package:dragonfly/src/screens/favorites/favorite_bar.dart';
 import 'package:dragonfly/src/screens/history/history_screen.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
-import 'package:dragonfly/src/screens/scaffold/widgets/tab_bar.dart';
 import 'package:dragonfly/src/widgets/docking.dart';
 import 'package:dragonfly/utils/extensions/list.dart';
-import 'package:dragonfly/utils/list.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Tab;
 import 'package:flutter/services.dart';
@@ -73,7 +70,13 @@ class LobbyScreen extends StatelessWidget {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: state.topDocks
-                      .map((e) => getWidgetFromRedockableInterface(e, true))
+                      .mapIndexed<Widget>(
+                        (i, e) => RedockableWidget(
+                          position: i,
+                          interface: e,
+                          child: getWidgetFromRedockableInterface(e, true),
+                        ),
+                      )
                       .intersperseOuter(
                         () => const DockingArea(
                             isInsideColumn: false, dock: Dock.top),
@@ -86,8 +89,14 @@ class LobbyScreen extends StatelessWidget {
                     children: [
                       Row(
                         children: state.leftDocks
-                            .map((e) =>
-                                getWidgetFromRedockableInterface(e, false))
+                            .mapIndexed<Widget>(
+                              (i, e) => RedockableWidget(
+                                position: i,
+                                interface: e,
+                                child:
+                                    getWidgetFromRedockableInterface(e, false),
+                              ),
+                            )
                             .intersperseOuter(
                               () => const DockingArea(
                                   isInsideColumn: false, dock: Dock.left),
@@ -104,8 +113,14 @@ class LobbyScreen extends StatelessWidget {
                       // right
                       Row(
                           children: state.rightDocks
-                              .map((e) =>
-                                  getWidgetFromRedockableInterface(e, false))
+                              .mapIndexed<Widget>(
+                                (i, e) => RedockableWidget(
+                                  position: i,
+                                  interface: e,
+                                  child: getWidgetFromRedockableInterface(
+                                      e, false),
+                                ),
+                              )
                               .intersperseOuter(
                                 () => const DockingArea(
                                     isInsideColumn: false, dock: Dock.right),
@@ -117,7 +132,10 @@ class LobbyScreen extends StatelessWidget {
                 // bottom
                 Column(
                   children: state.bottomDocks
-                      .map((e) => getWidgetFromRedockableInterface(e, true))
+                      .mapIndexed<Widget>((i, e) => RedockableWidget(
+                          position: i,
+                          interface: e,
+                          child: getWidgetFromRedockableInterface(e, true)))
                       .intersperseOuter(
                         () => const DockingArea(
                             isInsideColumn: true, dock: Dock.bottom),
@@ -130,16 +148,6 @@ class LobbyScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Widget getWidgetFromRedockableInterface(
-      RedockableInterface e, bool isInsideColumn) {
-    return switch (e) {
-      RedockableInterface.devtools => const DeveloperToolsScreen(),
-      RedockableInterface.tabBar => BrowserTabBar(isInsideColumn),
-      RedockableInterface.searchBar => const BrowserActionBar(),
-      RedockableInterface.bookmarks => const FavoriteTabBar(),
-    };
   }
 }
 

@@ -12,87 +12,51 @@ class BrowserTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RedockableWidget(
-      interface: RedockableInterface.tabBar,
-      child: BlocBuilder<BrowserCubit, Browser>(
-        builder: (context, state) {
-          // Use a column if isVertical is true, otherwise use a row.
-          if (!isInsideColumn) {
-            return SizedBox(
-              width: 60,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  border: Border(
-                    right: BorderSide(
-                      width: 2,
-                      color: Theme.of(context).colorScheme.surfaceContainer,
-                    ),
+    return BlocBuilder<BrowserCubit, Browser>(
+      builder: (context, state) {
+        // Use a column if isVertical is true, otherwise use a row.
+        if (!isInsideColumn) {
+          return SizedBox(
+            width: 60,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border(
+                  right: BorderSide(
+                    width: 2,
+                    color: Theme.of(context).colorScheme.surfaceContainer,
                   ),
                 ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: IconButton(
-                        onPressed: () =>
-                            context.read<BrowserCubit>().openNewTab(),
-                        style: ButtonStyle(
-                          shape: WidgetStatePropertyAll(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
-                            ),
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: IconButton(
+                      onPressed: () =>
+                          context.read<BrowserCubit>().openNewTab(),
+                      style: ButtonStyle(
+                        shape: WidgetStatePropertyAll(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4),
                           ),
                         ),
-                        icon: const Icon(Icons.add, size: 20),
                       ),
+                      icon: const Icon(Icons.add, size: 20),
                     ),
-                    const Divider(
-                      indent: 8,
-                      endIndent: 8,
-                    ),
-                    Expanded(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: state.tabs.length,
-                        itemBuilder: (context, index) {
-                          final tab = state.tabs[index];
-                          final isActive = tab.guid == state.currentTabGuid;
-
-                          return VerticalTab(
-                            tab: tab,
-                            isActive: isActive,
-                            onTap: () {
-                              context
-                                  .read<BrowserCubit>()
-                                  .switchToTab(tab.guid);
-                            },
-                            onClose: () {
-                              context.read<BrowserCubit>().closeTab(tab.guid);
-                            },
-                            isVertical: isInsideColumn,
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          } else {
-            return SizedBox(
-              height: 48,
-              child: Row(
-                children: [
+                  ),
+                  const Divider(
+                    indent: 8,
+                    endIndent: 8,
+                  ),
                   Expanded(
                     child: ListView.builder(
                       shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
                       itemCount: state.tabs.length,
                       itemBuilder: (context, index) {
                         final tab = state.tabs[index];
                         final isActive = tab.guid == state.currentTabGuid;
 
-                        return FlatTab(
+                        return VerticalTab(
                           tab: tab,
                           isActive: isActive,
                           onTap: () {
@@ -106,27 +70,57 @@ class BrowserTabBar extends StatelessWidget {
                       },
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: IconButton.filled(
-                      onPressed: () =>
-                          context.read<BrowserCubit>().openNewTab(),
-                      style: ButtonStyle(
-                        shape: WidgetStatePropertyAll(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                      ),
-                      icon: const Icon(Icons.add, size: 20),
-                    ),
-                  ),
                 ],
               ),
-            );
-          }
-        },
-      ),
+            ),
+          );
+        } else {
+          return SizedBox(
+            height: 48,
+            child: Row(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: state.tabs.length,
+                    itemBuilder: (context, index) {
+                      final tab = state.tabs[index];
+                      final isActive = tab.guid == state.currentTabGuid;
+
+                      return FlatTab(
+                        tab: tab,
+                        isActive: isActive,
+                        onTap: () {
+                          context.read<BrowserCubit>().switchToTab(tab.guid);
+                        },
+                        onClose: () {
+                          context.read<BrowserCubit>().closeTab(tab.guid);
+                        },
+                        isVertical: isInsideColumn,
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: IconButton.filled(
+                    onPressed: () => context.read<BrowserCubit>().openNewTab(),
+                    style: ButtonStyle(
+                      shape: WidgetStatePropertyAll(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ),
+                    icon: const Icon(Icons.add, size: 20),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 }
