@@ -55,8 +55,9 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
                           context
                               .read<BrowserInterfaceCubit>()
                               .startToRedockInterface(
-                                RedockableInterface.devtools, // TO DO : fix
-                              );
+                                  RedockableInterface.devtools,
+                                  Dock.bottom // TO DO : fix
+                                  );
                         },
                         onLongPressUp: () {
                           context

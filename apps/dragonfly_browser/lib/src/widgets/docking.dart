@@ -17,11 +17,16 @@ Widget getWidgetFromRedockableInterface(
 }
 
 class DockingArea extends StatefulWidget {
-  const DockingArea(
-      {super.key, required this.isInsideColumn, required this.dock});
+  const DockingArea({
+    super.key,
+    required this.isInsideColumn,
+    required this.dock,
+    required this.position,
+  });
 
   final bool isInsideColumn;
   final Dock dock;
+  final int position;
 
   @override
   State<DockingArea> createState() => _DockingAreaState();
@@ -39,7 +44,7 @@ class _DockingAreaState extends State<DockingArea> {
           onAcceptWithDetails: (details) {
             context
                 .read<BrowserInterfaceCubit>()
-                .addToDock(widget.dock, details.data);
+                .addToDock(widget.dock, details.data, widget.position);
             setState(() {
               _possibleInterface = null;
             });
@@ -87,12 +92,14 @@ class RedockableWidget extends StatelessWidget {
   final RedockableInterface interface;
   final int position;
   final Widget child;
+  final Dock dock;
 
   const RedockableWidget({
     super.key,
     required this.child,
     required this.position,
     required this.interface,
+    required this.dock,
   });
 
   @override
@@ -111,15 +118,14 @@ class RedockableWidget extends StatelessWidget {
         ),
       ),
       dragAnchorStrategy: pointerDragAnchorStrategy,
-      childWhenDragging: const SizedBox.shrink(),
+      childWhenDragging: child,
       onDragStarted: () {
-        context.read<BrowserInterfaceCubit>().startToRedockInterface(interface);
+        context
+            .read<BrowserInterfaceCubit>()
+            .startToRedockInterface(interface, dock);
       },
       onDraggableCanceled: (velocity, offset) {
-        context.read<BrowserInterfaceCubit>().endToRedockInterface();
-      },
-      onDragEnd: (details) {
-        context.read<BrowserInterfaceCubit>().endToRedockInterface();
+        context.read<BrowserInterfaceCubit>().resetToRedockInterface();
       },
       onDragCompleted: () {
         context.read<BrowserInterfaceCubit>().endToRedockInterface();

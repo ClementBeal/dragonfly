@@ -74,12 +74,16 @@ class LobbyScreen extends StatelessWidget {
                         (i, e) => RedockableWidget(
                           position: i,
                           interface: e,
+                          dock: Dock.top,
                           child: getWidgetFromRedockableInterface(e, true),
                         ),
                       )
-                      .intersperseOuter(
-                        () => const DockingArea(
-                            isInsideColumn: false, dock: Dock.top),
+                      .addAfterEach(
+                        (i) => DockingArea(
+                          isInsideColumn: false,
+                          dock: Dock.top,
+                          position: i,
+                        ),
                       )
                       .toList(),
                 ),
@@ -93,22 +97,22 @@ class LobbyScreen extends StatelessWidget {
                               (i, e) => RedockableWidget(
                                 position: i,
                                 interface: e,
+                                dock: Dock.left,
                                 child:
                                     getWidgetFromRedockableInterface(e, false),
                               ),
                             )
-                            .intersperseOuter(
-                              () => const DockingArea(
-                                  isInsideColumn: false, dock: Dock.left),
+                            .addAfterEach(
+                              (i) => DockingArea(
+                                isInsideColumn: false,
+                                dock: Dock.left,
+                                position: i,
+                              ),
                             )
                             .toList(),
                       ),
                       const Expanded(
-                        child: Stack(
-                          children: [
-                            BrowserScreen(),
-                          ],
-                        ),
+                        child: BrowserScreen(),
                       ),
                       // right
                       Row(
@@ -117,13 +121,17 @@ class LobbyScreen extends StatelessWidget {
                                 (i, e) => RedockableWidget(
                                   position: i,
                                   interface: e,
+                                  dock: Dock.right,
                                   child: getWidgetFromRedockableInterface(
                                       e, false),
                                 ),
                               )
-                              .intersperseOuter(
-                                () => const DockingArea(
-                                    isInsideColumn: false, dock: Dock.right),
+                              .addAfterEach(
+                                (i) => DockingArea(
+                                  isInsideColumn: false,
+                                  dock: Dock.right,
+                                  position: i,
+                                ),
                               )
                               .toList()),
                     ],
@@ -135,10 +143,14 @@ class LobbyScreen extends StatelessWidget {
                       .mapIndexed<Widget>((i, e) => RedockableWidget(
                           position: i,
                           interface: e,
+                          dock: Dock.bottom,
                           child: getWidgetFromRedockableInterface(e, true)))
-                      .intersperseOuter(
-                        () => const DockingArea(
-                            isInsideColumn: true, dock: Dock.bottom),
+                      .addAfterEach(
+                        (i) => DockingArea(
+                          isInsideColumn: true,
+                          dock: Dock.bottom,
+                          position: i,
+                        ),
                       )
                       .toList(),
                 ),

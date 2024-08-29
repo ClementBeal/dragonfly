@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 enum RedockableInterface { devtools, tabBar, searchBar, bookmarks }
 
-typedef RedockingData = (RedockableInterface interface, int index);
+typedef RedockingData = (RedockableInterface interface, int index, Dock dock);
 
 enum Dock { top, bottom, left, right }
 
@@ -79,7 +79,7 @@ class BrowserInterfaceCubit extends Cubit<BrowserInterfaceState> {
     emit(state.copyWith(showDevtools: !state.showDevtools));
   }
 
-  void startToRedockInterface(RedockableInterface interface) {
+  void startToRedockInterface(RedockableInterface interface, Dock dock) {
     final a = state.topDocks.indexWhere((e) => e == interface);
     final b = state.leftDocks.indexWhere((e) => e == interface);
     final c = state.bottomDocks.indexWhere((e) => e == interface);
@@ -95,7 +95,15 @@ class BrowserInterfaceCubit extends Cubit<BrowserInterfaceState> {
 
     emit(
       state.copyWith(
-        currentRedockingDock: () => (interface, index),
+        currentRedockingDock: () => (interface, index, dock),
+      ),
+    );
+  }
+
+  void resetToRedockInterface() {
+    emit(
+      state.copyWith(
+        currentRedockingDock: () => null,
       ),
     );
   }
@@ -108,38 +116,38 @@ class BrowserInterfaceCubit extends Cubit<BrowserInterfaceState> {
     );
   }
 
-  void addToDock(Dock dock, RedockableInterface interface) {
+  void addToDock(Dock dock, RedockableInterface interface, int index) {
     state.topDocks.remove(interface);
     state.bottomDocks.remove(interface);
     state.leftDocks.remove(interface);
     state.rightDocks.remove(interface);
 
-    var index = state.currentRedockingDock!.$2 - 1;
+    print(index);
 
     switch (dock) {
       case Dock.top:
-        if (state.topDocks.length >= index) {
+        if (state.topDocks.length <= index) {
           state.topDocks.add(interface);
         } else {
           state.topDocks.insert(index, interface);
         }
 
       case Dock.bottom:
-        if (state.bottomDocks.length >= index) {
+        if (state.bottomDocks.length <= index) {
           state.bottomDocks.add(interface);
         } else {
           state.bottomDocks.insert(index, interface);
         }
 
       case Dock.left:
-        if (state.leftDocks.length >= index) {
+        if (state.leftDocks.length <= index) {
           state.leftDocks.add(interface);
         } else {
           state.leftDocks.insert(index, interface);
         }
 
       case Dock.right:
-        if (state.rightDocks.length >= index) {
+        if (state.rightDocks.length <= index) {
           state.rightDocks.add(interface);
         } else {
           state.rightDocks.insert(index, interface);
