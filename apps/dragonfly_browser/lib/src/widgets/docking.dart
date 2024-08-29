@@ -21,7 +21,7 @@ class _DockingAreaState extends State<DockingArea> {
   Widget build(BuildContext context) {
     return BlocBuilder<BrowserInterfaceCubit, BrowserInterfaceState>(
       builder: (context, state) => Visibility(
-        visible: state.currentRedockingInterface != null,
+        visible: state.currentRedockingDock != null,
         child: DragTarget<RedockableInterface>(
           onAcceptWithDetails: (details) {
             context
@@ -69,13 +69,13 @@ class _DockingAreaState extends State<DockingArea> {
 }
 
 class RedockableWidget extends StatefulWidget {
-  final RedockableInterface type;
+  final RedockableInterface interface;
   final Widget child;
 
   const RedockableWidget({
     super.key,
-    required this.type,
     required this.child,
+    required this.interface,
   });
 
   @override
@@ -87,14 +87,14 @@ class _RedockableWidgetState extends State<RedockableWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return LongPressDraggable(
-      data: widget.type,
+    return LongPressDraggable<RedockableInterface>(
+      data: widget.interface,
       feedback: Material(
         color: Colors.transparent,
         child: CircleAvatar(
           radius: 30,
           backgroundColor: Colors.blueAccent.withOpacity(0.7),
-          child: Icon(
+          child: const Icon(
             Icons.drag_handle,
             color: Colors.white,
           ),
@@ -105,7 +105,7 @@ class _RedockableWidgetState extends State<RedockableWidget> {
       onDragStarted: () {
         context
             .read<BrowserInterfaceCubit>()
-            .startToRedockInterface(widget.type);
+            .startToRedockInterface(widget.interface);
       },
       onDraggableCanceled: (velocity, offset) {
         context.read<BrowserInterfaceCubit>().endToRedockInterface();

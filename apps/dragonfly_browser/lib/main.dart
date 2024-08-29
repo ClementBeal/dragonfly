@@ -86,7 +86,7 @@ class _MainAppState extends State<MainApp> {
           colorSchemeSeed: Colors.cyanAccent,
           brightness: Brightness.dark,
         ),
-        home: LobbyScreen(),
+        home: const LobbyScreen(),
       ),
     );
   }

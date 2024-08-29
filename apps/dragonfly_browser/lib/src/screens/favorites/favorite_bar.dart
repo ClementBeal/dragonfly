@@ -93,7 +93,7 @@ class _FavoriteChipState extends State<FavoriteChip> {
         onEnter: (event) => setState(() => _isHovered = true),
         onExit: (event) => setState(() => _isHovered = false),
         child: DecoratedBox(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
               // color: (_isHovered) ? Theme.of(context).primaryColor : null,
               ),
           child: Padding(

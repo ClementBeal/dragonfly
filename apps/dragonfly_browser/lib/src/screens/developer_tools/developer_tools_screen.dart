@@ -19,7 +19,7 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<BrowserInterfaceCubit, BrowserInterfaceState>(
       builder: (context, state) {
-        if (!state.showDevtools) return SizedBox.shrink();
+        if (!state.showDevtools) return const SizedBox.shrink();
 
         return DecoratedBox(
           decoration: BoxDecoration(
@@ -63,12 +63,12 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
                               .read<BrowserInterfaceCubit>()
                               .endToRedockInterface();
                         },
-                        child: Icon(
+                        child: const Icon(
                           Icons.pan_tool_alt,
                           // color: Colors.red.shade600,
                         ),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       IconWithTool(
                         icon: Icons.sync_alt_outlined,
                         label: "Network",
@@ -77,7 +77,7 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
                     ],
                   ),
                 ),
-                Expanded(child: NetworkToolScreen()),
+                const Expanded(child: NetworkToolScreen()),
               ],
             ),
           ),

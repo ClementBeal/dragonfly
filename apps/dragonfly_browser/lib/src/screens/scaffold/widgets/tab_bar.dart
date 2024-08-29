@@ -13,7 +13,7 @@ class BrowserTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RedockableWidget(
-      type: RedockableInterface.tabBar,
+      interface: RedockableInterface.tabBar,
       child: BlocBuilder<BrowserCubit, Browser>(
         builder: (context, state) {
           // Use a column if isVertical is true, otherwise use a row.
@@ -46,7 +46,7 @@ class BrowserTabBar extends StatelessWidget {
                         icon: const Icon(Icons.add, size: 20),
                       ),
                     ),
-                    Divider(
+                    const Divider(
                       indent: 8,
                       endIndent: 8,
                     ),
@@ -172,7 +172,7 @@ class FlatTab extends StatelessWidget {
               ),
             ),
             child: ConstrainedBox(
-              constraints: BoxConstraints(
+              constraints: const BoxConstraints(
                 minHeight: 80,
                 maxWidth: 120,
               ),
@@ -263,7 +263,7 @@ class VerticalTab extends StatelessWidget {
                         ),
                       )
                     else
-                      Icon(Icons.language),
+                      const Icon(Icons.language),
                     // Expanded(
                     //   child: Text(
                     //     tab.currentPage?.getTitle() ?? "No title",
@@ -284,6 +284,5 @@ class VerticalTab extends StatelessWidget {
         ),
       ),
     );
-    ;
   }
 }

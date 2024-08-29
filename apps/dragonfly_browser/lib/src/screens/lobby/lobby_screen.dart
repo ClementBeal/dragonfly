@@ -6,7 +6,7 @@ class LobbyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
           // color: Colors.black87.withAlpha(200),
           ),
       child: Center(

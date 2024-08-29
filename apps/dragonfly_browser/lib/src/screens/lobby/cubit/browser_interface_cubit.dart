@@ -6,7 +6,7 @@ enum Dock { top, bottom, left, right }
 
 class BrowserInterfaceState {
   final bool showDevtools;
-  final RedockableInterface? currentRedockingInterface;
+  final RedockableInterface? currentRedockingDock;
   final List<RedockableInterface> topDocks;
   final List<RedockableInterface> leftDocks;
   final List<RedockableInterface> bottomDocks;
@@ -14,7 +14,7 @@ class BrowserInterfaceState {
 
   BrowserInterfaceState({
     required this.showDevtools,
-    this.currentRedockingInterface,
+    this.currentRedockingDock,
     required this.topDocks,
     required this.leftDocks,
     required this.bottomDocks,
@@ -23,7 +23,7 @@ class BrowserInterfaceState {
 
   factory BrowserInterfaceState.initial() => BrowserInterfaceState(
         showDevtools: false,
-        currentRedockingInterface: null,
+        currentRedockingDock: null,
         topDocks: [
           RedockableInterface.tabBar,
           RedockableInterface.searchBar,
@@ -38,7 +38,7 @@ class BrowserInterfaceState {
 
   BrowserInterfaceState copyWith({
     bool? showDevtools,
-    RedockableInterface? Function()? currentRedockingInterface,
+    RedockableInterface? Function()? currentRedockingDock,
     List<RedockableInterface>? topDocks,
     List<RedockableInterface>? leftDocks,
     List<RedockableInterface>? bottomDocks,
@@ -46,9 +46,9 @@ class BrowserInterfaceState {
   }) {
     return BrowserInterfaceState(
       showDevtools: showDevtools ?? this.showDevtools,
-      currentRedockingInterface: (currentRedockingInterface != null)
-          ? currentRedockingInterface()
-          : this.currentRedockingInterface,
+      currentRedockingDock: (currentRedockingDock != null)
+          ? currentRedockingDock()
+          : this.currentRedockingDock,
       topDocks: topDocks ?? this.topDocks,
       leftDocks: leftDocks ?? this.leftDocks,
       bottomDocks: bottomDocks ?? this.bottomDocks,
@@ -78,7 +78,7 @@ class BrowserInterfaceCubit extends Cubit<BrowserInterfaceState> {
   void startToRedockInterface(RedockableInterface interface) {
     emit(
       state.copyWith(
-        currentRedockingInterface: () => interface,
+        currentRedockingDock: () => interface,
       ),
     );
   }
@@ -86,12 +86,17 @@ class BrowserInterfaceCubit extends Cubit<BrowserInterfaceState> {
   void endToRedockInterface() {
     emit(
       state.copyWith(
-        currentRedockingInterface: () => null,
+        currentRedockingDock: () => null,
       ),
     );
   }
 
   void addToDock(Dock dock, RedockableInterface interface) {
+    state.topDocks.remove(interface);
+    state.bottomDocks.remove(interface);
+    state.leftDocks.remove(interface);
+    state.rightDocks.remove(interface);
+
     switch (dock) {
       case Dock.top:
         state.topDocks.add(interface);

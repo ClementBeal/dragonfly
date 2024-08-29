@@ -84,7 +84,7 @@ class LobbyScreen extends StatelessWidget {
                                 getWidgetFromRedockableInterface(e, false))
                             .toList(),
                       ),
-                      Expanded(
+                      const Expanded(
                         child: Stack(
                           children: [
                             BrowserScreen(),
@@ -139,8 +139,8 @@ class LobbyScreen extends StatelessWidget {
     return switch (e) {
       RedockableInterface.devtools => const DeveloperToolsScreen(),
       RedockableInterface.tabBar => BrowserTabBar(isInsideColumn),
-      RedockableInterface.searchBar => BrowserActionBar(),
-      RedockableInterface.bookmarks => FavoriteTabBar(),
+      RedockableInterface.searchBar => const BrowserActionBar(),
+      RedockableInterface.bookmarks => const FavoriteTabBar(),
     };
   }
 }
