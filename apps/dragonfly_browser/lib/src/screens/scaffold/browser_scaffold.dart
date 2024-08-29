@@ -80,7 +80,7 @@ class LobbyScreen extends StatelessWidget {
                       )
                       .addAfterEach(
                         (i) => DockingArea(
-                          isInsideColumn: false,
+                          isInsideColumn: true,
                           dock: Dock.top,
                           position: i,
                         ),
