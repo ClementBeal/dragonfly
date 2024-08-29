@@ -9,7 +9,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 Widget getWidgetFromRedockableInterface(
     RedockableInterface e, bool isInsideColumn) {
   return switch (e) {
-    RedockableInterface.devtools => const DeveloperToolsScreen(),
+    RedockableInterface.devtools => DeveloperToolsScreen(
+        isInsideColumn: isInsideColumn,
+      ),
     RedockableInterface.tabBar => BrowserTabBar(isInsideColumn),
     RedockableInterface.searchBar => const BrowserActionBar(),
     RedockableInterface.bookmarks => const FavoriteTabBar(),

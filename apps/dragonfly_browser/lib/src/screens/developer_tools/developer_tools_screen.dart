@@ -6,7 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 enum DeveloperTool { network }
 
 class DeveloperToolsScreen extends StatefulWidget {
-  const DeveloperToolsScreen({super.key});
+  const DeveloperToolsScreen({super.key, required this.isInsideColumn});
+
+  final bool isInsideColumn;
 
   @override
   State<DeveloperToolsScreen> createState() => _DeveloperToolsScreenState();
@@ -31,7 +33,8 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
             ),
           ),
           child: SizedBox(
-            width: 200,
+            width: (!widget.isInsideColumn) ? 200 : null,
+            height: (widget.isInsideColumn) ? 200 : null,
             child: Column(
               children: [
                 SizedBox(
@@ -48,25 +51,6 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
                             Icons.close,
                             color: Colors.red.shade600,
                           ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onLongPress: () {
-                          context
-                              .read<BrowserInterfaceCubit>()
-                              .startToRedockInterface(
-                                  RedockableInterface.devtools,
-                                  Dock.bottom // TO DO : fix
-                                  );
-                        },
-                        onLongPressUp: () {
-                          context
-                              .read<BrowserInterfaceCubit>()
-                              .endToRedockInterface();
-                        },
-                        child: const Icon(
-                          Icons.pan_tool_alt,
-                          // color: Colors.red.shade600,
                         ),
                       ),
                       const SizedBox(width: 8),
