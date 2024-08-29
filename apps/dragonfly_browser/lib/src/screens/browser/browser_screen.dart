@@ -10,66 +10,82 @@ import 'package:flutter/material.dart' hide Element;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:html/dom.dart' hide Text;
+import 'package:desktop_drop/desktop_drop.dart';
 
 class BrowserScreen extends StatelessWidget {
   const BrowserScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SelectionArea(
-      contextMenuBuilder: (BuildContext context, editableTextState) {
-        return AdaptiveTextSelectionToolbar.buttonItems(
-          anchors: editableTextState.contextMenuAnchors,
-          buttonItems: <ContextMenuButtonItem>[
-            ...editableTextState.contextMenuButtonItems,
-            ContextMenuButtonItem(
-              onPressed: () {
-                final state = context.read<BrowserCubit>().state;
-                final currentTab = state.currentTab;
-              },
-              label: 'View Source',
-            ),
-          ],
-        );
-      },
-      child: BlocBuilder<BrowserCubit, Browser>(
-        builder: (context, state) {
-          final tab = state.currentTab;
+    return DropTarget(
+      onDragDone: (details) {
+        if (details.files.isNotEmpty) {
+          for (var (i, file) in details.files.indexed) {
+            final path = Uri.parse("file://${file.path}");
 
-          if (tab == null || tab.currentPage == null) {
-            return const LobbyScreen();
+            context.read<BrowserCubit>().openNewTab(
+                  initialUrl: path.toFilePath(),
+                  switchTab: i == 0,
+                );
           }
-
-          final currentPage = tab.currentPage!;
-
-          return switch (currentPage.status) {
-            PageStatus.loading =>
-              const Center(child: CircularProgressIndicator()),
-            PageStatus.error => const Center(
-                child: Text("Error"),
-              ),
-            PageStatus.success => SizedBox.expand(
-                child: switch (currentPage) {
-                  FileExplorerPage p => FileExplorerPageScreen(
-                      page: p,
-                      tab: tab,
-                    ),
-                  HtmlPage() => SingleChildScrollView(
-                      child: CSSOMProvider(
-                        cssom: currentPage.cssom ?? cssomBuilder.browserStyle!,
-                        child: (currentPage.document!.documentElement != null)
-                            ? DomWidget(
-                                currentPage.document!.documentElement!,
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                    ),
-                  // TODO: Handle this case.
-                  MediaPage p => MediaPageScreen(page: p),
+        }
+      },
+      child: SelectionArea(
+        contextMenuBuilder: (BuildContext context, editableTextState) {
+          return AdaptiveTextSelectionToolbar.buttonItems(
+            anchors: editableTextState.contextMenuAnchors,
+            buttonItems: <ContextMenuButtonItem>[
+              ...editableTextState.contextMenuButtonItems,
+              ContextMenuButtonItem(
+                onPressed: () {
+                  final state = context.read<BrowserCubit>().state;
+                  final currentTab = state.currentTab;
                 },
+                label: 'View Source',
               ),
-          };
+            ],
+          );
         },
+        child: BlocBuilder<BrowserCubit, Browser>(
+          builder: (context, state) {
+            final tab = state.currentTab;
+
+            if (tab == null || tab.currentPage == null) {
+              return const LobbyScreen();
+            }
+
+            final currentPage = tab.currentPage!;
+
+            return switch (currentPage.status) {
+              PageStatus.loading =>
+                const Center(child: CircularProgressIndicator()),
+              PageStatus.error => const Center(
+                  child: Text("Error"),
+                ),
+              PageStatus.success => SizedBox.expand(
+                  child: switch (currentPage) {
+                    FileExplorerPage p => FileExplorerPageScreen(
+                        page: p,
+                        tab: tab,
+                      ),
+                    HtmlPage() => SingleChildScrollView(
+                        child: CSSOMProvider(
+                          cssom:
+                              currentPage.cssom ?? cssomBuilder.browserStyle!,
+                          child: (currentPage.document!.documentElement != null)
+                              ? DomWidget(
+                                  currentPage.document!.documentElement!,
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                      ),
+                    // TODO: Handle this case.
+                    MediaPage p => MediaPageScreen(page: p),
+                  },
+                ),
+            };
+          },
+        ),
       ),
     );
   }
