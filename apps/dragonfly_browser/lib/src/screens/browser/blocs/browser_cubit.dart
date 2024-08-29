@@ -10,8 +10,8 @@ class BrowserCubit extends Cubit<Browser> {
     emit(state.copyWith());
   }
 
-  void openNewTab({String? initialUrl}) {
-    state.openNewTab(initialUrl);
+  void openNewTab({String? initialUrl, bool switchTab = false}) {
+    state.openNewTab(initialUrl, switchTab: switchTab);
 
     emit(state.copyWith());
   }

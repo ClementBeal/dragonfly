@@ -243,7 +243,7 @@ class Browser {
     )..onUpdate = onUpdate;
   }
 
-  void openNewTab(String? initialUrl) {
+  void openNewTab(String? initialUrl, {bool switchTab = true}) {
     final newTab = Tab();
 
     if (initialUrl != null) {
@@ -251,7 +251,10 @@ class Browser {
     }
 
     tabs.add(newTab);
-    currentTabGuid = newTab.guid;
+
+    if (switchTab) {
+      switchToTab(newTab.guid);
+    }
   }
 
   void closeCurrentTab() {
