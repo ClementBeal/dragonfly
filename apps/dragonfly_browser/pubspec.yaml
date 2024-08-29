@@ -25,8 +25,8 @@ dependencies:
   html: ^0.15.4
   url_launcher: ^6.3.0
   audioplayers: ^6.1.0
+  data_table_2: ^2.5.15
 
-  data_table_2: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
