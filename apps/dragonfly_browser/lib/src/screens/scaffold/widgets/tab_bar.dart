@@ -28,21 +28,25 @@ class BrowserTabBar extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  // Padding(
-                  //   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  //   child: IconButton.filled(
-                  //     onPressed: () =>
-                  //         context.read<BrowserCubit>().openNewTab(),
-                  //     style: ButtonStyle(
-                  //       shape: WidgetStatePropertyAll(
-                  //         RoundedRectangleBorder(
-                  //           borderRadius: BorderRadius.circular(4),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //     icon: const Icon(Icons.add, size: 20),
-                  //   ),
-                  // ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: IconButton(
+                      onPressed: () =>
+                          context.read<BrowserCubit>().openNewTab(),
+                      style: ButtonStyle(
+                        shape: WidgetStatePropertyAll(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ),
+                      icon: const Icon(Icons.add, size: 20),
+                    ),
+                  ),
+                  Divider(
+                    indent: 8,
+                    endIndent: 8,
+                  ),
                   Expanded(
                     child: ListView.builder(
                       shrinkWrap: true,
@@ -233,6 +237,9 @@ class VerticalTab extends StatelessWidget {
         child: GestureDetector(
           onTap: onTap,
           child: Card(
+            color: isActive
+                ? Colors.blue.shade700.withOpacity(0.4)
+                : Colors.transparent,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Center(
