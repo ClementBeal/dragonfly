@@ -8,6 +8,7 @@ import 'package:dragonfly/src/screens/history/history_screen.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
 import 'package:dragonfly/src/widgets/docking.dart';
 import 'package:dragonfly/utils/extensions/list.dart';
+import 'package:dragonfly/utils/url_detection.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Tab;
 import 'package:flutter/services.dart';
@@ -237,9 +238,11 @@ class _SearchBarState extends State<SearchBar> {
           style: const TextStyle(color: Colors.white),
           textAlignVertical: TextAlignVertical.center,
           onEditingComplete: () {
-            var uri = Uri.parse(_searchController.text);
+            final formattedUri = detectUrl(_searchController.text);
 
-            context.read<BrowserCubit>().navigateToPage(uri.toString());
+            context
+                .read<BrowserCubit>()
+                .navigateToPage(formattedUri.toString());
           },
           decoration: InputDecoration(
             filled: true,
