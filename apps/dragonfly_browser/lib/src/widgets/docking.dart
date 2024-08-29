@@ -61,21 +61,23 @@ class _DockingAreaState extends State<DockingArea> {
           },
           builder: (context, candidateData, rejectedData) =>
               switch (_possibleInterface) {
-            null => Container(
-                width: 60,
-                height: 60,
+            null => DecoratedBox(
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
+                  // shape: BoxShape.circle,
                   color: Colors.blue.shade600.withOpacity(0.4),
                   border: Border.all(
                     width: 4,
                     color: Colors.blue.shade600,
                   ),
                 ),
-                child: Center(
-                  child: Icon(
-                    Icons.add,
-                    color: Colors.blue.shade600,
+                child: SizedBox(
+                  width: widget.isInsideColumn ? null : 40,
+                  height: !widget.isInsideColumn ? null : 40,
+                  child: Center(
+                    child: Icon(
+                      Icons.add,
+                      color: Colors.blue.shade600,
+                    ),
                   ),
                 ),
               ),
