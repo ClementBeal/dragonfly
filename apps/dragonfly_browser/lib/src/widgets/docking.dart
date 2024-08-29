@@ -1,54 +1,116 @@
-import 'package:dragonfly/src/screens/developer_tools/developer_tools_screen.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
+import 'package:dragonfly/src/screens/scaffold/widgets/tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DockingArea extends StatefulWidget {
-  const DockingArea({super.key});
+  const DockingArea({super.key, required this.isInsideColumn});
+
+  final bool isInsideColumn;
 
   @override
   State<DockingArea> createState() => _DockingAreaState();
 }
 
 class _DockingAreaState extends State<DockingArea> {
+  RedockableInterface? _possibleInterface;
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<BrowserInterfaceCubit, BrowserInterfaceState>(
-      builder: (context, state) {
-        final bool isDocking = state.currentRedockingInterface != null;
-        return DragTarget<RedockableInterface>(
-          builder: (context, candidateData, rejectedData) => AnimatedCrossFade(
-            duration: const Duration(milliseconds: 200),
-            crossFadeState: (isDocking)
-                ? CrossFadeState.showFirst
-                : CrossFadeState.showSecond,
-            secondChild: const SizedBox.shrink(),
-            firstChild: Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isDocking
-                    ? Colors.blue.shade600.withOpacity(0.4)
-                    : Colors.transparent,
-                // borderRadius: BorderRadius.circular(30),
-                border: isDocking
-                    ? Border.all(
-                        width: 4,
-                        color: Colors.blue.shade600,
-                      )
-                    : null,
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.add,
-                  color: isDocking ? Colors.white : Colors.blue.shade600,
-                ),
-              ),
-            ),
-          ),
-        );
+    return DragTarget<RedockableInterface>(
+      onAcceptWithDetails: (details) {
+        setState(() {
+          _possibleInterface = details.data;
+        });
       },
+      onMove: (details) {
+        setState(() {
+          _possibleInterface = details.data;
+        });
+      },
+      onLeave: (data) {
+        setState(() {
+          _possibleInterface = null;
+        });
+      },
+      builder: (context, candidateData, rejectedData) =>
+          BlocBuilder<BrowserInterfaceCubit, BrowserInterfaceState>(
+        builder: (context, state) {
+          return (_possibleInterface != null)
+              ? BrowserTabBar(widget.isInsideColumn)
+              : Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.blue.shade600.withOpacity(0.4),
+                    border: Border.all(
+                      width: 4,
+                      color: Colors.blue.shade600,
+                    ),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.add,
+                      color: Colors.blue.shade600,
+                    ),
+                  ),
+                );
+        },
+      ),
+    );
+  }
+}
+
+class RedockableWidget extends StatefulWidget {
+  final RedockableInterface type;
+  final Widget child;
+
+  const RedockableWidget({
+    super.key,
+    required this.type,
+    required this.child,
+  });
+
+  @override
+  State<RedockableWidget> createState() => _RedockableWidgetState();
+}
+
+class _RedockableWidgetState extends State<RedockableWidget> {
+  bool isDragging = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return LongPressDraggable(
+      data: widget.type,
+      feedback: Material(
+        color: Colors.transparent,
+        child: CircleAvatar(
+          radius: 30,
+          backgroundColor: Colors.blueAccent.withOpacity(0.7),
+          child: Icon(
+            Icons.drag_handle,
+            color: Colors.white,
+          ),
+        ),
+      ),
+      dragAnchorStrategy: pointerDragAnchorStrategy,
+      childWhenDragging: const SizedBox.shrink(),
+      onDragStarted: () {
+        context
+            .read<BrowserInterfaceCubit>()
+            .startToRedockInterface(widget.type);
+      },
+      onDraggableCanceled: (velocity, offset) {
+        context.read<BrowserInterfaceCubit>().endToRedockInterface();
+      },
+      onDragEnd: (details) {
+        context.read<BrowserInterfaceCubit>().endToRedockInterface();
+      },
+      onDragCompleted: () {
+        context.read<BrowserInterfaceCubit>().endToRedockInterface();
+      },
+      child: widget.child,
     );
   }
 }

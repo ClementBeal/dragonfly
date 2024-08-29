@@ -90,17 +90,17 @@ class LobbyScreen extends StatelessWidget {
                             BrowserScreen(),
                             Align(
                               alignment: Alignment.topCenter,
-                              child: DockingArea(),
+                              child: DockingArea(isInsideColumn: true),
                             ),
                             Align(
                                 alignment: Alignment.centerLeft,
-                                child: DockingArea()),
+                                child: DockingArea(isInsideColumn: false)),
                             Align(
                                 alignment: Alignment.centerRight,
-                                child: DockingArea()),
+                                child: DockingArea(isInsideColumn: false)),
                             Align(
                                 alignment: Alignment.bottomCenter,
-                                child: DockingArea()),
+                                child: DockingArea(isInsideColumn: true)),
                           ],
                         ),
                       ),

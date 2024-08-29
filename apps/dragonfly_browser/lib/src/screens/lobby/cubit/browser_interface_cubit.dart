@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 enum RedockableInterface { devtools, tabBar, searchBar, bookmarks }
@@ -28,9 +27,7 @@ class BrowserInterfaceState {
           RedockableInterface.searchBar,
           RedockableInterface.bookmarks,
         ],
-        leftDocks: [
-          RedockableInterface.tabBar,
-        ],
+        leftDocks: [],
         bottomDocks: [],
         rightDocks: [
           RedockableInterface.devtools,
