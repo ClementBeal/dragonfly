@@ -1,6 +1,4 @@
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
-import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
-import 'package:dragonfly/src/widgets/docking.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Tab;
 import 'package:flutter_bloc/flutter_bloc.dart';

@@ -51,11 +51,13 @@ class MediaPage extends Page {
 class HtmlPage extends Page {
   final Document? document;
   final CssomTree? cssom;
+  final Uri? favicon;
 
   HtmlPage(
       {required super.url,
       required super.status,
       super.guid,
+      this.favicon,
       required this.document,
       required this.cssom});
 
@@ -95,7 +97,8 @@ class Tab {
       _history.removeRange(_currentIndex + 1, _history.length);
     }
 
-    final scheme = Uri.parse(url).scheme;
+    final uriRequest = Uri.parse(url);
+    final scheme = uriRequest.scheme;
 
     if (scheme == "http" || scheme == "https") {
       _history.add(
@@ -108,12 +111,26 @@ class Tab {
       );
       _currentIndex++;
 
-      final document = await getHttp(Uri.parse(url));
+      final document = await getHttp(uriRequest);
       CssomTree? cssom;
+      Uri? favicon;
 
       if (document != null) {
         final linkCssNode =
             document.querySelectorAll('link[rel="stylesheet"]').firstOrNull;
+
+        final linkFavicon = document.querySelector('link[rel="icon"]');
+
+        if (linkFavicon != null) {
+          final href = linkFavicon.attributes["href"];
+          favicon = Uri.tryParse(href!) ?? uriRequest.replace(path: href);
+          print(favicon);
+
+          final faviconData = await http.get(favicon);
+
+          FileCache.cacheFile(favicon, faviconData.bodyBytes);
+        }
+
         if (linkCssNode != null) {
           final href = linkCssNode.attributes["href"];
           cssom = await getCss(Uri.parse(url).replace(path: href));
@@ -123,6 +140,7 @@ class Tab {
       _history.last = HtmlPage(
         document: document,
         cssom: cssom,
+        favicon: favicon,
         status: (document != null) ? PageStatus.success : PageStatus.error,
         url: url,
       );

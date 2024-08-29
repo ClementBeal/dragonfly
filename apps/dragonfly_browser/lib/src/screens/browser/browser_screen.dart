@@ -69,14 +69,20 @@ class BrowserScreen extends StatelessWidget {
                         tab: tab,
                       ),
                     HtmlPage() => SingleChildScrollView(
-                        child: CSSOMProvider(
-                          cssom:
-                              currentPage.cssom ?? cssomBuilder.browserStyle!,
-                          child: (currentPage.document!.documentElement != null)
-                              ? DomWidget(
-                                  currentPage.document!.documentElement!,
-                                )
-                              : const SizedBox.shrink(),
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                          ),
+                          child: CSSOMProvider(
+                            cssom:
+                                currentPage.cssom ?? cssomBuilder.browserStyle!,
+                            child:
+                                (currentPage.document!.documentElement != null)
+                                    ? DomWidget(
+                                        currentPage.document!.documentElement!,
+                                      )
+                                    : const SizedBox.shrink(),
+                          ),
                         ),
                       ),
                     // TODO: Handle this case.
