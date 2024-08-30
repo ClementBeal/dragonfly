@@ -76,14 +76,32 @@ class BrowserScreen extends StatelessWidget {
                                 currentPage.cssom ?? cssomBuilder.browserStyle!,
                             child:
                                 (currentPage.document!.documentElement != null)
-                                    ? DomWidget(
-                                        currentPage.document!.documentElement!,
-                                      )
+                                    ? Builder(builder: (context) {
+                                        // TO DO
+                                        // dirty hack for testing purpose
+                                        // it has to be moded to a special package
+                                        // called `dragonfly_renderer`
+
+                                        final renderTree = RenderTreeView(
+                                          devicePixelRatio: 3,
+                                          child: RenderTreeText(
+                                            text: "I lovee you",
+                                            color: "#0f0a32",
+                                            fontFamily: "Aria",
+                                            fontSize: 22,
+                                            letterSpacing: 12,
+                                            textAlign: "end",
+                                            wordSpacing: 30,
+                                            textDecoration: "wavy",
+                                          ),
+                                        );
+
+                                        return TreeRenderer(renderTree);
+                                      })
                                     : const SizedBox.shrink(),
                           ),
                         ),
                       ),
-                    // TODO: Handle this case.
                     MediaPage p => MediaPageScreen(page: p),
                   },
                 ),
@@ -92,6 +110,47 @@ class BrowserScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class TreeRenderer extends StatelessWidget {
+  const TreeRenderer(this.renderNode, {super.key});
+
+  final RenderTreeObject renderNode;
+
+  @override
+  Widget build(BuildContext context) {
+    return switch (renderNode) {
+      RenderTreeView r => Column(
+          // mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TreeRenderer(r.child),
+          ],
+        ),
+      RenderTreeText r => Text(
+          r.text,
+          textAlign: switch (r.textAlign) {
+            "start" => TextAlign.start,
+            "end" => TextAlign.end,
+            "left" => TextAlign.left,
+            "right" => TextAlign.right,
+            "center" => TextAlign.center,
+            "justify" => TextAlign.justify,
+            _ => null,
+          },
+          style: TextStyle(
+            color: (r.color != null) ? HexColor.fromHex(r.color!) : null,
+            fontSize: r.fontSize,
+            fontFamily: r.fontFamily,
+            letterSpacing: r.letterSpacing,
+            wordSpacing: r.wordSpacing,
+          ),
+        ),
+      RenderTreeBox r => Row(
+          children: [],
+        ),
+    };
   }
 }
 
@@ -131,75 +190,6 @@ class DomWidget extends StatelessWidget {
     }
 
     return switch (tag) {
-      // "img" => Builder(
-      // builder: (context) {
-      // final image = BrowserImage(href: domNode.attributes["src"]!);
-      // final alt = domNode.attributes["alt"];
-      // final placeholder = domNode.attributes["placeholder"];
-
-      // final currentTab = context.read<BrowserCubit>().state.currentTab;
-
-      // return switch (image.type) {
-      // ImageType.unknown => DecoratedBox(
-      // decoration: BoxDecoration(
-      // border: Border.all(
-      // color: Colors.grey.shade400,
-      // ),
-      // ),
-      // child: (alt == null)
-      // ? const Icon(
-      // Icons.image,
-      // size: 22,
-      // )
-      // : Text(alt),
-      // ),
-      // ImageType.url => Image.network(image.href),
-      // ImageType.png ||
-      // ImageType.ico ||
-      // ImageType.jpeg ||
-      // ImageType.webp ||
-      // ImageType.gif =>
-      // (image.isMemoryImage)
-      // ? Image.memory(
-      // image.decodeBase64()!,
-      // semanticLabel: alt,
-      // errorBuilder: (context, error, stackTrace) {
-      // return Text(placeholder ?? "No picture found");
-      // },
-      // )
-      // : Image.network(Uri.parse(currentTab!.currentPage!.url)
-      // .replace(path: image.href)
-      // .toString()),
-      // ImageType.svg => SvgPicture.memory(
-      // image.decodeBase64()!,
-      // height: 120,
-      // width: 120,
-      // ),
-      // };
-      // },
-      // ),
-      "li" => Flex(
-          direction: Axis.vertical,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // const Icon(Icons.circle, size: 8),
-            // Text("stp")
-            ...children.map((e) => DomWidget(e)),
-          ],
-        ),
-      "ol" => Flex(
-          direction: Axis.vertical,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: children
-              .map((e) => DomWidget(
-                    e,
-                    parentStyle: style,
-                  ))
-              .toList(),
-        ),
-      "a" => AWidget(domNode: domNode, style: style, children: children),
       _ => BlockNode(
           node: domNode,
           style: style,

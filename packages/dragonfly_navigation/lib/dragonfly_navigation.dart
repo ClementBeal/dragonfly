@@ -22,3 +22,6 @@ export 'src/file_explorer/file_explorer.dart'
     show exploreDirectory, ExplorationResult, FileType;
 export 'src/files/cache_file.dart' show FileCache;
 export 'src/files/favicon.dart' show BrowserImage;
+
+export 'src/render_tree/nodes/render_tree_node.dart'
+    show RenderTreeBox, RenderTreeObject, RenderTreeText, RenderTreeView;
