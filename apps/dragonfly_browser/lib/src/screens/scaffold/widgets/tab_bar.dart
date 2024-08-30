@@ -1,6 +1,6 @@
+
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
-import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
-import 'package:dragonfly/src/widgets/docking.dart';
+import 'package:dragonfly/src/screens/scaffold/widgets/favicon_icon.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Tab;
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -168,9 +168,10 @@ class FlatTab extends StatelessWidget {
             child: ConstrainedBox(
               constraints: const BoxConstraints(
                 minHeight: 80,
-                maxWidth: 120,
+                maxWidth: 160,
               ),
               child: Row(
+                spacing: 8,
                 mainAxisSize: isVertical ? MainAxisSize.max : MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -182,6 +183,8 @@ class FlatTab extends StatelessWidget {
                         child: CircularProgressIndicator(),
                       ),
                     ),
+                  if (tab.currentPage is HtmlPage)
+                    BrowserImageRender((tab.currentPage as HtmlPage).favicon),
                   Expanded(
                     child: Text(
                       tab.currentPage?.getTitle() ?? "No title",
@@ -257,7 +260,14 @@ class VerticalTab extends StatelessWidget {
                         ),
                       )
                     else
-                      const Icon(Icons.language),
+                      SizedBox.square(
+                        dimension: 20,
+                        child: BrowserImageRender(
+                          (tab.currentPage as HtmlPage?)?.favicon,
+                          onEmpty: () => const Icon(Icons.language),
+                        ),
+                      ),
+
                     // Expanded(
                     //   child: Text(
                     //     tab.currentPage?.getTitle() ?? "No title",

@@ -1,5 +1,4 @@
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
-import 'package:dragonfly/browser/page.dart';
 import 'package:dragonfly/src/screens/browser/browser_theme.dart';
 import 'package:dragonfly/src/screens/browser/helpers/color_utils.dart';
 import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
@@ -8,7 +7,6 @@ import 'package:dragonfly/src/screens/lobby/lobby_screen.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Element;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:html/dom.dart' hide Text;
 import 'package:desktop_drop/desktop_drop.dart';
 
@@ -69,14 +67,20 @@ class BrowserScreen extends StatelessWidget {
                         tab: tab,
                       ),
                     HtmlPage() => SingleChildScrollView(
-                        child: CSSOMProvider(
-                          cssom:
-                              currentPage.cssom ?? cssomBuilder.browserStyle!,
-                          child: (currentPage.document!.documentElement != null)
-                              ? DomWidget(
-                                  currentPage.document!.documentElement!,
-                                )
-                              : const SizedBox.shrink(),
+                        child: DecoratedBox(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                          ),
+                          child: CSSOMProvider(
+                            cssom:
+                                currentPage.cssom ?? cssomBuilder.browserStyle!,
+                            child:
+                                (currentPage.document!.documentElement != null)
+                                    ? DomWidget(
+                                        currentPage.document!.documentElement!,
+                                      )
+                                    : const SizedBox.shrink(),
+                          ),
                         ),
                       ),
                     // TODO: Handle this case.
@@ -127,53 +131,53 @@ class DomWidget extends StatelessWidget {
     }
 
     return switch (tag) {
-      "img" => Builder(
-          builder: (context) {
-            final image = Favicon(href: domNode.attributes["src"]!);
-            final alt = domNode.attributes["alt"];
-            final placeholder = domNode.attributes["placeholder"];
+      // "img" => Builder(
+      // builder: (context) {
+      // final image = BrowserImage(href: domNode.attributes["src"]!);
+      // final alt = domNode.attributes["alt"];
+      // final placeholder = domNode.attributes["placeholder"];
 
-            final currentTab = context.read<BrowserCubit>().state.currentTab;
+      // final currentTab = context.read<BrowserCubit>().state.currentTab;
 
-            return switch (image.type) {
-              FaviconType.unknown => DecoratedBox(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey.shade400,
-                    ),
-                  ),
-                  child: (alt == null)
-                      ? const Icon(
-                          Icons.image,
-                          size: 22,
-                        )
-                      : Text(alt),
-                ),
-              FaviconType.url => Image.network(image.href),
-              FaviconType.png ||
-              FaviconType.ico ||
-              FaviconType.jpeg ||
-              FaviconType.webp ||
-              FaviconType.gif =>
-                (image.isMemoryImage)
-                    ? Image.memory(
-                        image.decodeBase64()!,
-                        semanticLabel: alt,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Text(placeholder ?? "No picture found");
-                        },
-                      )
-                    : Image.network(Uri.parse(currentTab!.currentPage!.url)
-                        .replace(path: image.href)
-                        .toString()),
-              FaviconType.svg => SvgPicture.memory(
-                  image.decodeBase64()!,
-                  height: 120,
-                  width: 120,
-                ),
-            };
-          },
-        ),
+      // return switch (image.type) {
+      // ImageType.unknown => DecoratedBox(
+      // decoration: BoxDecoration(
+      // border: Border.all(
+      // color: Colors.grey.shade400,
+      // ),
+      // ),
+      // child: (alt == null)
+      // ? const Icon(
+      // Icons.image,
+      // size: 22,
+      // )
+      // : Text(alt),
+      // ),
+      // ImageType.url => Image.network(image.href),
+      // ImageType.png ||
+      // ImageType.ico ||
+      // ImageType.jpeg ||
+      // ImageType.webp ||
+      // ImageType.gif =>
+      // (image.isMemoryImage)
+      // ? Image.memory(
+      // image.decodeBase64()!,
+      // semanticLabel: alt,
+      // errorBuilder: (context, error, stackTrace) {
+      // return Text(placeholder ?? "No picture found");
+      // },
+      // )
+      // : Image.network(Uri.parse(currentTab!.currentPage!.url)
+      // .replace(path: image.href)
+      // .toString()),
+      // ImageType.svg => SvgPicture.memory(
+      // image.decodeBase64()!,
+      // height: 120,
+      // width: 120,
+      // ),
+      // };
+      // },
+      // ),
       "li" => Flex(
           direction: Axis.vertical,
           crossAxisAlignment: CrossAxisAlignment.start,

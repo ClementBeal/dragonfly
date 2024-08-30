@@ -17,20 +17,8 @@ late final NavigationHistory navigationHistory;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final db = initialize("test.sqlite");
-  // final db = initializeInMemory();
-  browserFavorites = BrowserFavorites(db);
-  navigationHistory = NavigationHistory(db);
-
-  // if (kDebugMode) {
-  //   for (var i = 0; i < 2000; i++) {
-  //     navigationHistory.fakeData(
-  //       Uri.parse(Faker().internet.httpsUrl()),
-  //       Faker().internet.domainName(),
-  //       Faker().date.dateTimeBetween(DateTime(2022), DateTime.now()),
-  //     );
-  //   }
-  // }
+  final dbManager = DatabaseManager();
+  dbManager.initializeInMemory();
 
   await windowManager.ensureInitialized();
   Highlighter.initialize(['../../../assets/languages/html']);

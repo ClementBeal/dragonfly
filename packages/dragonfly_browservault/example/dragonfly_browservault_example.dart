@@ -1,9 +1,7 @@
-import 'package:dragonfly_browservault/src/browser_favorites.dart';
-import 'package:dragonfly_browservault/src/initializer.dart';
-import 'package:dragonfly_browservault/src/navigation_history.dart';
+import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 
 void main() {
-  final db = initializeInMemory();
+  final db = DatabaseManager().initializeInMemory();
 
   final favorites = BrowserFavorites(db);
   final history = NavigationHistory(db);

@@ -1,5 +1,3 @@
-import 'package:collection/collection.dart';
-import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 enum RedockableInterface { devtools, tabBar, searchBar, bookmarks }

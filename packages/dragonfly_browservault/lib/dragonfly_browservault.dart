@@ -7,4 +7,6 @@ export 'src/browser_favorites.dart'
     show Favorite, BrowserFavorites, BrowserFavoriteException;
 export 'src/navigation_history.dart'
     show Link, NavigationHistory, NavigationHistoryException;
-export 'src/initializer.dart' show initialize, initializeInMemory;
+export 'src/db_manager.dart' show DatabaseManager;
+export 'src/cache.dart' show FileCacheRepo;
+export 'src/_db.dart' show db;

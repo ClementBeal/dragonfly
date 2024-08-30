@@ -167,7 +167,7 @@ packages:
       path: "../../packages/dragonfly_browservault"
       relative: true
     source: path
-    version: "1.0.0"
+    version: "0.0.1"
   dragonfly_css_parser:
     dependency: "direct overridden"
     description:
@@ -365,6 +365,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.15.0"
+  mime:
+    dependency: transitive
+    description:
+      name: mime
+      sha256: "801fd0b26f14a4a58ccb09d5892c3fbdeff209594300a542492cf13fba9d247a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.6"
   nested:
     dependency: transitive
     description:

@@ -1,10 +1,13 @@
 import 'dart:io';
 
+import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_navigation/src/files/favicon.dart';
 import 'package:dragonfly_navigation/src/html/dom.dart';
 import 'package:html/dom.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
@@ -51,11 +54,13 @@ class MediaPage extends Page {
 class HtmlPage extends Page {
   final Document? document;
   final CssomTree? cssom;
+  final BrowserImage? favicon;
 
   HtmlPage(
       {required super.url,
       required super.status,
       super.guid,
+      this.favicon,
       required this.document,
       required this.cssom});
 
@@ -95,7 +100,8 @@ class Tab {
       _history.removeRange(_currentIndex + 1, _history.length);
     }
 
-    final scheme = Uri.parse(url).scheme;
+    final uriRequest = Uri.parse(url);
+    final scheme = uriRequest.scheme;
 
     if (scheme == "http" || scheme == "https") {
       _history.add(
@@ -108,12 +114,44 @@ class Tab {
       );
       _currentIndex++;
 
-      final document = await getHttp(Uri.parse(url));
+      final document = await getHttp(uriRequest);
       CssomTree? cssom;
+      BrowserImage? cachedFavicon;
 
       if (document != null) {
         final linkCssNode =
             document.querySelectorAll('link[rel="stylesheet"]').firstOrNull;
+
+        final linkFavicon = document.querySelector('link[rel="icon"]');
+
+        if (linkFavicon != null) {
+          final href = linkFavicon.attributes["href"];
+          final faviconUri = href!.startsWith("/")
+              ? uriRequest.replace(path: href)
+              : Uri.parse(href);
+
+          cachedFavicon = FileCache.getCacheFile(faviconUri);
+
+          if (cachedFavicon == null) {
+            final faviconData = await http.get(faviconUri);
+            final cachedFaviconUri =
+                FileCache.cacheFile(faviconUri, faviconData.bodyBytes);
+
+            cachedFavicon = BrowserImage(
+              path: cachedFaviconUri,
+              mimetype: lookupMimeType(
+                cachedFaviconUri.toFilePath(),
+              )!,
+            );
+
+            FileCacheRepo(db).addFileToCache(
+              p.basename(cachedFaviconUri.toString()),
+              faviconUri.toString(),
+              faviconData.headers["content-type"]!,
+            );
+          }
+        }
+
         if (linkCssNode != null) {
           final href = linkCssNode.attributes["href"];
           cssom = await getCss(Uri.parse(url).replace(path: href));
@@ -123,6 +161,7 @@ class Tab {
       _history.last = HtmlPage(
         document: document,
         cssom: cssom,
+        favicon: cachedFavicon,
         status: (document != null) ? PageStatus.success : PageStatus.error,
         url: url,
       );
