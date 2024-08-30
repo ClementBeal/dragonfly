@@ -262,7 +262,14 @@ class VerticalTab extends StatelessWidget {
                         ),
                       )
                     else
-                      const Icon(Icons.language),
+                      SizedBox.square(
+                        dimension: 20,
+                        child: BrowserImageRender(
+                          (tab.currentPage as HtmlPage?)?.favicon,
+                          onEmpty: () => const Icon(Icons.language),
+                        ),
+                      ),
+
                     // Expanded(
                     //   child: Text(
                     //     tab.currentPage?.getTitle() ?? "No title",

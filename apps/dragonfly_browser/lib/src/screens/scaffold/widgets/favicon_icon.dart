@@ -5,19 +5,21 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class BrowserImageRender extends StatelessWidget {
-  const BrowserImageRender(this.faviconUri, {super.key});
+  const BrowserImageRender(this.faviconUri, {super.key, this.onEmpty});
 
   final BrowserImage? faviconUri;
+  final Widget Function()? onEmpty;
 
   @override
   Widget build(BuildContext context) {
     if (faviconUri == null) {
-      return SizedBox.shrink();
+      return onEmpty?.call() ?? const SizedBox.shrink();
     }
 
     if (faviconUri!.mimetype == "image/svg+xml") {
       return SvgPicture.file(
         File.fromUri(faviconUri!.path),
+        // fit: BoxFit.cover,
       );
     }
 
