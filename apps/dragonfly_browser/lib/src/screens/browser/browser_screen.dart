@@ -1,5 +1,4 @@
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
-import 'package:dragonfly/browser/page.dart';
 import 'package:dragonfly/src/screens/browser/browser_theme.dart';
 import 'package:dragonfly/src/screens/browser/helpers/color_utils.dart';
 import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
@@ -8,7 +7,6 @@ import 'package:dragonfly/src/screens/lobby/lobby_screen.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Element;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:html/dom.dart' hide Text;
 import 'package:desktop_drop/desktop_drop.dart';
 
@@ -70,7 +68,7 @@ class BrowserScreen extends StatelessWidget {
                       ),
                     HtmlPage() => SingleChildScrollView(
                         child: DecoratedBox(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.white,
                           ),
                           child: CSSOMProvider(
