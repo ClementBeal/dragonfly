@@ -12,6 +12,7 @@ class RenderTreeView extends RenderTreeObject {
 
 class RenderTreeBox extends RenderTreeObject {
   List<RenderTreeObject> children;
+  String? backgroundColor;
   double? paddingTop;
   double? paddingRight;
   double? paddingBottom;
@@ -24,6 +25,7 @@ class RenderTreeBox extends RenderTreeObject {
 
   RenderTreeBox(
       {required this.children,
+      this.backgroundColor,
       this.paddingTop,
       this.paddingRight,
       this.paddingBottom,

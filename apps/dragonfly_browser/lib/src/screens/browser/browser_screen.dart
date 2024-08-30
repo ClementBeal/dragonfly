@@ -66,41 +66,46 @@ class BrowserScreen extends StatelessWidget {
                         page: p,
                         tab: tab,
                       ),
-                    HtmlPage() => SingleChildScrollView(
-                        child: DecoratedBox(
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                          ),
-                          child: CSSOMProvider(
-                            cssom:
-                                currentPage.cssom ?? cssomBuilder.browserStyle!,
-                            child:
-                                (currentPage.document!.documentElement != null)
-                                    ? Builder(builder: (context) {
-                                        // TO DO
-                                        // dirty hack for testing purpose
-                                        // it has to be moded to a special package
-                                        // called `dragonfly_renderer`
+                    HtmlPage() => CSSOMProvider(
+                        cssom: currentPage.cssom ?? cssomBuilder.browserStyle!,
+                        child: (currentPage.document!.documentElement != null)
+                            ? Builder(builder: (context) {
+                                // TO DO
+                                // dirty hack for testing purpose
+                                // it has to be moded to a special package
+                                // called `dragonfly_renderer`
 
-                                        final renderTree = RenderTreeView(
-                                          devicePixelRatio: 3,
-                                          child: RenderTreeText(
-                                            text: "I lovee you",
-                                            color: "#0f0a32",
-                                            fontFamily: "Aria",
-                                            fontSize: 22,
-                                            letterSpacing: 12,
-                                            textAlign: "end",
-                                            wordSpacing: 30,
-                                            textDecoration: "wavy",
-                                          ),
-                                        );
+                                final renderTree = RenderTreeView(
+                                  devicePixelRatio: 3,
+                                  child: RenderTreeBox(
+                                    backgroundColor: "#ffffff",
+                                    children: [
+                                      RenderTreeText(
+                                        text: "I lovee you",
+                                        color: "#0f0a32",
+                                        fontFamily: "Aria",
+                                        fontSize: 22,
+                                        letterSpacing: 12,
+                                        textAlign: "end",
+                                        wordSpacing: 30,
+                                        textDecoration: "wavy",
+                                      ),
+                                      RenderTreeText(
+                                        text: "Me too",
+                                        color: "#dea332",
+                                        fontFamily: "Roboto",
+                                        fontSize: 54,
+                                        letterSpacing: 2,
+                                        textAlign: "start",
+                                        wordSpacing: 8,
+                                      ),
+                                    ],
+                                  ),
+                                );
 
-                                        return TreeRenderer(renderTree);
-                                      })
-                                    : const SizedBox.shrink(),
-                          ),
-                        ),
+                                return TreeRenderer(renderTree);
+                              })
+                            : const SizedBox.shrink(),
                       ),
                     MediaPage p => MediaPageScreen(page: p),
                   },
@@ -121,12 +126,14 @@ class TreeRenderer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return switch (renderNode) {
-      RenderTreeView r => Column(
-          // mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TreeRenderer(r.child),
-          ],
+      RenderTreeView r => SizedBox.expand(
+          child: Column(
+            // mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(child: TreeRenderer(r.child)),
+            ],
+          ),
         ),
       RenderTreeText r => Text(
           r.text,
@@ -147,8 +154,16 @@ class TreeRenderer extends StatelessWidget {
             wordSpacing: r.wordSpacing,
           ),
         ),
-      RenderTreeBox r => Row(
-          children: [],
+      RenderTreeBox r => Container(
+          color: (r.backgroundColor != null)
+              ? HexColor.fromHex(r.backgroundColor!)
+              : null,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (final c in r.children) TreeRenderer(c),
+            ],
+          ),
         ),
     };
   }
