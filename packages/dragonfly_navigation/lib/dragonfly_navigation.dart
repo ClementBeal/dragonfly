@@ -24,4 +24,11 @@ export 'src/files/cache_file.dart' show FileCache;
 export 'src/files/favicon.dart' show BrowserImage;
 
 export 'src/render_tree/nodes/render_tree_node.dart'
-    show RenderTreeBox, RenderTreeObject, RenderTreeText, RenderTreeView;
+    show
+        RenderTreeBox,
+        RenderTreeObject,
+        RenderTreeText,
+        RenderTreeView,
+        RenderTreeInline;
+
+export 'src/render_tree/render_tree.dart' show BrowserRenderTree, RenderTree;

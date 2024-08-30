@@ -1,0 +1,460 @@
+/*
+ THe HTML is a custom one
+ I don't know if it's a godo idea to store the font size here 
+*/
+html {
+  font-family: "Noto Serif";
+  font-size: 16px;
+  color: #000000;
+}
+
+address {
+  display: block;
+  font-style: italic;
+}
+
+area {
+  display: none;
+}
+
+article {
+  display: block;
+}
+
+aside {
+  display: block;
+}
+
+b {
+  font-weight: bold;
+}
+
+bdi {
+  unicode-bidi: -webkit-isolate;
+}
+
+bdo {
+  unicode-bidi: bidi-override;
+}
+
+blockquote {
+  display: block;
+  margin-before: 1em;
+  margin-after: 1em;
+  margin-start: 40px;
+  margin-end: 40px;
+}
+
+body {
+  display: block;
+  margin: 8px;
+}
+body:focus {
+  outline: none;
+}
+
+caption {
+  display: table-caption;
+  text-align: center;
+}
+
+cite {
+  font-style: italic;
+}
+
+code {
+  font-family: monospace;
+}
+
+col {
+  display: table-column;
+}
+
+colgroup {
+  display: table-column-group;
+}
+
+datalist {
+  display: none;
+}
+
+dd {
+  display: block;
+  margin-start: 40px;
+}
+
+del {
+  text-decoration: line-through;
+}
+
+details {
+  display: block;
+}
+
+dfn {
+  font-style: italic;
+}
+
+div {
+  display: block;
+}
+
+dl {
+  display: block;
+  margin-before: 1em;
+  margin-after: 1em;
+  margin-start: 0;
+  margin-end: 0;
+}
+
+dt {
+  display: block;
+}
+
+em {
+  font-style: italic;
+}
+
+embed:focus {
+  outline: none;
+}
+
+/* fieldset {
+  display: block;
+  margin-start: 2px;
+  margin-end: 2px;
+  padding-before: 0.35em;
+  padding-start: 0.75em;
+  padding-end: 0.75em;
+  padding-after: 0.625em;
+  border: 2px groove black;
+} */
+
+figcaption {
+  display: block;
+}
+
+figure {
+  display: block;
+  margin-before: 1em;
+  margin-after: 1em;
+  margin-start: 40px;
+  margin-end: 40px;
+}
+
+footer {
+  display: block;
+}
+
+form {
+  display: block;
+  margin-top: 0em;
+}
+
+h1 {
+  display: block;
+  font-size: 2em;
+  margin-before: 0.67em;
+  margin-after: 0.67em;
+  margin-start: 0;
+  margin-end: 0;
+  font-weight: bold;
+}
+
+h2 {
+  display: block;
+  font-size: 1.5em;
+  margin-before: 0.83em;
+  margin-after: 0.83em;
+  margin-start: 0;
+  margin-end: 0;
+  font-weight: bold;
+}
+
+h3 {
+  display: block;
+  font-size: 1.17em;
+  margin-before: 1em;
+  margin-after: 1em;
+  margin-start: 0;
+  margin-end: 0;
+  font-weight: bold;
+}
+
+h4 {
+  display: block;
+  margin-before: 1.33em;
+  margin-after: 1.33em;
+  margin-start: 0;
+  margin-end: 0;
+  font-weight: bold;
+}
+
+h5 {
+  display: block;
+  font-size: 0.83em;
+  margin-before: 1.67em;
+  margin-after: 1.67em;
+  margin-start: 0;
+  margin-end: 0;
+  font-weight: bold;
+}
+
+h6 {
+  display: block;
+  font-size: 0.67em;
+  margin-before: 2.33em;
+  margin-after: 2.33em;
+  margin-start: 0;
+  margin-end: 0;
+  font-weight: bold;
+}
+
+head {
+  display: none;
+}
+
+header {
+  display: block;
+}
+
+hgroup {
+  display: block;
+}
+/*
+hr {
+  display: block;
+  margin-before: 0.5em;
+  margin-after: 0.5em;
+  margin-start: auto;
+  margin-end: auto;
+  border-style: inset;
+  border-width: 1px;
+} */
+
+html {
+  display: block;
+}
+
+html:focus {
+  outline: none;
+}
+
+i {
+  font-style: italic;
+}
+
+iframe:focus {
+  outline: none;
+}
+/* iframe[seamless] {
+  display: block;
+} */
+
+img {
+  display: inline-block;
+}
+ins {
+  text-decoration: underline;
+}
+
+kbd {
+  font-family: monospace;
+}
+
+label {
+  cursor: default;
+}
+
+legend {
+  display: block;
+  padding-start: 2px;
+  padding-end: 2px;
+  border: none;
+}
+
+li {
+  display: list-item;
+  text-align: -webkit-match-parent;
+}
+link {
+  display: none;
+}
+map {
+  display: inline;
+}
+mark {
+  background-color: yellow;
+  color: black;
+}
+menu {
+  display: block;
+  list-style-type: disc;
+  margin-before: 1em;
+  margin-after: 1em;
+  margin-start: 0;
+  margin-end: 0;
+  padding-start: 40px;
+}
+nav {
+  display: block;
+}
+
+object:focus {
+  outline: none;
+}
+
+ol {
+  display: block;
+  list-style-type: decimal;
+  margin-before: 1em;
+  margin-after: 1em;
+  margin-start: 0;
+  margin-end: 0;
+  padding-start: 40px;
+}
+
+output {
+  display: inline;
+}
+output {
+  unicode-bidi: -webkit-isolate;
+}
+p {
+  display: block;
+  margin-before: 1em;
+  margin-after: 1em;
+  margin-start: 0;
+  margin-end: 0;
+}
+param {
+  display: none;
+}
+
+pre {
+  display: block;
+  font-family: monospace;
+  white-space: pre;
+  /* margin: 1em 0; */
+}
+
+q {
+  display: inline;
+}
+q:before {
+  content: open-quote;
+}
+q:after {
+  content: close-quote;
+}
+
+rt {
+  line-height: normal;
+}
+
+s {
+  text-decoration: line-through;
+}
+
+samp {
+  font-family: monospace;
+}
+
+script {
+  display: none;
+}
+
+section {
+  display: block;
+}
+small {
+  font-size: smaller;
+}
+
+strong {
+  font-weight: bold;
+}
+
+style {
+  display: none;
+}
+
+sub {
+  vertical-align: sub;
+  font-size: smaller;
+}
+
+summary {
+  display: block;
+}
+
+sup {
+  vertical-align: super;
+  font-size: smaller;
+}
+
+table {
+  display: table;
+  border-collapse: separate;
+  border-spacing: 2px;
+  border-color: gray;
+}
+
+tbody {
+  display: table-row-group;
+  vertical-align: middle;
+  border-color: inherit;
+}
+
+td {
+  display: table-cell;
+  vertical-align: inherit;
+}
+
+tfoot {
+  display: table-footer-group;
+  vertical-align: middle;
+  border-color: inherit;
+}
+
+th {
+  display: table-cell;
+  vertical-align: inherit;
+}
+th {
+  font-weight: bold;
+  text-align: center;
+}
+
+thead {
+  display: table-header-group;
+  vertical-align: middle;
+  border-color: inherit;
+}
+
+title {
+  display: none;
+}
+
+tr {
+  display: table-row;
+  vertical-align: inherit;
+  border-color: inherit;
+}
+
+u {
+  text-decoration: underline;
+}
+
+ul {
+  display: block;
+  list-style-type: disc;
+  margin-before: 1em;
+  margin-after: 1em;
+  margin-start: 0;
+  margin-end: 0;
+  padding-start: 40px;
+}
+var {
+  font-style: italic;
+}

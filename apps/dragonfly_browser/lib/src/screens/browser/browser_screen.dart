@@ -7,7 +7,6 @@ import 'package:dragonfly/src/screens/lobby/lobby_screen.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Element;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:html/dom.dart' hide Text;
 import 'package:desktop_drop/desktop_drop.dart';
 
 class BrowserScreen extends StatelessWidget {
@@ -75,39 +74,12 @@ class BrowserScreen extends StatelessWidget {
                                 // it has to be moded to a special package
                                 // called `dragonfly_renderer`
 
-                                final renderTree = RenderTreeView(
-                                  devicePixelRatio: 3,
-                                  child: RenderTreeBox(
-                                    marginBottom: 8,
-                                    marginLeft: 8,
-                                    marginRight: 8,
-                                    marginTop: 8,
-                                    backgroundColor: "#ffffff",
-                                    children: [
-                                      RenderTreeText(
-                                        text: "I lovee you",
-                                        color: "#0f0a32",
-                                        fontFamily: "Aria",
-                                        fontSize: 22,
-                                        letterSpacing: 12,
-                                        textAlign: "end",
-                                        wordSpacing: 30,
-                                        textDecoration: "wavy",
-                                      ),
-                                      RenderTreeText(
-                                        text: "Me too",
-                                        color: "#dea332",
-                                        fontFamily: "Roboto",
-                                        fontSize: 54,
-                                        letterSpacing: 2,
-                                        textAlign: "start",
-                                        wordSpacing: 8,
-                                      ),
-                                    ],
-                                  ),
-                                );
+                                final renderTree = BrowserRenderTree(
+                                  dom: currentPage.document!,
+                                  cssom: currentPage.cssom!,
+                                ).parse();
 
-                                return TreeRenderer(renderTree);
+                                return TreeRenderer(renderTree.child);
                               })
                             : const SizedBox.shrink(),
                       ),
@@ -129,14 +101,28 @@ class TreeRenderer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(renderNode.runtimeType);
+
     return switch (renderNode) {
-      RenderTreeView r => SizedBox.expand(
-          child: Column(
-            // mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(child: TreeRenderer(r.child)),
-            ],
+      RenderTreeInline r => Row(
+          mainAxisSize: MainAxisSize.min,
+          children: r.children.map((a) => TreeRenderer(a)).toList(),
+        ),
+      RenderTreeView r => DecoratedBox(
+          decoration: BoxDecoration(
+            color: HexColor.fromHex(r.backgroundColor),
+          ),
+          child: SizedBox.expand(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                // mainAxisAlignment: MainAxisAlignment.start,
+                // crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TreeRenderer(r.child),
+                ],
+              ),
+            ),
           ),
         ),
       RenderTreeText r => Text(
@@ -151,12 +137,25 @@ class TreeRenderer extends StatelessWidget {
             _ => null,
           },
           style: TextStyle(
-            color: (r.color != null) ? HexColor.fromHex(r.color!) : null,
-            fontSize: r.fontSize,
-            fontFamily: r.fontFamily,
-            letterSpacing: r.letterSpacing,
-            wordSpacing: r.wordSpacing,
-          ),
+              color: (r.color != null) ? HexColor.fromHex(r.color!) : null,
+              fontSize: r.fontSize,
+              fontFamily: r.fontFamily,
+              letterSpacing: r.letterSpacing,
+              wordSpacing: r.wordSpacing,
+              fontWeight: switch (r.fontWeight) {
+                "normal" => FontWeight.normal,
+                "bold" => FontWeight.bold,
+                "100" => FontWeight.w100,
+                "200" => FontWeight.w200,
+                "300" => FontWeight.w300,
+                "400" => FontWeight.w400,
+                "500" => FontWeight.w500,
+                "600" => FontWeight.w600,
+                "700" => FontWeight.w700,
+                "800" => FontWeight.w800,
+                "900" => FontWeight.w900,
+                _ => FontWeight.normal,
+              }),
         ),
       RenderTreeBox r => Container(
           color: (r.backgroundColor != null)
@@ -176,7 +175,8 @@ class TreeRenderer extends StatelessWidget {
               right: r.paddingRight ?? 0.0,
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 for (final c in r.children) TreeRenderer(c),
               ],
@@ -184,362 +184,5 @@ class TreeRenderer extends StatelessWidget {
           ),
         ),
     };
-  }
-}
-
-class DomWidget extends StatelessWidget {
-  const DomWidget(this.domNode, {super.key, this.parentStyle});
-
-  final Element domNode;
-  final CssStyle? parentStyle;
-
-  @override
-  Widget build(BuildContext context) {
-    final tag = domNode.localName;
-    final children = domNode.children;
-    final style = switch (tag) {
-      null => CssStyle(),
-      _ => (CSSOMProvider.of(context)!.cssom.find(tag)?.style ?? CssStyle())
-    }
-        .clone();
-
-    if (parentStyle != null) {
-      style.inheritFromParent(parentStyle!);
-    }
-
-    // the styles from the classes are not passed to the children
-    // final styleWithClasses = style.clone();
-
-    for (var className in domNode.classes) {
-      final newTheme =
-          CSSOMProvider.of(context)!.cssom.find(".$className")?.style;
-      if (newTheme != null) {
-        style.mergeClass(newTheme);
-      }
-    }
-
-    if (style.display == "none") {
-      return const SizedBox.shrink();
-    }
-
-    return switch (tag) {
-      _ => BlockNode(
-          node: domNode,
-          style: style,
-          children: children
-              .map(
-                (e) => DomWidget(
-                  e,
-                  parentStyle: style,
-                ),
-              )
-              .toList(),
-        ),
-    };
-  }
-}
-
-class AWidget extends StatelessWidget {
-  const AWidget({
-    super.key,
-    required this.domNode,
-    required this.style,
-    required this.children,
-  });
-
-  final Element domNode;
-  final CssStyle style;
-  final List<Element> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: () {
-          final href = domNode.attributes["href"]!;
-
-          Uri uri;
-          if (href.startsWith('/') ||
-              href.startsWith('./') ||
-              !href.contains('://')) {
-            // Relative link
-            uri = Uri.parse(context
-                    .read<BrowserCubit>()
-                    .state
-                    .currentTab!
-                    .currentPage!
-                    .url)
-                .resolve(href);
-          } else {
-            // Assume absolute URI
-            uri = Uri.parse(href);
-          }
-
-          context.read<BrowserCubit>().navigateToPage(uri.toString());
-        },
-        child: BlockNode(
-          node: domNode,
-          style: style,
-          children: children.map((e) => DomWidget(e)).toList(),
-        ),
-      ),
-    );
-  }
-}
-
-class BlockNode extends StatelessWidget {
-  const BlockNode(
-      {super.key,
-      required this.style,
-      required this.node,
-      this.children = const []});
-
-  final CssStyle style;
-  final Element node;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO : it works on my machine. Probably not on another one
-    // the Mediaquery.devicePixelRatio returns 1 for me when it's 3...
-    const pixelRatio = 3;
-    final display = style.display;
-    final fontSizeStyle = style.fontSize ??
-        CSSOMProvider.of(context)!.cssom.find("html")!.style.fontSize ??
-        "12px";
-
-    // TODO : why we can use logical pixel here and not for margin?
-    final fontSize = FontSize(value: fontSizeStyle).getValue(16, 16.0, 1);
-    final text = node.nodes
-        .where((node) => node.nodeType == Node.TEXT_NODE)
-        .map((node) => node.text)
-        .join();
-    final textIsEmpty = text.trim().isEmpty;
-
-    final bloc = DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border(
-          left: parseBorderSide(style.borderLeft ?? style.border),
-          right: parseBorderSide(style.borderRight ?? style.border),
-          top: parseBorderSide(style.borderTop ?? style.border),
-          bottom: parseBorderSide(style.borderBottom ?? style.border),
-        ),
-        borderRadius: (style.borderRadius != null)
-            ? BorderRadius.all(
-                Radius.circular(
-                  FontSize(value: style.borderRadius!)
-                      .getValue(16, fontSize, 1),
-                ),
-              )
-            : null,
-        color: (style.backgroundColor != null)
-            ? HexColor.fromHex(style.backgroundColor!)
-            : null,
-      ),
-      child: Padding(
-        padding: EdgeInsets.only(
-          bottom: (style.paddingBottom != null && style.paddingBottom != "0")
-              ? FontSize(value: style.paddingBottom!)
-                  .getValue(16, fontSize, pixelRatio)
-              : 0.0,
-          left: (style.paddingLeft != null && style.paddingLeft != "0")
-              ? FontSize(value: style.paddingLeft!)
-                  .getValue(16, fontSize, pixelRatio)
-              : 0.0,
-          top: (style.paddingTop != null && style.paddingTop != "0")
-              ? FontSize(value: style.paddingTop!)
-                  .getValue(16, fontSize, pixelRatio)
-              : 0.0,
-          right: (style.paddingRight != null && style.paddingRight != "0")
-              ? FontSize(value: style.paddingRight!)
-                  .getValue(16, fontSize, pixelRatio)
-              : 0.0,
-        ),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: (style.maxWidth != null)
-                ? FontSize(value: style.maxWidth!).getValue(16, fontSize, 1)
-                : double.infinity,
-            minHeight: (style.minHeight != null)
-                ? FontSize(value: style.minHeight!).getValue(16, fontSize, 1)
-                : 0.0,
-          ),
-          child: switch (display) {
-            "grid" => GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: (style.gap != null)
-                    ? FontSize(value: style.gap!).getValue(16, 16, 1)
-                    : 0,
-                mainAxisSpacing: (style.gap != null)
-                    ? FontSize(value: style.gap!).getValue(16, 16, 1)
-                    : 0,
-                crossAxisCount: 3,
-                children: <Widget>[
-                  if (!textIsEmpty)
-                    TextWidget(
-                      text: text,
-                      style: style,
-                      fontSize: 12,
-                    ),
-                  ...children,
-                ],
-              ),
-            _ => Flex(
-                direction: switch (display) {
-                  "inline-block" => Axis.horizontal,
-                  // "flex" => Axis.horizontal,
-                  _ => Axis.vertical,
-                },
-                crossAxisAlignment: switch (display) {
-                  "inline-block" => CrossAxisAlignment.start,
-                  _ => CrossAxisAlignment.stretch,
-                },
-                mainAxisSize: switch (display) {
-                  "inline-block" => MainAxisSize.min,
-                  _ => MainAxisSize.max,
-                },
-                mainAxisAlignment: switch (display) {
-                  "inline-block" => MainAxisAlignment.start,
-                  "flex" => switch (style.justifyContent) {
-                      "center" => MainAxisAlignment.center,
-                      _ => MainAxisAlignment.start
-                    },
-                  _ => MainAxisAlignment.start,
-                },
-                children: [
-                  if (!textIsEmpty)
-                    TextWidget(text: text, style: style, fontSize: fontSize),
-                  ...children,
-                ],
-              ),
-          },
-        ),
-      ),
-    );
-
-    if (style.marginBottom != null ||
-        style.marginLeft != null ||
-        style.marginTop != null ||
-        style.marginRight != null) {
-      if (style.marginBottom == "auto" &&
-          style.marginLeft == "auto" &&
-          style.marginTop == "auto" &&
-          style.marginRight == "auto") {
-        return Align(
-          alignment: Alignment.center,
-          child: bloc,
-        );
-      } else {
-        return Container(
-          margin: EdgeInsets.only(
-            bottom: (style.marginBottom != null &&
-                    style.marginBottom != "0" &&
-                    style.marginBottom != "auto")
-                ? FontSize(value: style.marginBottom!)
-                    .getValue(16, fontSize, pixelRatio)
-                : 0.0,
-            left: (style.marginLeft != null &&
-                    style.marginLeft != "0" &&
-                    style.marginLeft != "auto")
-                ? FontSize(value: style.marginLeft!)
-                    .getValue(16, fontSize, pixelRatio)
-                : 0.0,
-            top: (style.marginTop != null &&
-                    style.marginTop != "0" &&
-                    style.marginTop != "auto")
-                ? FontSize(value: style.marginTop!)
-                    .getValue(16, fontSize, pixelRatio)
-                : 0.0,
-            right: (style.marginRight != null &&
-                    style.marginRight != "0" &&
-                    style.marginRight != "auto")
-                ? FontSize(value: style.marginRight!)
-                    .getValue(16, fontSize, pixelRatio)
-                : 0.0,
-          ),
-          child: bloc,
-        );
-      }
-    }
-
-    return bloc;
-  }
-
-  BorderSide parseBorderSide(String? borderString) {
-    if (borderString == null) return BorderSide.none;
-
-    final parts = borderString.split(' ');
-
-    final width = FontSize(value: parts[0]).getValue(16, 0, 1);
-    final style = parts[1];
-    final color = HexColor.fromHex(parts[2]);
-
-    BorderStyle borderStyle;
-    switch (style) {
-      case 'solid':
-        borderStyle = BorderStyle.solid;
-        break;
-      case 'none':
-        borderStyle = BorderStyle.none;
-        break;
-      default:
-        throw Exception('Unsupported border style: $style');
-    }
-
-    // Return the BorderSide
-    return BorderSide(
-      width: width,
-      style: borderStyle,
-      color: color,
-    );
-  }
-}
-
-class TextWidget extends StatelessWidget {
-  const TextWidget({
-    super.key,
-    required this.text,
-    required this.style,
-    required this.fontSize,
-  });
-
-  final String? text;
-  final CssStyle style;
-  final double fontSize;
-
-  @override
-  Widget build(BuildContext context) {
-    final htmlNode = CSSOMProvider.of(context)!.cssom.find("html")!;
-    final fontFamily =
-        (style.fontFamily ?? htmlNode.style.fontFamily ?? "").split(",");
-
-    return Text(
-      text!,
-      textAlign: switch (style.textAlign) {
-        "left" => TextAlign.left,
-        "center" => TextAlign.center,
-        _ => TextAlign.left
-      },
-      style: TextStyle(
-        height: style.lineHeight,
-        fontSize: fontSize,
-        fontFamily: fontFamily[0],
-        fontFamilyFallback: fontFamily.sublist(1),
-        decoration: (style.textDecoration == "underline")
-            ? TextDecoration.underline
-            : null,
-        fontWeight: switch (style.fontWeight) {
-          "bold" || "700" => FontWeight.bold,
-          "400" => FontWeight.w400,
-          _ => null,
-        },
-        // color: Colors.black,
-        color: (style.textColor != null)
-            ? HexColor.fromHex(style.textColor!)
-            : HexColor.fromHex(htmlNode.style.textColor!),
-      ),
-    );
   }
 }
