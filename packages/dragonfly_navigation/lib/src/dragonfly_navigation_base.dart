@@ -130,22 +130,26 @@ class Tab {
               ? uriRequest.replace(path: href)
               : Uri.parse(href);
 
-          final faviconData = await http.get(faviconUri);
-          final cachedFaviconUri =
-              FileCache.cacheFile(faviconUri, faviconData.bodyBytes);
+          cachedFavicon = FileCache.getCacheFile(faviconUri);
 
-          cachedFavicon = BrowserImage(
-            path: cachedFaviconUri,
-            mimetype: lookupMimeType(
-              cachedFaviconUri.toFilePath(),
-            )!,
-          );
+          if (cachedFavicon == null) {
+            final faviconData = await http.get(faviconUri);
+            final cachedFaviconUri =
+                FileCache.cacheFile(faviconUri, faviconData.bodyBytes);
 
-          FileCacheRepo(db).addFileToCache(
-            p.basename(cachedFaviconUri.toFilePath()),
-            cachedFaviconUri.toString(),
-            faviconData.headers["content-type"]!,
-          );
+            cachedFavicon = BrowserImage(
+              path: cachedFaviconUri,
+              mimetype: lookupMimeType(
+                cachedFaviconUri.toFilePath(),
+              )!,
+            );
+
+            FileCacheRepo(db).addFileToCache(
+              p.basename(cachedFaviconUri.toString()),
+              faviconUri.toString(),
+              faviconData.headers["content-type"]!,
+            );
+          }
         }
 
         if (linkCssNode != null) {

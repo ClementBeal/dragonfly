@@ -23,6 +23,7 @@ class FileCacheRepo {
     ''', [filename, uri, mimetype]);
   }
 
+  /// Returns the filename and the mimetype
   (String, String)? getFileFromCache(String uri) {
     final result = _db.select('''
       SELECT filename, mimetype FROM $_tableName
