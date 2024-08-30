@@ -78,6 +78,10 @@ class BrowserScreen extends StatelessWidget {
                                 final renderTree = RenderTreeView(
                                   devicePixelRatio: 3,
                                   child: RenderTreeBox(
+                                    marginBottom: 8,
+                                    marginLeft: 8,
+                                    marginRight: 8,
+                                    marginTop: 8,
                                     backgroundColor: "#ffffff",
                                     children: [
                                       RenderTreeText(
@@ -158,11 +162,25 @@ class TreeRenderer extends StatelessWidget {
           color: (r.backgroundColor != null)
               ? HexColor.fromHex(r.backgroundColor!)
               : null,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (final c in r.children) TreeRenderer(c),
-            ],
+          margin: EdgeInsets.only(
+            bottom: r.marginBottom ?? 0.0,
+            left: r.marginLeft ?? 0.0,
+            top: r.marginTop ?? 0.0,
+            right: r.marginRight ?? 0.0,
+          ),
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: r.paddingBottom ?? 0.0,
+              left: r.paddingLeft ?? 0.0,
+              top: r.paddingTop ?? 0.0,
+              right: r.paddingRight ?? 0.0,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (final c in r.children) TreeRenderer(c),
+              ],
+            ),
           ),
         ),
     };
