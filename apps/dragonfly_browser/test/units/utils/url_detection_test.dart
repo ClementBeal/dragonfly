@@ -10,7 +10,8 @@ void main() {
         "facebook.net": "http://facebook.net",
         "/home/user": "file:///home/user",
         "random": "https://www.google.com/search?q=random",
-        "google": "https://www.google.com/search?q=google"
+        "google": "https://www.google.com/search?q=google",
+        "http://localhost:8088": "http://localhost:8088",
       };
 
       for (var entry in data.entries) {
