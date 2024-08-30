@@ -101,9 +101,73 @@ class TreeRenderer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(renderNode.runtimeType);
-
     return switch (renderNode) {
+      RenderTreeList r => Container(
+          color: (r.backgroundColor != null)
+              ? HexColor.fromHex(r.backgroundColor!)
+              : null,
+          margin: EdgeInsets.only(
+            bottom: r.marginBottom ?? 0.0,
+            left: r.marginLeft ?? 0.0,
+            top: r.marginTop ?? 0.0,
+            right: r.marginRight ?? 0.0,
+          ),
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: r.paddingBottom ?? 0.0,
+              left: r.paddingLeft ?? 0.0,
+              top: r.paddingTop ?? 0.0,
+              right: r.paddingRight ?? 0.0,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (final c in r.children)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.red,
+                        ),
+                      ),
+                      TreeRenderer(c),
+                    ],
+                  ),
+              ],
+            ),
+          ),
+        ),
+      RenderTreeListItem r => Container(
+          color: (r.backgroundColor != null)
+              ? HexColor.fromHex(r.backgroundColor!)
+              : null,
+          margin: EdgeInsets.only(
+            bottom: r.marginBottom ?? 0.0,
+            left: r.marginLeft ?? 0.0,
+            top: r.marginTop ?? 0.0,
+            right: r.marginRight ?? 0.0,
+          ),
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: r.paddingBottom ?? 0.0,
+              left: r.paddingLeft ?? 0.0,
+              top: r.paddingTop ?? 0.0,
+              right: r.paddingRight ?? 0.0,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (final c in r.children) TreeRenderer(c),
+              ],
+            ),
+          ),
+        ),
       RenderTreeInline r => Row(
           mainAxisSize: MainAxisSize.min,
           children: r.children.map((a) => TreeRenderer(a)).toList(),

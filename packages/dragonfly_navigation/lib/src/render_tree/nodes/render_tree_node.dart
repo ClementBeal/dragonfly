@@ -18,30 +18,31 @@ class RenderTreeView extends RenderTreeObject {
 }
 
 class RenderTreeBox extends RenderTreeObject {
-  List<RenderTreeObject> children;
-  String? backgroundColor;
-  double? paddingTop;
-  double? paddingRight;
-  double? paddingBottom;
-  double? paddingLeft;
-  double? marginTop;
-  double? marginRight;
-  double? marginBottom;
-  double? marginLeft;
-  double? borderWidth;
+  final List<RenderTreeObject> children;
+  final String? backgroundColor;
+  final double? paddingTop;
+  final double? paddingRight;
+  final double? paddingBottom;
+  final double? paddingLeft;
+  final double? marginTop;
+  final double? marginRight;
+  final double? marginBottom;
+  final double? marginLeft;
+  final double? borderWidth;
 
-  RenderTreeBox(
-      {required this.children,
-      this.backgroundColor,
-      this.paddingTop,
-      this.paddingRight,
-      this.paddingBottom,
-      this.paddingLeft,
-      this.marginTop,
-      this.marginRight,
-      this.marginBottom,
-      this.marginLeft,
-      this.borderWidth});
+  RenderTreeBox({
+    required this.children,
+    required this.backgroundColor,
+    required this.paddingTop,
+    required this.paddingRight,
+    required this.paddingBottom,
+    required this.paddingLeft,
+    required this.marginTop,
+    required this.marginRight,
+    required this.marginBottom,
+    required this.marginLeft,
+    required this.borderWidth,
+  });
 
   @override
   String toString() {
@@ -50,26 +51,26 @@ class RenderTreeBox extends RenderTreeObject {
 }
 
 class RenderTreeText extends RenderTreeObject {
-  String text;
-  String? fontFamily;
-  double? fontSize;
-  String? color;
-  String? textDecoration; // "underline", "overline", "line-through"
-  double? letterSpacing;
-  double? wordSpacing;
-  String? textAlign; // "left", "center", "right", "justify"
-  String? fontWeight;
+  final String text;
+  final String? fontFamily;
+  final double? fontSize;
+  final String? color;
+  final String? textDecoration; // "underline", "overline", "line-through"
+  final double? letterSpacing;
+  final double? wordSpacing;
+  final String? textAlign; // "left", "center", "right", "justify"
+  final String? fontWeight;
 
   RenderTreeText({
     required this.text,
-    this.fontFamily,
-    this.fontSize,
-    this.color,
-    this.textDecoration,
-    this.letterSpacing,
-    this.wordSpacing,
-    this.textAlign,
-    this.fontWeight,
+    required this.fontFamily,
+    required this.fontSize,
+    required this.color,
+    required this.textDecoration,
+    required this.letterSpacing,
+    required this.wordSpacing,
+    required this.textAlign,
+    required this.fontWeight,
   });
 
   @override
@@ -84,4 +85,38 @@ class RenderTreeInline extends RenderTreeObject {
   RenderTreeInline({
     required this.children,
   });
+}
+
+class RenderTreeList extends RenderTreeBox {
+  final String listType;
+
+  RenderTreeList({
+    required this.listType,
+    required super.children,
+    required super.backgroundColor,
+    required super.paddingTop,
+    required super.paddingRight,
+    required super.paddingBottom,
+    required super.paddingLeft,
+    required super.marginTop,
+    required super.marginRight,
+    required super.marginBottom,
+    required super.marginLeft,
+    required super.borderWidth,
+  });
+}
+
+class RenderTreeListItem extends RenderTreeBox {
+  RenderTreeListItem(
+      {required super.children,
+      required super.backgroundColor,
+      required super.paddingTop,
+      required super.paddingRight,
+      required super.paddingBottom,
+      required super.paddingLeft,
+      required super.marginTop,
+      required super.marginRight,
+      required super.marginBottom,
+      required super.marginLeft,
+      required super.borderWidth});
 }

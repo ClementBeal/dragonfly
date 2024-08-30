@@ -29,6 +29,8 @@ export 'src/render_tree/nodes/render_tree_node.dart'
         RenderTreeObject,
         RenderTreeText,
         RenderTreeView,
+        RenderTreeList,
+        RenderTreeListItem,
         RenderTreeInline;
 
 export 'src/render_tree/render_tree.dart' show BrowserRenderTree, RenderTree;

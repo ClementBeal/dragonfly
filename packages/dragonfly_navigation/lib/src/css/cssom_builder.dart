@@ -109,6 +109,7 @@ class CssomBuilder {
       "align-items": (String value) => style.alignItems = value,
       "min-height": (String value) => style.minHeight = value,
       "font-family": (String value) => style.fontFamily = value,
+      "list-style-type": (String value) => style.listStyleType = value,
     };
 
     final handler = propertyHandlers[declaration.property];
