@@ -1,10 +1,13 @@
 import 'dart:io';
 
+import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_navigation/src/files/favicon.dart';
 import 'package:dragonfly_navigation/src/html/dom.dart';
 import 'package:html/dom.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
@@ -51,7 +54,7 @@ class MediaPage extends Page {
 class HtmlPage extends Page {
   final Document? document;
   final CssomTree? cssom;
-  final Uri? favicon;
+  final BrowserImage? favicon;
 
   HtmlPage(
       {required super.url,
@@ -113,7 +116,7 @@ class Tab {
 
       final document = await getHttp(uriRequest);
       CssomTree? cssom;
-      Uri? favicon;
+      BrowserImage? cachedFavicon;
 
       if (document != null) {
         final linkCssNode =
@@ -123,12 +126,26 @@ class Tab {
 
         if (linkFavicon != null) {
           final href = linkFavicon.attributes["href"];
-          favicon = Uri.tryParse(href!) ?? uriRequest.replace(path: href);
-          print(favicon);
+          final faviconUri = href!.startsWith("/")
+              ? uriRequest.replace(path: href)
+              : Uri.parse(href);
 
-          final faviconData = await http.get(favicon);
+          final faviconData = await http.get(faviconUri);
+          final cachedFaviconUri =
+              FileCache.cacheFile(faviconUri, faviconData.bodyBytes);
 
-          FileCache.cacheFile(favicon, faviconData.bodyBytes);
+          cachedFavicon = BrowserImage(
+            path: cachedFaviconUri,
+            mimetype: lookupMimeType(
+              cachedFaviconUri.toFilePath(),
+            )!,
+          );
+
+          FileCacheRepo(db).addFileToCache(
+            p.basename(cachedFaviconUri.toFilePath()),
+            cachedFaviconUri.toString(),
+            faviconData.headers["content-type"]!,
+          );
         }
 
         if (linkCssNode != null) {
@@ -140,7 +157,7 @@ class Tab {
       _history.last = HtmlPage(
         document: document,
         cssom: cssom,
-        favicon: favicon,
+        favicon: cachedFavicon,
         status: (document != null) ? PageStatus.success : PageStatus.error,
         url: url,
       );

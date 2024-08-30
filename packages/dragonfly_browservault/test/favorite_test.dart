@@ -1,5 +1,4 @@
-import 'package:dragonfly_browservault/src/browser_favorites.dart';
-import 'package:dragonfly_browservault/src/initializer.dart';
+import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:test/test.dart';
 
@@ -8,7 +7,7 @@ void main() {
   late BrowserFavorites favorites;
 
   setUp(() {
-    db = initializeInMemory();
+    db = DatabaseManager().initializeInMemory();
     favorites = BrowserFavorites(db);
   });
 

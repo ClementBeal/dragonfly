@@ -7,20 +7,24 @@ import 'package:uuid/v4.dart';
 final cacheDirectory = Directory("cache");
 
 class FileCache {
-  static String cacheFile(Uri uri, Uint8List data) {
-    final extension = p.extension(uri.path);
-    final filename = p.setExtension(
-      p.join(
-        cacheDirectory.path,
-        UuidV4().generate(),
-      ),
-      extension,
+  /// Save the file in the cache folder
+  ///
+  /// The [requestUri] is used to extract the extension
+  ///
+  /// The returned [uri] is pointing to the cached file
+  static Uri cacheFile(Uri requestUri, Uint8List data) {
+    final extension = p.extension(requestUri.path);
+    final filename = p.setExtension(UuidV4().generate(), extension);
+
+    final storeFilePath = p.join(
+      cacheDirectory.path,
+      filename,
     );
 
-    File(
-      filename,
-    ).writeAsBytes(data);
+    final file = File(
+      storeFilePath,
+    )..writeAsBytes(data);
 
-    return filename;
+    return file.uri;
   }
 }

@@ -1,5 +1,4 @@
-import 'package:dragonfly_browservault/src/initializer.dart';
-import 'package:dragonfly_browservault/src/navigation_history.dart';
+import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:test/test.dart';
 
@@ -9,7 +8,7 @@ void main() {
 
   setUp(() {
     // Initialize in-memory database for testing
-    db = initializeInMemory();
+    db = DatabaseManager().initializeInMemory();
     history = NavigationHistory(db);
   });
 

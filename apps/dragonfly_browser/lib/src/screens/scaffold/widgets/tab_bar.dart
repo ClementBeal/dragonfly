@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
+import 'package:dragonfly/src/screens/scaffold/widgets/favicon_icon.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Tab;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 class BrowserTabBar extends StatelessWidget {
   const BrowserTabBar(this.isInsideColumn, {super.key});
@@ -166,9 +170,10 @@ class FlatTab extends StatelessWidget {
             child: ConstrainedBox(
               constraints: const BoxConstraints(
                 minHeight: 80,
-                maxWidth: 120,
+                maxWidth: 160,
               ),
               child: Row(
+                spacing: 8,
                 mainAxisSize: isVertical ? MainAxisSize.max : MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -180,6 +185,8 @@ class FlatTab extends StatelessWidget {
                         child: CircularProgressIndicator(),
                       ),
                     ),
+                  if (tab.currentPage is HtmlPage)
+                    BrowserImageRender((tab.currentPage as HtmlPage).favicon),
                   Expanded(
                     child: Text(
                       tab.currentPage?.getTitle() ?? "No title",
