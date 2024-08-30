@@ -68,89 +68,91 @@ class BrowserRenderTree {
         .map((a) => a.text)
         .join("");
 
-    return switch (c?.style.display ?? "inline") {
-      "inline" => RenderTreeInline(
-          children: element.children.map((e) => _parse(e)).toList(),
-        ),
-      "block" => RenderTreeBox(
-          marginBottom: (c?.style.marginBottom == null)
-              ? null
-              : convertCssSizeToPixels(
-                  cssValue: c!.style.marginBottom!,
-                  baseFontSize: 16,
-                  parentFontSize: 16,
-                ),
-          marginLeft: (c?.style.marginLeft == null)
-              ? null
-              : convertCssSizeToPixels(
-                  cssValue: c!.style.marginLeft!,
-                  baseFontSize: 16,
-                  parentFontSize: 16,
-                ),
-          marginTop: (c?.style.marginTop == null)
-              ? null
-              : convertCssSizeToPixels(
-                  cssValue: c!.style.marginTop!,
-                  baseFontSize: 16,
-                  parentFontSize: 16,
-                ),
-          marginRight: (c?.style.marginRight == null)
-              ? null
-              : convertCssSizeToPixels(
-                  cssValue: c!.style.marginRight!,
-                  baseFontSize: 16,
-                  parentFontSize: 16,
-                ),
-          paddingBottom: (c?.style.paddingBottom == null)
-              ? null
-              : convertCssSizeToPixels(
-                  cssValue: c!.style.paddingBottom!,
-                  baseFontSize: 16,
-                  parentFontSize: 16,
-                ),
-          paddingLeft: (c?.style.paddingLeft == null)
-              ? null
-              : convertCssSizeToPixels(
-                  cssValue: c!.style.paddingLeft!,
-                  baseFontSize: 16,
-                  parentFontSize: 16,
-                ),
-          paddingTop: (c?.style.paddingTop == null)
-              ? null
-              : convertCssSizeToPixels(
-                  cssValue: c!.style.paddingTop!,
-                  baseFontSize: 16,
-                  parentFontSize: 16,
-                ),
-          paddingRight: (c?.style.paddingRight == null)
-              ? null
-              : convertCssSizeToPixels(
-                  cssValue: c!.style.paddingRight!,
-                  baseFontSize: 16,
-                  parentFontSize: 16,
-                ),
-          children: [
-            if (text != "")
-              RenderTreeText(
-                text: text,
-                color: c?.style.textColor,
-                fontFamily: c?.style.fontFamily,
-                fontSize: (c?.style.fontSize == null)
-                    ? null
-                    : convertCssSizeToPixels(
-                        cssValue: c!.style.fontSize!,
-                        baseFontSize: 16,
-                        parentFontSize: 16,
-                      ),
-                textAlign: c?.style.textAlign,
-                fontWeight: c?.style.fontWeight,
+    final displayProperty = c?.style.display ?? "inline";
+
+    if (displayProperty == "inline") {
+      return RenderTreeInline(
+        children: element.children.map((e) => _parse(e)).toList(),
+      );
+    } else if (displayProperty == "block") {
+      return RenderTreeBox(
+        marginBottom: (c?.style.marginBottom == null)
+            ? null
+            : convertCssSizeToPixels(
+                cssValue: c!.style.marginBottom!,
+                baseFontSize: 16,
+                parentFontSize: 16,
               ),
-            ...element.children.map((e) => _parse(e)),
-          ],
-        ),
-      _ => RenderTreeText(text: text),
-      // _ => throw Exception(
-      //     "dont exist -> ${c?.style.display} (${element.localName!})")
-    };
+        marginLeft: (c?.style.marginLeft == null)
+            ? null
+            : convertCssSizeToPixels(
+                cssValue: c!.style.marginLeft!,
+                baseFontSize: 16,
+                parentFontSize: 16,
+              ),
+        marginTop: (c?.style.marginTop == null)
+            ? null
+            : convertCssSizeToPixels(
+                cssValue: c!.style.marginTop!,
+                baseFontSize: 16,
+                parentFontSize: 16,
+              ),
+        marginRight: (c?.style.marginRight == null)
+            ? null
+            : convertCssSizeToPixels(
+                cssValue: c!.style.marginRight!,
+                baseFontSize: 16,
+                parentFontSize: 16,
+              ),
+        paddingBottom: (c?.style.paddingBottom == null)
+            ? null
+            : convertCssSizeToPixels(
+                cssValue: c!.style.paddingBottom!,
+                baseFontSize: 16,
+                parentFontSize: 16,
+              ),
+        paddingLeft: (c?.style.paddingLeft == null)
+            ? null
+            : convertCssSizeToPixels(
+                cssValue: c!.style.paddingLeft!,
+                baseFontSize: 16,
+                parentFontSize: 16,
+              ),
+        paddingTop: (c?.style.paddingTop == null)
+            ? null
+            : convertCssSizeToPixels(
+                cssValue: c!.style.paddingTop!,
+                baseFontSize: 16,
+                parentFontSize: 16,
+              ),
+        paddingRight: (c?.style.paddingRight == null)
+            ? null
+            : convertCssSizeToPixels(
+                cssValue: c!.style.paddingRight!,
+                baseFontSize: 16,
+                parentFontSize: 16,
+              ),
+        children: [
+          if (text != "")
+            RenderTreeText(
+              text: text,
+              color: c?.style.textColor,
+              fontFamily: c?.style.fontFamily,
+              fontSize: (c?.style.fontSize == null)
+                  ? null
+                  : convertCssSizeToPixels(
+                      cssValue: c!.style.fontSize!,
+                      baseFontSize: 16,
+                      parentFontSize: 16,
+                    ),
+              textAlign: c?.style.textAlign,
+              fontWeight: c?.style.fontWeight,
+            ),
+          ...element.children.map((e) => _parse(e)),
+        ],
+      );
+    }
+
+    return RenderTreeText(text: text);
   }
 }
