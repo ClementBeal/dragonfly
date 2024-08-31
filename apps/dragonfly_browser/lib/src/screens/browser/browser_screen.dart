@@ -101,6 +101,7 @@ class TreeRenderer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(renderNode.runtimeType);
     return switch (renderNode) {
       RenderTreeList r => Container(
           color: (r.backgroundColor != null)
@@ -220,6 +221,22 @@ class TreeRenderer extends StatelessWidget {
                 "900" => FontWeight.w900,
                 _ => FontWeight.normal,
               }),
+        ),
+      RenderTreeLink r => GestureDetector(
+          onTap: () {
+            final a = Uri.parse(context
+                .read<BrowserCubit>()
+                .state
+                .currentTab!
+                .currentPage!
+                .url);
+            context
+                .read<BrowserCubit>()
+                .navigateToPage(a.replace(path: r.link).toString());
+          },
+          child: Column(
+            children: r.children.map((e) => TreeRenderer(e)).toList(),
+          ),
         ),
       RenderTreeBox r => Container(
           color: (r.backgroundColor != null)
