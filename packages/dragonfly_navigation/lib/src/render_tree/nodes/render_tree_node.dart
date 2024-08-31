@@ -139,3 +139,22 @@ class RenderTreeLink extends RenderTreeBox {
     required super.borderWidth,
   });
 }
+
+class RenderTreeImage extends RenderTreeBox {
+  final String link;
+
+  RenderTreeImage({
+    required this.link,
+    required super.children,
+    required super.backgroundColor,
+    required super.paddingTop,
+    required super.paddingRight,
+    required super.paddingBottom,
+    required super.paddingLeft,
+    required super.marginTop,
+    required super.marginRight,
+    required super.marginBottom,
+    required super.marginLeft,
+    required super.borderWidth,
+  });
+}

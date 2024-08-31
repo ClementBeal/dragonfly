@@ -6,6 +6,7 @@ import 'package:dragonfly/src/screens/browser/pages/media_page/media_page_screen
 import 'package:dragonfly/src/screens/lobby/lobby_screen.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Element;
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 
@@ -65,7 +66,7 @@ class BrowserScreen extends StatelessWidget {
                         page: p,
                         tab: tab,
                       ),
-                    HtmlPage() => CSSOMProvider(
+                    HtmlPage page => CSSOMProvider(
                         cssom: currentPage.cssom ?? cssomBuilder.browserStyle!,
                         child: (currentPage.document!.documentElement != null)
                             ? Builder(builder: (context) {
@@ -77,6 +78,7 @@ class BrowserScreen extends StatelessWidget {
                                 final renderTree = BrowserRenderTree(
                                   dom: currentPage.document!,
                                   cssom: currentPage.cssom!,
+                                  initialRoute: page.url,
                                 ).parse();
 
                                 return TreeRenderer(renderTree.child);
@@ -101,7 +103,6 @@ class TreeRenderer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(renderNode.runtimeType);
     return switch (renderNode) {
       RenderTreeList r => Container(
           color: (r.backgroundColor != null)
@@ -121,19 +122,21 @@ class TreeRenderer extends StatelessWidget {
               right: r.paddingRight ?? 0.0,
             ),
             child: Column(
+              // spacing: 6,
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 for (final c in r.children)
                   Row(
+                    spacing: 8,
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        width: 8,
-                        height: 8,
+                        width: 6,
+                        height: 6,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.red,
+                          color: Colors.black,
                         ),
                       ),
                       TreeRenderer(c),
@@ -173,6 +176,7 @@ class TreeRenderer extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: r.children.map((a) => TreeRenderer(a)).toList(),
         ),
+      RenderTreeImage r => Image.network(r.link),
       RenderTreeView r => DecoratedBox(
           decoration: BoxDecoration(
             color: HexColor.fromHex(r.backgroundColor),

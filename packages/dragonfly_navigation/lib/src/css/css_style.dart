@@ -1,3 +1,5 @@
+import 'package:dragonfly_navigation/src/render_tree/render_tree.dart';
+
 class CssStyle {
   CssStyle({
     this.marginTop,
@@ -64,6 +66,56 @@ class CssStyle {
   String? alignItems;
   String? minHeight;
   String? fontFamily;
+
+  double? marginTopConverted;
+  double? marginBottomConverted;
+  double? marginLeftConverted;
+  double? marginRightConverted;
+  double? paddingTopConverted;
+  double? paddingBottomConverted;
+  double? paddingLeftConverted;
+  double? paddingRightConverted;
+  double? fontSizeConverted;
+
+  void convertUnits(double baseFontSize, double parentFontSize) {
+    marginTopConverted = (marginTop != null)
+        ? convertCssSizeToPixels(
+            cssValue: marginTop!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    marginBottomConverted = (marginBottom != null)
+        ? convertCssSizeToPixels(
+            cssValue: marginBottom!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    marginLeftConverted = (marginLeft != null)
+        ? convertCssSizeToPixels(
+            cssValue: marginLeft!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    marginRightConverted = (marginRight != null)
+        ? convertCssSizeToPixels(
+            cssValue: marginRight!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    paddingTopConverted = (paddingTop != null)
+        ? convertCssSizeToPixels(
+            cssValue: paddingTop!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    paddingBottomConverted = (paddingBottom != null)
+        ? convertCssSizeToPixels(
+            cssValue: paddingBottom!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    paddingLeftConverted = (paddingLeft != null)
+        ? convertCssSizeToPixels(
+            cssValue: paddingLeft!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    paddingRightConverted = (paddingRight != null)
+        ? convertCssSizeToPixels(
+            cssValue: paddingRight!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+
+    fontSizeConverted = (fontSize != null)
+        ? convertCssSizeToPixels(
+            cssValue: fontSize!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+  }
 
   void merge(CssStyle newTheme) {
     lineHeight = newTheme.lineHeight ?? lineHeight;
