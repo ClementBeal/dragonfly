@@ -102,9 +102,10 @@ class TreeRenderer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // if (renderNode is RenderTreeBox) {
-    //   print((renderNode as RenderTreeBox).borderLeftColor);
-    // }
+    if (renderNode is RenderTreeGrid) {
+      print((renderNode as RenderTreeGrid).rowGap);
+      print((renderNode as RenderTreeGrid).columnGap);
+    }
 
     return switch (renderNode) {
       RenderTreeList r => Container(
@@ -138,6 +139,9 @@ class TreeRenderer extends StatelessWidget {
                     )
                   : BorderSide.none,
             ),
+            borderRadius: (r.borderRadius != null)
+                ? BorderRadius.circular(r.borderRadius!)
+                : null,
           ),
           margin: EdgeInsets.only(
             bottom: r.marginBottom ?? 0.0,
@@ -208,6 +212,9 @@ class TreeRenderer extends StatelessWidget {
                     )
                   : BorderSide.none,
             ),
+            borderRadius: (r.borderRadius != null)
+                ? BorderRadius.circular(r.borderRadius!)
+                : null,
           ),
           margin: EdgeInsets.only(
             bottom: r.marginBottom ?? 0.0,
@@ -363,6 +370,73 @@ class TreeRenderer extends StatelessWidget {
             ),
           ),
         ),
+      RenderTreeGrid r => Container(
+          color: (r.backgroundColor != null)
+              ? HexColor.fromHex(r.backgroundColor!)
+              : null,
+          margin: EdgeInsets.only(
+            bottom: r.marginBottom ?? 0.0,
+            left: r.marginLeft ?? 0.0,
+            top: r.marginTop ?? 0.0,
+            right: r.marginRight ?? 0.0,
+          ),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: (r.backgroundColor != null)
+                  ? HexColor.fromHex(r.backgroundColor!)
+                  : null,
+              borderRadius: (r.borderRadius != null)
+                  ? BorderRadius.circular(r.borderRadius!)
+                  : null,
+              border: Border(
+                bottom: (r.borderBottomColor != null)
+                    ? BorderSide(
+                        width: r.borderRightWidth ?? 0.0,
+                        color: HexColor.fromHex(r.borderBottomColor!),
+                      )
+                    : BorderSide.none,
+                left: (r.borderLeftColor != null)
+                    ? BorderSide(
+                        width: r.borderLeftWidth ?? 0.0,
+                        color: HexColor.fromHex(r.borderLeftColor!),
+                      )
+                    : BorderSide.none,
+                top: (r.borderTopColor != null)
+                    ? BorderSide(
+                        width: r.borderTopWidth ?? 0.0,
+                        color: HexColor.fromHex(r.borderTopColor!),
+                      )
+                    : BorderSide.none,
+                right: (r.borderRightColor != null)
+                    ? BorderSide(
+                        width: r.borderRightWidth ?? 0.0,
+                        color: HexColor.fromHex(r.borderRightColor!),
+                      )
+                    : BorderSide.none,
+              ),
+            ),
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: r.paddingBottom ?? 0.0,
+                left: r.paddingLeft ?? 0.0,
+                top: r.paddingTop ?? 0.0,
+                right: r.paddingRight ?? 0.0,
+              ),
+              child: GridView(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: r.columnGap ?? 0.0,
+                  crossAxisSpacing: r.rowGap ?? 0.0,
+                ),
+                children: [
+                  for (final c in r.children) TreeRenderer(c),
+                ],
+              ),
+            ),
+          ),
+        ),
       RenderTreeBox r => Container(
           color: (r.backgroundColor != null)
               ? HexColor.fromHex(r.backgroundColor!)
@@ -409,6 +483,9 @@ class TreeRenderer extends StatelessWidget {
                       )
                     : BorderSide.none,
               ),
+              borderRadius: (r.borderRadius != null)
+                  ? BorderRadius.circular(r.borderRadius!)
+                  : null,
             ),
             child: Padding(
               padding: EdgeInsets.only(

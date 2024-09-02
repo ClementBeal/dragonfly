@@ -27,7 +27,8 @@ class CssStyle {
     this.borderRightColor,
     this.borderTopColor,
     this.borderBottomColor,
-    this.gap,
+    this.rowGap,
+    this.columnGap,
     this.border,
     this.justifyContent,
     this.alignItems,
@@ -71,12 +72,18 @@ class CssStyle {
   String? borderTopColor;
   String? borderBottomColor;
 
-  String? gap;
   String? border;
   String? justifyContent;
   String? alignItems;
   String? minHeight;
   String? fontFamily;
+
+  // grid
+  String? rowGap;
+  String? columnGap;
+
+  double? rowGapConverted;
+  double? columnGapConverted;
 
   double? marginTopConverted;
   double? marginBottomConverted;
@@ -92,6 +99,7 @@ class CssStyle {
   double? borderRightWidthConverted;
   double? borderTopWidthConverted;
   double? borderBottomWidthConverted;
+  double? borderRadiusConverted;
 
   double? maxWidthConverted;
   double? maxHeightConverted;
@@ -160,6 +168,20 @@ class CssStyle {
         ? convertCssSizeToPixels(
             cssValue: maxHeight!, baseFontSize: 16, parentFontSize: 16)
         : null;
+
+    borderRadiusConverted = (borderRadius != null)
+        ? convertCssSizeToPixels(
+            cssValue: borderRadius!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+
+    rowGapConverted = (rowGap != null)
+        ? convertCssSizeToPixels(
+            cssValue: rowGap!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    columnGapConverted = (columnGap != null)
+        ? convertCssSizeToPixels(
+            cssValue: columnGap!, baseFontSize: 16, parentFontSize: 16)
+        : null;
   }
 
   void merge(CssStyle newTheme) {
@@ -204,7 +226,8 @@ class CssStyle {
 
     border = newTheme.border ?? border;
 
-    gap = newTheme.gap ?? gap;
+    rowGap = newTheme.rowGap ?? rowGap;
+    columnGap = newTheme.columnGap ?? columnGap;
     justifyContent = newTheme.justifyContent ?? justifyContent;
     alignItems = newTheme.alignItems ?? alignItems;
   }
@@ -252,7 +275,8 @@ class CssStyle {
       borderRightWidth: borderRightWidth,
       borderTopWidth: borderTopWidth,
       borderBottomWidth: borderBottomWidth,
-      gap: gap,
+      rowGap: rowGap,
+      columnGap: columnGap,
       border: border,
       justifyContent: justifyContent,
       alignItems: alignItems,

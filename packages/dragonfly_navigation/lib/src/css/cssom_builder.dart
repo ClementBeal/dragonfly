@@ -134,13 +134,30 @@ class CssomBuilder {
           style.backgroundColor = tokens[0];
         }
       },
-      "gap": (String value) => style.gap = value,
-      "border": (String value) => style.border = value,
+      "border": (String value) {
+        final tokens = value.split(" ");
+
+        style.borderBottomWidth = tokens[0];
+        style.borderLeftWidth = tokens[0];
+        style.borderRightWidth = tokens[0];
+        style.borderTopWidth = tokens[0];
+
+        style.borderTopColor = tokens[2];
+        style.borderBottomColor = tokens[2];
+        style.borderLeftColor = tokens[2];
+        style.borderRightColor = tokens[2];
+      },
       "justify-content": (String value) => style.justifyContent = value,
       "align-items": (String value) => style.alignItems = value,
       "min-height": (String value) => style.minHeight = value,
       "font-family": (String value) => style.fontFamily = value,
       "list-style-type": (String value) => style.listStyleType = value,
+      "gap": (String value) {
+        style.rowGap = value;
+        style.columnGap = value;
+      },
+      "column-gap": (String value) => style.columnGap = value,
+      "row-gap": (String value) => style.rowGap = value,
     };
 
     final handler = propertyHandlers[declaration.property];

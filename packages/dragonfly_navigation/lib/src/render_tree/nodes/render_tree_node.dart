@@ -37,6 +37,7 @@ class RenderTreeBox extends RenderTreeObject {
   final double? borderRightWidth;
   final double? borderTopWidth;
   final double? borderBottomWidth;
+  final double? borderRadius;
 
   final double? maxWidth;
   final double? maxHeight;
@@ -63,6 +64,7 @@ class RenderTreeBox extends RenderTreeObject {
     required this.borderBottomWidth,
     required this.maxHeight,
     required this.maxWidth,
+    required this.borderRadius,
   });
 
   @override
@@ -134,6 +136,7 @@ class RenderTreeList extends RenderTreeBox {
     required super.borderBottomWidth,
     required super.maxHeight,
     required super.maxWidth,
+    required super.borderRadius,
   });
 }
 
@@ -160,6 +163,7 @@ class RenderTreeListItem extends RenderTreeBox {
     required super.borderBottomWidth,
     required super.maxHeight,
     required super.maxWidth,
+    required super.borderRadius,
   });
 }
 
@@ -189,6 +193,7 @@ class RenderTreeLink extends RenderTreeBox {
     required super.borderBottomWidth,
     required super.maxHeight,
     required super.maxWidth,
+    required super.borderRadius,
   });
 }
 
@@ -218,6 +223,7 @@ class RenderTreeImage extends RenderTreeBox {
     required super.borderBottomWidth,
     required super.maxHeight,
     required super.maxWidth,
+    required super.borderRadius,
   });
 }
 
@@ -249,5 +255,38 @@ class RenderTreeFlex extends RenderTreeBox {
     required super.borderBottomWidth,
     required super.maxHeight,
     required super.maxWidth,
+    required super.borderRadius,
+  });
+}
+
+class RenderTreeGrid extends RenderTreeBox {
+  final double? rowGap;
+  final double? columnGap;
+
+  RenderTreeGrid({
+    required this.rowGap,
+    required this.columnGap,
+    required super.children,
+    required super.backgroundColor,
+    required super.paddingTop,
+    required super.paddingRight,
+    required super.paddingBottom,
+    required super.paddingLeft,
+    required super.marginTop,
+    required super.marginRight,
+    required super.marginBottom,
+    required super.marginLeft,
+    required super.borderWidth,
+    required super.borderLeftColor,
+    required super.borderRightColor,
+    required super.borderTopColor,
+    required super.borderBottomColor,
+    required super.borderLeftWidth,
+    required super.borderRightWidth,
+    required super.borderTopWidth,
+    required super.borderBottomWidth,
+    required super.maxHeight,
+    required super.maxWidth,
+    required super.borderRadius,
   });
 }

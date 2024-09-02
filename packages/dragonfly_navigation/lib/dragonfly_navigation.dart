@@ -33,6 +33,7 @@ export 'src/render_tree/nodes/render_tree_node.dart'
         RenderTreeListItem,
         RenderTreeLink,
         RenderTreeFlex,
+        RenderTreeGrid,
         RenderTreeImage,
         RenderTreeInline;
 

@@ -109,6 +109,7 @@ class BrowserRenderTree {
         borderBottomWidth: c.borderBottomWidthConverted,
         maxHeight: c.maxHeightConverted,
         maxWidth: c.maxWidthConverted,
+        borderRadius: c.borderRadiusConverted,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -150,6 +151,7 @@ class BrowserRenderTree {
         borderBottomWidth: c.borderBottomWidthConverted,
         maxHeight: c.maxHeightConverted,
         maxWidth: c.maxWidthConverted,
+        borderRadius: c.borderRadiusConverted,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -170,6 +172,37 @@ class BrowserRenderTree {
       );
     } else if (displayProperty == "inline") {
       return RenderTreeInline(
+        children: element.children.map((e) => _parse(e, c)).toList(),
+      );
+    } else if (displayProperty == "grid") {
+      print(c.rowGap);
+      print(c.columnGap);
+      print(c.rowGapConverted);
+      print(c.columnGapConverted);
+      return RenderTreeGrid(
+        columnGap: c.columnGapConverted,
+        rowGap: c.rowGapConverted,
+        marginBottom: c.marginBottomConverted,
+        marginLeft: c.marginLeftConverted,
+        marginTop: c.marginTopConverted,
+        marginRight: c.marginRightConverted,
+        paddingBottom: c.paddingBottomConverted,
+        paddingLeft: c.paddingLeftConverted,
+        paddingTop: c.paddingTopConverted,
+        paddingRight: c.paddingRightConverted,
+        borderBottomColor: c.borderBottomColor,
+        borderLeftColor: c.borderLeftColor,
+        borderRightColor: c.borderRightColor,
+        borderTopColor: c.borderTopColor,
+        borderLeftWidth: c.borderLeftWidthConverted,
+        borderRightWidth: c.borderRightWidthConverted,
+        borderTopWidth: c.borderTopWidthConverted,
+        borderBottomWidth: c.borderBottomWidthConverted,
+        backgroundColor: c.backgroundColor,
+        borderWidth: null,
+        maxHeight: c.maxHeightConverted,
+        maxWidth: c.maxWidthConverted,
+        borderRadius: c.borderRadiusConverted,
         children: element.children.map((e) => _parse(e, c)).toList(),
       );
     } else if (displayProperty == "flex") {
@@ -196,6 +229,7 @@ class BrowserRenderTree {
         borderWidth: null,
         maxHeight: c.maxHeightConverted,
         maxWidth: c.maxWidthConverted,
+        borderRadius: c.borderRadiusConverted,
         children: element.children.map((e) => _parse(e, c)).toList(),
       );
     } else if (displayProperty == "list-item") {
@@ -218,6 +252,7 @@ class BrowserRenderTree {
         borderBottomWidth: c.borderBottomWidthConverted,
         maxHeight: c.maxHeightConverted,
         maxWidth: c.maxWidthConverted,
+        borderRadius: c.borderRadiusConverted,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -264,6 +299,7 @@ class BrowserRenderTree {
           borderBottomWidth: c.borderBottomWidthConverted,
           maxHeight: c.maxHeightConverted,
           maxWidth: c.maxWidthConverted,
+          borderRadius: c.borderRadiusConverted,
           children: [
             if (text != "")
               RenderTreeText(
@@ -303,6 +339,7 @@ class BrowserRenderTree {
         borderBottomWidth: c.borderBottomWidthConverted,
         maxWidth: c.maxWidthConverted,
         maxHeight: c.maxHeightConverted,
+        borderRadius: c.borderRadiusConverted,
         children: [
           if (text != "")
             RenderTreeText(
