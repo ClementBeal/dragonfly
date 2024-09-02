@@ -1,5 +1,4 @@
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
-import 'package:dragonfly_navigation/src/render_tree/nodes/render_tree_node.dart';
 import 'package:html/dom.dart';
 
 class RenderTree {
@@ -71,13 +70,15 @@ class BrowserRenderTree {
     final rule = cssom.find(element.localName!)?.clone();
 
     final CssStyle c = (rule != null)
-        ? (rule.style
-          ..inheritFromParent(parentStyle)
-          ..convertUnits(16, parentStyle.fontSizeConverted!))
+        ? (rule.style..inheritFromParent(parentStyle))
         : parentStyle;
-    // final parentFontSize
 
-    // TO DO : fontSize -> is calculated from REM or EM
+    for (var className in element.classes) {
+      final classRule = cssom.find(".$className")?.clone();
+      if (classRule != null) c.mergeClass(classRule.style);
+    }
+
+    c.convertUnits(16, parentStyle.fontSizeConverted!);
 
     final text = element.nodes
         .where((a) => a.nodeType == Node.TEXT_NODE)
@@ -106,6 +107,8 @@ class BrowserRenderTree {
         borderRightWidth: c.borderRightWidthConverted,
         borderTopWidth: c.borderTopWidthConverted,
         borderBottomWidth: c.borderBottomWidthConverted,
+        maxHeight: c.maxHeightConverted,
+        maxWidth: c.maxWidthConverted,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -145,6 +148,8 @@ class BrowserRenderTree {
         borderRightWidth: c.borderRightWidthConverted,
         borderTopWidth: c.borderTopWidthConverted,
         borderBottomWidth: c.borderBottomWidthConverted,
+        maxHeight: c.maxHeightConverted,
+        maxWidth: c.maxWidthConverted,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -167,6 +172,32 @@ class BrowserRenderTree {
       return RenderTreeInline(
         children: element.children.map((e) => _parse(e, c)).toList(),
       );
+    } else if (displayProperty == "flex") {
+      return RenderTreeFlex(
+        direction: "row",
+        justifyContent: c.justifyContent,
+        marginBottom: c.marginBottomConverted,
+        marginLeft: c.marginLeftConverted,
+        marginTop: c.marginTopConverted,
+        marginRight: c.marginRightConverted,
+        paddingBottom: c.paddingBottomConverted,
+        paddingLeft: c.paddingLeftConverted,
+        paddingTop: c.paddingTopConverted,
+        paddingRight: c.paddingRightConverted,
+        borderBottomColor: c.borderBottomColor,
+        borderLeftColor: c.borderLeftColor,
+        borderRightColor: c.borderRightColor,
+        borderTopColor: c.borderTopColor,
+        borderLeftWidth: c.borderLeftWidthConverted,
+        borderRightWidth: c.borderRightWidthConverted,
+        borderTopWidth: c.borderTopWidthConverted,
+        borderBottomWidth: c.borderBottomWidthConverted,
+        backgroundColor: c.backgroundColor,
+        borderWidth: null,
+        maxHeight: c.maxHeightConverted,
+        maxWidth: c.maxWidthConverted,
+        children: element.children.map((e) => _parse(e, c)).toList(),
+      );
     } else if (displayProperty == "list-item") {
       return RenderTreeListItem(
         marginBottom: c.marginBottomConverted,
@@ -185,6 +216,8 @@ class BrowserRenderTree {
         borderRightWidth: c.borderRightWidthConverted,
         borderTopWidth: c.borderTopWidthConverted,
         borderBottomWidth: c.borderBottomWidthConverted,
+        maxHeight: c.maxHeightConverted,
+        maxWidth: c.maxWidthConverted,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -229,6 +262,8 @@ class BrowserRenderTree {
           borderRightWidth: c.borderRightWidthConverted,
           borderTopWidth: c.borderTopWidthConverted,
           borderBottomWidth: c.borderBottomWidthConverted,
+          maxHeight: c.maxHeightConverted,
+          maxWidth: c.maxWidthConverted,
           children: [
             if (text != "")
               RenderTreeText(
@@ -266,6 +301,8 @@ class BrowserRenderTree {
         borderRightWidth: c.borderRightWidthConverted,
         borderTopWidth: c.borderTopWidthConverted,
         borderBottomWidth: c.borderBottomWidthConverted,
+        maxWidth: c.maxWidthConverted,
+        maxHeight: c.maxHeightConverted,
         children: [
           if (text != "")
             RenderTreeText(

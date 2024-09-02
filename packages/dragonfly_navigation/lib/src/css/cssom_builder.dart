@@ -147,18 +147,13 @@ class CssomBuilder {
     if (handler != null) {
       handler(declaration.value);
     }
-
-    print(style.paddingLeft);
   }
 
   void _applyMargin(CssStyle style, String value) {
     final tokens = value.split(" ");
 
     if (tokens.length == 1 && value == "auto") {
-      style.marginTop = value;
-      style.marginBottom = value;
-      style.marginLeft = value;
-      style.marginRight = value;
+      style.isCentered = true;
     } else if (tokens.length == 1) {
       style.marginTop = value;
       style.marginBottom = value;

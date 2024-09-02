@@ -102,6 +102,10 @@ class TreeRenderer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // if (renderNode is RenderTreeBox) {
+    //   print((renderNode as RenderTreeBox).borderLeftColor);
+    // }
+
     return switch (renderNode) {
       RenderTreeList r => Container(
           decoration: BoxDecoration(
@@ -297,10 +301,77 @@ class TreeRenderer extends StatelessWidget {
             children: r.children.map((e) => TreeRenderer(e)).toList(),
           ),
         ),
+      RenderTreeFlex r => Container(
+          color: (r.backgroundColor != null)
+              ? HexColor.fromHex(r.backgroundColor!)
+              : null,
+          margin: EdgeInsets.only(
+            bottom: r.marginBottom ?? 0.0,
+            left: r.marginLeft ?? 0.0,
+            top: r.marginTop ?? 0.0,
+            right: r.marginRight ?? 0.0,
+          ),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: (r.backgroundColor != null)
+                  ? HexColor.fromHex(r.backgroundColor!)
+                  : null,
+              border: Border(
+                bottom: (r.borderBottomColor != null)
+                    ? BorderSide(
+                        width: r.borderRightWidth ?? 0.0,
+                        color: HexColor.fromHex(r.borderBottomColor!),
+                      )
+                    : BorderSide.none,
+                left: (r.borderLeftColor != null)
+                    ? BorderSide(
+                        width: r.borderLeftWidth ?? 0.0,
+                        color: HexColor.fromHex(r.borderLeftColor!),
+                      )
+                    : BorderSide.none,
+                top: (r.borderTopColor != null)
+                    ? BorderSide(
+                        width: r.borderTopWidth ?? 0.0,
+                        color: HexColor.fromHex(r.borderTopColor!),
+                      )
+                    : BorderSide.none,
+                right: (r.borderRightColor != null)
+                    ? BorderSide(
+                        width: r.borderRightWidth ?? 0.0,
+                        color: HexColor.fromHex(r.borderRightColor!),
+                      )
+                    : BorderSide.none,
+              ),
+            ),
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: r.paddingBottom ?? 0.0,
+                left: r.paddingLeft ?? 0.0,
+                top: r.paddingTop ?? 0.0,
+                right: r.paddingRight ?? 0.0,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: switch (r.justifyContent) {
+                  "start" => MainAxisAlignment.start,
+                  _ => MainAxisAlignment.start,
+                },
+                children: [
+                  // for (final c in r.children) TreeRenderer(c),
+                ],
+              ),
+            ),
+          ),
+        ),
       RenderTreeBox r => Container(
           color: (r.backgroundColor != null)
               ? HexColor.fromHex(r.backgroundColor!)
               : null,
+          alignment: Alignment.center,
+          constraints: BoxConstraints(
+            maxWidth: r.maxWidth ?? double.infinity,
+            maxHeight: r.maxHeight ?? double.infinity,
+          ),
           margin: EdgeInsets.only(
             bottom: r.marginBottom ?? 0.0,
             left: r.marginLeft ?? 0.0,

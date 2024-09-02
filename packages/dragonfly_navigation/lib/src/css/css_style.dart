@@ -93,6 +93,9 @@ class CssStyle {
   double? borderTopWidthConverted;
   double? borderBottomWidthConverted;
 
+  double? maxWidthConverted;
+  double? maxHeightConverted;
+
   void convertUnits(double baseFontSize, double parentFontSize) {
     marginTopConverted = (marginTop != null)
         ? convertCssSizeToPixels(
@@ -147,6 +150,15 @@ class CssStyle {
     borderBottomWidthConverted = (borderBottomWidth != null)
         ? convertCssSizeToPixels(
             cssValue: borderBottomWidth!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+
+    maxWidthConverted = (maxWidth != null)
+        ? convertCssSizeToPixels(
+            cssValue: maxWidth!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    maxHeightConverted = (maxHeight != null)
+        ? convertCssSizeToPixels(
+            cssValue: maxHeight!, baseFontSize: 16, parentFontSize: 16)
         : null;
   }
 
