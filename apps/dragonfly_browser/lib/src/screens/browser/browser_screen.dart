@@ -109,6 +109,12 @@ class TreeRenderer extends StatelessWidget {
 
     return switch (renderNode) {
       RenderTreeList r => Container(
+          constraints: BoxConstraints(
+            maxWidth: r.maxWidth ?? double.infinity,
+            maxHeight: r.maxHeight ?? double.infinity,
+            minHeight: r.minHeight ?? 0.0,
+            minWidth: r.minWidth ?? 0.0,
+          ),
           decoration: BoxDecoration(
             color: (r.backgroundColor != null)
                 ? HexColor.fromHex(r.backgroundColor!)
@@ -182,6 +188,12 @@ class TreeRenderer extends StatelessWidget {
           ),
         ),
       RenderTreeListItem r => Container(
+          constraints: BoxConstraints(
+            maxWidth: r.maxWidth ?? double.infinity,
+            maxHeight: r.maxHeight ?? double.infinity,
+            minHeight: r.minHeight ?? 0.0,
+            minWidth: r.minWidth ?? 0.0,
+          ),
           decoration: BoxDecoration(
             color: (r.backgroundColor != null)
                 ? HexColor.fromHex(r.backgroundColor!)
@@ -304,11 +316,59 @@ class TreeRenderer extends StatelessWidget {
                 .read<BrowserCubit>()
                 .navigateToPage(a.replace(path: r.link).toString());
           },
-          child: Column(
-            children: r.children.map((e) => TreeRenderer(e)).toList(),
+          child: Container(
+            padding: EdgeInsets.only(
+              bottom: r.paddingBottom ?? 0.0,
+              left: r.paddingLeft ?? 0.0,
+              top: r.paddingTop ?? 0.0,
+              right: r.paddingRight ?? 0.0,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: (r.borderRadius != null)
+                  ? BorderRadius.circular(r.borderRadius!)
+                  : null,
+              color: (r.backgroundColor != null)
+                  ? HexColor.fromHex(r.backgroundColor!)
+                  : null,
+              border: Border(
+                bottom: (r.borderBottomColor != null)
+                    ? BorderSide(
+                        width: r.borderRightWidth ?? 0.0,
+                        color: HexColor.fromHex(r.borderBottomColor!),
+                      )
+                    : BorderSide.none,
+                left: (r.borderLeftColor != null)
+                    ? BorderSide(
+                        width: r.borderLeftWidth ?? 0.0,
+                        color: HexColor.fromHex(r.borderLeftColor!),
+                      )
+                    : BorderSide.none,
+                top: (r.borderTopColor != null)
+                    ? BorderSide(
+                        width: r.borderTopWidth ?? 0.0,
+                        color: HexColor.fromHex(r.borderTopColor!),
+                      )
+                    : BorderSide.none,
+                right: (r.borderRightColor != null)
+                    ? BorderSide(
+                        width: r.borderRightWidth ?? 0.0,
+                        color: HexColor.fromHex(r.borderRightColor!),
+                      )
+                    : BorderSide.none,
+              ),
+            ),
+            child: Column(
+              children: r.children.map((e) => TreeRenderer(e)).toList(),
+            ),
           ),
         ),
       RenderTreeFlex r => Container(
+          constraints: BoxConstraints(
+            maxWidth: r.maxWidth ?? double.infinity,
+            maxHeight: r.maxHeight ?? double.infinity,
+            minHeight: r.minHeight ?? 0.0,
+            minWidth: r.minWidth ?? 0.0,
+          ),
           color: (r.backgroundColor != null)
               ? HexColor.fromHex(r.backgroundColor!)
               : null,
@@ -364,7 +424,7 @@ class TreeRenderer extends StatelessWidget {
                   _ => MainAxisAlignment.start,
                 },
                 children: [
-                  // for (final c in r.children) TreeRenderer(c),
+                  for (final c in r.children) TreeRenderer(c),
                 ],
               ),
             ),
@@ -445,6 +505,8 @@ class TreeRenderer extends StatelessWidget {
           constraints: BoxConstraints(
             maxWidth: r.maxWidth ?? double.infinity,
             maxHeight: r.maxHeight ?? double.infinity,
+            minHeight: r.minHeight ?? 0.0,
+            minWidth: r.minWidth ?? 0.0,
           ),
           margin: EdgeInsets.only(
             bottom: r.marginBottom ?? 0.0,

@@ -110,6 +110,8 @@ class BrowserRenderTree {
         maxHeight: c.maxHeightConverted,
         maxWidth: c.maxWidthConverted,
         borderRadius: c.borderRadiusConverted,
+        minHeight: c.minHeightConverted,
+        minWidth: c.minWidthtConverted,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -152,6 +154,8 @@ class BrowserRenderTree {
         maxHeight: c.maxHeightConverted,
         maxWidth: c.maxWidthConverted,
         borderRadius: c.borderRadiusConverted,
+        minHeight: c.minHeightConverted,
+        minWidth: c.minWidthtConverted,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -203,6 +207,8 @@ class BrowserRenderTree {
         maxHeight: c.maxHeightConverted,
         maxWidth: c.maxWidthConverted,
         borderRadius: c.borderRadiusConverted,
+        minHeight: c.minHeightConverted,
+        minWidth: c.minWidthtConverted,
         children: element.children.map((e) => _parse(e, c)).toList(),
       );
     } else if (displayProperty == "flex") {
@@ -230,6 +236,8 @@ class BrowserRenderTree {
         maxHeight: c.maxHeightConverted,
         maxWidth: c.maxWidthConverted,
         borderRadius: c.borderRadiusConverted,
+        minHeight: c.minHeightConverted,
+        minWidth: c.minWidthtConverted,
         children: element.children.map((e) => _parse(e, c)).toList(),
       );
     } else if (displayProperty == "list-item") {
@@ -253,6 +261,8 @@ class BrowserRenderTree {
         maxHeight: c.maxHeightConverted,
         maxWidth: c.maxWidthConverted,
         borderRadius: c.borderRadiusConverted,
+        minHeight: c.minHeightConverted,
+        minWidth: c.minWidthtConverted,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -300,6 +310,8 @@ class BrowserRenderTree {
           maxHeight: c.maxHeightConverted,
           maxWidth: c.maxWidthConverted,
           borderRadius: c.borderRadiusConverted,
+          minHeight: c.minHeightConverted,
+          minWidth: c.minWidthtConverted,
           children: [
             if (text != "")
               RenderTreeText(
@@ -340,6 +352,8 @@ class BrowserRenderTree {
         maxWidth: c.maxWidthConverted,
         maxHeight: c.maxHeightConverted,
         borderRadius: c.borderRadiusConverted,
+        minHeight: c.minHeightConverted,
+        minWidth: c.minWidthtConverted,
         children: [
           if (text != "")
             RenderTreeText(

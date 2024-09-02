@@ -41,6 +41,8 @@ class RenderTreeBox extends RenderTreeObject {
 
   final double? maxWidth;
   final double? maxHeight;
+  final double? minWidth;
+  final double? minHeight;
 
   RenderTreeBox({
     required this.children,
@@ -65,6 +67,8 @@ class RenderTreeBox extends RenderTreeObject {
     required this.maxHeight,
     required this.maxWidth,
     required this.borderRadius,
+    required this.minHeight,
+    required this.minWidth,
   });
 
   @override
@@ -137,6 +141,8 @@ class RenderTreeList extends RenderTreeBox {
     required super.maxHeight,
     required super.maxWidth,
     required super.borderRadius,
+    required super.minHeight,
+    required super.minWidth,
   });
 }
 
@@ -164,6 +170,8 @@ class RenderTreeListItem extends RenderTreeBox {
     required super.maxHeight,
     required super.maxWidth,
     required super.borderRadius,
+    required super.minHeight,
+    required super.minWidth,
   });
 }
 
@@ -194,6 +202,8 @@ class RenderTreeLink extends RenderTreeBox {
     required super.maxHeight,
     required super.maxWidth,
     required super.borderRadius,
+    required super.minHeight,
+    required super.minWidth,
   });
 }
 
@@ -224,6 +234,8 @@ class RenderTreeImage extends RenderTreeBox {
     required super.maxHeight,
     required super.maxWidth,
     required super.borderRadius,
+    required super.minHeight,
+    required super.minWidth,
   });
 }
 
@@ -256,6 +268,8 @@ class RenderTreeFlex extends RenderTreeBox {
     required super.maxHeight,
     required super.maxWidth,
     required super.borderRadius,
+    required super.minHeight,
+    required super.minWidth,
   });
 }
 
@@ -288,5 +302,7 @@ class RenderTreeGrid extends RenderTreeBox {
     required super.maxHeight,
     required super.maxWidth,
     required super.borderRadius,
+    required super.minHeight,
+    required super.minWidth,
   });
 }

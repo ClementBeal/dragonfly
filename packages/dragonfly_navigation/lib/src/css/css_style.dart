@@ -76,6 +76,7 @@ class CssStyle {
   String? justifyContent;
   String? alignItems;
   String? minHeight;
+  String? minWidth;
   String? fontFamily;
 
   // grid
@@ -103,6 +104,8 @@ class CssStyle {
 
   double? maxWidthConverted;
   double? maxHeightConverted;
+  double? minHeightConverted;
+  double? minWidthtConverted;
 
   void convertUnits(double baseFontSize, double parentFontSize) {
     marginTopConverted = (marginTop != null)
@@ -167,6 +170,15 @@ class CssStyle {
     maxHeightConverted = (maxHeight != null)
         ? convertCssSizeToPixels(
             cssValue: maxHeight!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+
+    minWidthtConverted = (minWidth != null)
+        ? convertCssSizeToPixels(
+            cssValue: minWidth!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    minHeightConverted = (minHeight != null)
+        ? convertCssSizeToPixels(
+            cssValue: minHeight!, baseFontSize: 16, parentFontSize: 16)
         : null;
 
     borderRadiusConverted = (borderRadius != null)

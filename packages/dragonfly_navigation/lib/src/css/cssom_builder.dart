@@ -96,7 +96,6 @@ class CssomBuilder {
       "margin-top": (String value) => style.marginTop = value,
       "margin-right": (String value) => style.marginRight = value,
       "margin-bottom": (String value) => style.marginBottom = value,
-      "max-width": (String value) => style.maxWidth = value,
       "padding": (String value) => _applyPadding(style, value),
       "padding-left": (String value) => style.paddingLeft = value,
       "padding-top": (String value) => style.paddingTop = value,
@@ -135,8 +134,22 @@ class CssomBuilder {
         }
       },
       "border": (String value) {
-        final tokens = value.split(" ");
+        if (value == "none") {
+          style.borderBottomWidth = null;
+          style.borderLeftWidth = null;
+          style.borderRightWidth = null;
+          style.borderTopWidth = null;
 
+          style.borderTopColor = null;
+          style.borderBottomColor = null;
+          style.borderLeftColor = null;
+          style.borderRightColor = null;
+
+          return;
+        }
+
+        final tokens = value.split(" ");
+        print(value);
         style.borderBottomWidth = tokens[0];
         style.borderLeftWidth = tokens[0];
         style.borderRightWidth = tokens[0];
@@ -150,6 +163,9 @@ class CssomBuilder {
       "justify-content": (String value) => style.justifyContent = value,
       "align-items": (String value) => style.alignItems = value,
       "min-height": (String value) => style.minHeight = value,
+      "min-width": (String value) => style.minWidth = value,
+      "max-height": (String value) => style.maxHeight = value,
+      "max-width": (String value) => style.maxWidth = value,
       "font-family": (String value) => style.fontFamily = value,
       "list-style-type": (String value) => style.listStyleType = value,
       "gap": (String value) {
