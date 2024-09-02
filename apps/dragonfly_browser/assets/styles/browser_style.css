@@ -39,10 +39,10 @@ bdo {
 
 blockquote {
   display: block;
-  margin-before: 1em;
-  margin-after: 1em;
-  margin-start: 40px;
-  margin-end: 40px;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: 40px;
+  margin-right: 40px;
 }
 
 body {

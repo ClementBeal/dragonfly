@@ -23,16 +23,20 @@ class CssStyle {
     this.isCentered,
     this.display,
     this.borderRadius,
-    this.borderLeft,
-    this.borderRight,
-    this.borderTop,
-    this.borderBottom,
+    this.borderLeftColor,
+    this.borderRightColor,
+    this.borderTopColor,
+    this.borderBottomColor,
     this.gap,
     this.border,
     this.justifyContent,
     this.alignItems,
     this.minHeight,
     this.fontFamily,
+    this.borderLeftWidth,
+    this.borderRightWidth,
+    this.borderTopWidth,
+    this.borderBottomWidth,
   });
 
   double? lineHeight;
@@ -56,10 +60,17 @@ class CssStyle {
   String? listStyleType;
   String? display;
   String? borderRadius;
-  String? borderLeft;
-  String? borderRight;
-  String? borderTop;
-  String? borderBottom;
+
+  String? borderLeftWidth;
+  String? borderRightWidth;
+  String? borderTopWidth;
+  String? borderBottomWidth;
+
+  String? borderLeftColor;
+  String? borderRightColor;
+  String? borderTopColor;
+  String? borderBottomColor;
+
   String? gap;
   String? border;
   String? justifyContent;
@@ -76,6 +87,11 @@ class CssStyle {
   double? paddingLeftConverted;
   double? paddingRightConverted;
   double? fontSizeConverted;
+
+  double? borderLeftWidthConverted;
+  double? borderRightWidthConverted;
+  double? borderTopWidthConverted;
+  double? borderBottomWidthConverted;
 
   void convertUnits(double baseFontSize, double parentFontSize) {
     marginTopConverted = (marginTop != null)
@@ -115,6 +131,23 @@ class CssStyle {
         ? convertCssSizeToPixels(
             cssValue: fontSize!, baseFontSize: 16, parentFontSize: 16)
         : null;
+
+    borderLeftWidthConverted = (borderLeftWidth != null)
+        ? convertCssSizeToPixels(
+            cssValue: borderLeftWidth!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    borderRightWidthConverted = (borderRightWidth != null)
+        ? convertCssSizeToPixels(
+            cssValue: borderRightWidth!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    borderTopWidthConverted = (borderTopWidth != null)
+        ? convertCssSizeToPixels(
+            cssValue: borderTopWidth!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    borderBottomWidthConverted = (borderBottomWidth != null)
+        ? convertCssSizeToPixels(
+            cssValue: borderBottomWidth!, baseFontSize: 16, parentFontSize: 16)
+        : null;
   }
 
   void merge(CssStyle newTheme) {
@@ -147,10 +180,16 @@ class CssStyle {
     display = newTheme.display ?? display;
     borderRadius = newTheme.borderRadius ?? borderRadius;
 
-    borderLeft = newTheme.borderLeft ?? borderLeft;
-    borderRight = newTheme.borderRight ?? borderRight;
-    borderTop = newTheme.borderTop ?? borderTop;
-    borderBottom = newTheme.borderBottom ?? borderBottom;
+    borderLeftColor = newTheme.borderLeftColor ?? borderLeftColor;
+    borderRightColor = newTheme.borderRightColor ?? borderRightColor;
+    borderTopColor = newTheme.borderTopColor ?? borderTopColor;
+    borderBottomColor = newTheme.borderBottomColor ?? borderBottomColor;
+
+    borderLeftWidth = newTheme.borderLeftWidth ?? borderLeftWidth;
+    borderRightWidth = newTheme.borderRightWidth ?? borderRightWidth;
+    borderTopWidth = newTheme.borderTopWidth ?? borderTopWidth;
+    borderBottomWidth = newTheme.borderBottomWidth ?? borderBottomWidth;
+
     border = newTheme.border ?? border;
 
     gap = newTheme.gap ?? gap;
@@ -193,10 +232,14 @@ class CssStyle {
       isCentered: isCentered,
       display: display,
       borderRadius: borderRadius,
-      borderLeft: borderLeft,
-      borderRight: borderRight,
-      borderTop: borderTop,
-      borderBottom: borderBottom,
+      borderLeftColor: borderLeftColor,
+      borderRightColor: borderRightColor,
+      borderTopColor: borderTopColor,
+      borderBottomColor: borderBottomColor,
+      borderLeftWidth: borderLeftWidth,
+      borderRightWidth: borderRightWidth,
+      borderTopWidth: borderTopWidth,
+      borderBottomWidth: borderBottomWidth,
       gap: gap,
       border: border,
       justifyContent: justifyContent,

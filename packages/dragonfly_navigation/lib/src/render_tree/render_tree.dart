@@ -68,7 +68,6 @@ class BrowserRenderTree {
   }
 
   RenderTreeObject _parse(Element element, CssStyle parentStyle) {
-    print(element.localName);
     final rule = cssom.find(element.localName!);
 
     final CssStyle c = (rule != null)
@@ -99,6 +98,14 @@ class BrowserRenderTree {
         paddingLeft: c.paddingLeftConverted,
         paddingTop: c.paddingTopConverted,
         paddingRight: c.paddingRightConverted,
+        borderBottomColor: c.borderBottomColor,
+        borderLeftColor: c.borderLeftColor,
+        borderRightColor: c.borderRightColor,
+        borderTopColor: c.borderTopColor,
+        borderLeftWidth: c.borderLeftWidthConverted,
+        borderRightWidth: c.borderRightWidthConverted,
+        borderTopWidth: c.borderTopWidthConverted,
+        borderBottomWidth: c.borderBottomWidthConverted,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -114,7 +121,7 @@ class BrowserRenderTree {
             ),
           ...element.children.map((e) => _parse(e, c)),
         ],
-        backgroundColor: null,
+        backgroundColor: c.backgroundColor,
         borderWidth: null,
       );
     } else if (element.localName! == "img") {
@@ -130,6 +137,14 @@ class BrowserRenderTree {
         paddingLeft: c.paddingLeftConverted,
         paddingTop: c.paddingTopConverted,
         paddingRight: c.paddingRightConverted,
+        borderBottomColor: c.borderBottomColor,
+        borderLeftColor: c.borderLeftColor,
+        borderRightColor: c.borderRightColor,
+        borderTopColor: c.borderTopColor,
+        borderLeftWidth: c.borderLeftWidthConverted,
+        borderRightWidth: c.borderRightWidthConverted,
+        borderTopWidth: c.borderTopWidthConverted,
+        borderBottomWidth: c.borderBottomWidthConverted,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -145,7 +160,7 @@ class BrowserRenderTree {
             ),
           ...element.children.map((e) => _parse(e, c)),
         ],
-        backgroundColor: null,
+        backgroundColor: c.backgroundColor,
         borderWidth: null,
       );
     } else if (displayProperty == "inline") {
@@ -162,6 +177,14 @@ class BrowserRenderTree {
         paddingLeft: c.paddingLeftConverted,
         paddingTop: c.paddingTopConverted,
         paddingRight: c.paddingRightConverted,
+        borderBottomColor: c.borderBottomColor,
+        borderLeftColor: c.borderLeftColor,
+        borderRightColor: c.borderRightColor,
+        borderTopColor: c.borderTopColor,
+        borderLeftWidth: c.borderLeftWidthConverted,
+        borderRightWidth: c.borderRightWidthConverted,
+        borderTopWidth: c.borderTopWidthConverted,
+        borderBottomWidth: c.borderBottomWidthConverted,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -183,7 +206,7 @@ class BrowserRenderTree {
             ),
           ...element.children.map((e) => _parse(e, c)),
         ],
-        backgroundColor: null,
+        backgroundColor: c.backgroundColor,
         borderWidth: null,
       );
     } else if (displayProperty == "block") {
@@ -198,6 +221,14 @@ class BrowserRenderTree {
           paddingLeft: c.paddingLeftConverted,
           paddingTop: c.paddingTopConverted,
           paddingRight: c.paddingRightConverted,
+          borderBottomColor: c.borderBottomColor,
+          borderLeftColor: c.borderLeftColor,
+          borderRightColor: c.borderRightColor,
+          borderTopColor: c.borderTopColor,
+          borderLeftWidth: c.borderLeftWidthConverted,
+          borderRightWidth: c.borderRightWidthConverted,
+          borderTopWidth: c.borderTopWidthConverted,
+          borderBottomWidth: c.borderBottomWidthConverted,
           children: [
             if (text != "")
               RenderTreeText(
@@ -213,7 +244,7 @@ class BrowserRenderTree {
               ),
             ...element.children.map((e) => _parse(e, c)),
           ],
-          backgroundColor: null,
+          backgroundColor: c.backgroundColor,
           borderWidth: null,
         );
       }
@@ -227,6 +258,14 @@ class BrowserRenderTree {
         paddingLeft: c.paddingLeftConverted,
         paddingTop: c.paddingTopConverted,
         paddingRight: c.paddingRightConverted,
+        borderBottomColor: c.borderBottomColor,
+        borderLeftColor: c.borderLeftColor,
+        borderRightColor: c.borderRightColor,
+        borderTopColor: c.borderTopColor,
+        borderLeftWidth: c.borderLeftWidthConverted,
+        borderRightWidth: c.borderRightWidthConverted,
+        borderTopWidth: c.borderTopWidthConverted,
+        borderBottomWidth: c.borderBottomWidthConverted,
         children: [
           if (text != "")
             RenderTreeText(
@@ -242,7 +281,7 @@ class BrowserRenderTree {
             ),
           ...element.children.map((e) => _parse(e, c)),
         ],
-        backgroundColor: null,
+        backgroundColor: c.backgroundColor,
         borderWidth: null,
       );
     }

@@ -99,10 +99,33 @@ class CssomBuilder {
       "font-weight": (String value) => style.fontWeight = value,
       "display": (String value) => style.display = value,
       "border-radius": (String value) => style.borderRadius = value,
-      "border-left": (String value) => style.borderLeft = value,
-      "border-right": (String value) => style.borderRight = value,
-      "border-top": (String value) => style.borderTop = value,
-      "border-bottom": (String value) => style.borderBottom = value,
+      "border-left": (String value) {
+        final tokens = value.split(" ");
+        style.borderLeftColor = tokens[2];
+        style.borderLeftWidth = tokens[0];
+      },
+      "border-right": (String value) {
+        final tokens = value.split(" ");
+        style.borderRightColor = tokens[2];
+        style.borderRightWidth = tokens[0];
+      },
+      "border-top": (String value) {
+        final tokens = value.split(" ");
+        style.borderTopColor = tokens[2];
+        style.borderTopWidth = tokens[0];
+      },
+      "border-bottom": (String value) {
+        final tokens = value.split(" ");
+        style.borderBottomColor = tokens[2];
+        style.borderBottomWidth = tokens[0];
+      },
+      "background": (String value) {
+        final tokens = value.split(" ");
+
+        if (tokens.length == 1) {
+          style.backgroundColor = tokens[0];
+        }
+      },
       "gap": (String value) => style.gap = value,
       "border": (String value) => style.border = value,
       "justify-content": (String value) => style.justifyContent = value,

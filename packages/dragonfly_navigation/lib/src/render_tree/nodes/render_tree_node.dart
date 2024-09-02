@@ -29,6 +29,14 @@ class RenderTreeBox extends RenderTreeObject {
   final double? marginBottom;
   final double? marginLeft;
   final double? borderWidth;
+  final String? borderLeftColor;
+  final String? borderRightColor;
+  final String? borderTopColor;
+  final String? borderBottomColor;
+  final double? borderLeftWidth;
+  final double? borderRightWidth;
+  final double? borderTopWidth;
+  final double? borderBottomWidth;
 
   RenderTreeBox({
     required this.children,
@@ -42,6 +50,14 @@ class RenderTreeBox extends RenderTreeObject {
     required this.marginBottom,
     required this.marginLeft,
     required this.borderWidth,
+    required this.borderLeftColor,
+    required this.borderRightColor,
+    required this.borderTopColor,
+    required this.borderBottomColor,
+    required this.borderLeftWidth,
+    required this.borderRightWidth,
+    required this.borderTopWidth,
+    required this.borderBottomWidth,
   });
 
   @override
@@ -103,22 +119,39 @@ class RenderTreeList extends RenderTreeBox {
     required super.marginBottom,
     required super.marginLeft,
     required super.borderWidth,
+    required super.borderLeftColor,
+    required super.borderRightColor,
+    required super.borderTopColor,
+    required super.borderBottomColor,
+    required super.borderLeftWidth,
+    required super.borderRightWidth,
+    required super.borderTopWidth,
+    required super.borderBottomWidth,
   });
 }
 
 class RenderTreeListItem extends RenderTreeBox {
-  RenderTreeListItem(
-      {required super.children,
-      required super.backgroundColor,
-      required super.paddingTop,
-      required super.paddingRight,
-      required super.paddingBottom,
-      required super.paddingLeft,
-      required super.marginTop,
-      required super.marginRight,
-      required super.marginBottom,
-      required super.marginLeft,
-      required super.borderWidth});
+  RenderTreeListItem({
+    required super.children,
+    required super.backgroundColor,
+    required super.paddingTop,
+    required super.paddingRight,
+    required super.paddingBottom,
+    required super.paddingLeft,
+    required super.marginTop,
+    required super.marginRight,
+    required super.marginBottom,
+    required super.marginLeft,
+    required super.borderWidth,
+    required super.borderLeftColor,
+    required super.borderRightColor,
+    required super.borderTopColor,
+    required super.borderBottomColor,
+    required super.borderLeftWidth,
+    required super.borderRightWidth,
+    required super.borderTopWidth,
+    required super.borderBottomWidth,
+  });
 }
 
 class RenderTreeLink extends RenderTreeBox {
@@ -137,6 +170,14 @@ class RenderTreeLink extends RenderTreeBox {
     required super.marginBottom,
     required super.marginLeft,
     required super.borderWidth,
+    required super.borderLeftColor,
+    required super.borderRightColor,
+    required super.borderTopColor,
+    required super.borderBottomColor,
+    required super.borderLeftWidth,
+    required super.borderRightWidth,
+    required super.borderTopWidth,
+    required super.borderBottomWidth,
   });
 }
 
@@ -156,5 +197,13 @@ class RenderTreeImage extends RenderTreeBox {
     required super.marginBottom,
     required super.marginLeft,
     required super.borderWidth,
+    required super.borderLeftColor,
+    required super.borderRightColor,
+    required super.borderTopColor,
+    required super.borderBottomColor,
+    required super.borderLeftWidth,
+    required super.borderRightWidth,
+    required super.borderTopWidth,
+    required super.borderBottomWidth,
   });
 }

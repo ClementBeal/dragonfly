@@ -6,7 +6,6 @@ import 'package:dragonfly/src/screens/browser/pages/media_page/media_page_screen
 import 'package:dragonfly/src/screens/lobby/lobby_screen.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Element;
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 
@@ -173,7 +172,7 @@ class TreeRenderer extends StatelessWidget {
           ),
         ),
       RenderTreeInline r => Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.max,
           children: r.children.map((a) => TreeRenderer(a)).toList(),
         ),
       RenderTreeImage r => Image.network(r.link),
@@ -184,7 +183,7 @@ class TreeRenderer extends StatelessWidget {
           child: SizedBox.expand(
             child: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                // crossAxisAlignment: CrossAxisAlignment.start,
                 // mainAxisAlignment: MainAxisAlignment.start,
                 // crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -242,32 +241,69 @@ class TreeRenderer extends StatelessWidget {
             children: r.children.map((e) => TreeRenderer(e)).toList(),
           ),
         ),
-      RenderTreeBox r => Container(
-          color: (r.backgroundColor != null)
-              ? HexColor.fromHex(r.backgroundColor!)
-              : null,
-          margin: EdgeInsets.only(
-            bottom: r.marginBottom ?? 0.0,
-            left: r.marginLeft ?? 0.0,
-            top: r.marginTop ?? 0.0,
-            right: r.marginRight ?? 0.0,
-          ),
-          child: Padding(
-            padding: EdgeInsets.only(
-              bottom: r.paddingBottom ?? 0.0,
-              left: r.paddingLeft ?? 0.0,
-              top: r.paddingTop ?? 0.0,
-              right: r.paddingRight ?? 0.0,
+      RenderTreeBox r => Builder(builder: (context) {
+          print(r.borderLeftColor);
+          print(r.borderLeftWidth);
+          return Container(
+            color: (r.backgroundColor != null)
+                ? HexColor.fromHex(r.backgroundColor!)
+                : null,
+            margin: EdgeInsets.only(
+              bottom: r.marginBottom ?? 0.0,
+              left: r.marginLeft ?? 0.0,
+              top: r.marginTop ?? 0.0,
+              right: r.marginRight ?? 0.0,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (final c in r.children) TreeRenderer(c),
-              ],
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: (r.backgroundColor != null)
+                    ? HexColor.fromHex(r.backgroundColor!)
+                    : null,
+                border: Border(
+                  bottom: (r.borderBottomColor != null)
+                      ? BorderSide(
+                          width: r.borderRightWidth ?? 0.0,
+                          color: HexColor.fromHex(r.borderBottomColor!),
+                        )
+                      : BorderSide.none,
+                  left: (r.borderLeftColor != null)
+                      ? BorderSide(
+                          width: r.borderLeftWidth ?? 0.0,
+                          color: HexColor.fromHex(r.borderLeftColor!),
+                        )
+                      : BorderSide.none,
+                  top: (r.borderTopColor != null)
+                      ? BorderSide(
+                          width: r.borderTopWidth ?? 0.0,
+                          color: HexColor.fromHex(r.borderTopColor!),
+                        )
+                      : BorderSide.none,
+                  right: (r.borderRightColor != null)
+                      ? BorderSide(
+                          width: r.borderRightWidth ?? 0.0,
+                          color: HexColor.fromHex(r.borderRightColor!),
+                        )
+                      : BorderSide.none,
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: r.paddingBottom ?? 0.0,
+                  left: r.paddingLeft ?? 0.0,
+                  top: r.paddingTop ?? 0.0,
+                  right: r.paddingRight ?? 0.0,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (final c in r.children) TreeRenderer(c),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        }),
     };
   }
 }
