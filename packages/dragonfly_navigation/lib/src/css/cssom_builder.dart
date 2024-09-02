@@ -92,8 +92,16 @@ class CssomBuilder {
       "background-color": (String value) => style.backgroundColor = value,
       "text-decoration": (String value) => style.textDecoration = value,
       "margin": (String value) => _applyMargin(style, value),
+      "margin-left": (String value) => style.marginLeft = value,
+      "margin-top": (String value) => style.marginTop = value,
+      "margin-right": (String value) => style.marginRight = value,
+      "margin-bottom": (String value) => style.marginBottom = value,
       "max-width": (String value) => style.maxWidth = value,
       "padding": (String value) => _applyPadding(style, value),
+      "padding-left": (String value) => style.paddingLeft = value,
+      "padding-top": (String value) => style.paddingTop = value,
+      "padding-right": (String value) => style.paddingRight = value,
+      "padding-bottom": (String value) => style.paddingBottom = value,
       "text-align": (String value) => style.textAlign = value,
       "font-size": (String value) => style.fontSize = value,
       "font-weight": (String value) => style.fontWeight = value,
@@ -139,6 +147,8 @@ class CssomBuilder {
     if (handler != null) {
       handler(declaration.value);
     }
+
+    print(style.paddingLeft);
   }
 
   void _applyMargin(CssStyle style, String value) {

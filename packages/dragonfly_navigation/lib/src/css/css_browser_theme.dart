@@ -82,7 +82,7 @@ datalist {
 
 dd {
   display: block;
-  margin-start: 40px;
+  margin-left: 40px;
 }
 
 del {
@@ -103,10 +103,10 @@ div {
 
 dl {
   display: block;
-  margin-before: 1em;
-  margin-after: 1em;
-  margin-start: 0;
-  margin-end: 0;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 dt {
@@ -123,12 +123,12 @@ embed:focus {
 
 /* fieldset {
   display: block;
-  margin-start: 2px;
-  margin-end: 2px;
-  padding-before: 0.35em;
-  padding-start: 0.75em;
-  padding-end: 0.75em;
-  padding-after: 0.625em;
+  margin-left: 2px;
+  margin-right: 2px;
+  padding-top: 0.35em;
+  padding-left: 0.75em;
+  padding-right: 0.75em;
+  padding-bottom: 0.625em;
   border: 2px groove black;
 } */
 
@@ -138,10 +138,10 @@ figcaption {
 
 figure {
   display: block;
-  margin-before: 1em;
-  margin-after: 1em;
-  margin-start: 40px;
-  margin-end: 40px;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: 40px;
+  margin-right: 40px;
 }
 
 footer {
@@ -156,59 +156,59 @@ form {
 h1 {
   display: block;
   font-size: 2em;
-  margin-before: 0.67em;
-  margin-after: 0.67em;
-  margin-start: 0;
-  margin-end: 0;
+  margin-top: 0.67em;
+  margin-bottom: 0.67em;
+  margin-left: 0;
+  margin-right: 0;
   font-weight: bold;
 }
 
 h2 {
   display: block;
   font-size: 1.5em;
-  margin-before: 0.83em;
-  margin-after: 0.83em;
-  margin-start: 0;
-  margin-end: 0;
+  margin-top: 0.83em;
+  margin-bottom: 0.83em;
+  margin-left: 0;
+  margin-right: 0;
   font-weight: bold;
 }
 
 h3 {
   display: block;
   font-size: 1.17em;
-  margin-before: 1em;
-  margin-after: 1em;
-  margin-start: 0;
-  margin-end: 0;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: 0;
+  margin-right: 0;
   font-weight: bold;
 }
 
 h4 {
   display: block;
-  margin-before: 1.33em;
-  margin-after: 1.33em;
-  margin-start: 0;
-  margin-end: 0;
+  margin-top: 1.33em;
+  margin-bottom: 1.33em;
+  margin-left: 0;
+  margin-right: 0;
   font-weight: bold;
 }
 
 h5 {
   display: block;
   font-size: 0.83em;
-  margin-before: 1.67em;
-  margin-after: 1.67em;
-  margin-start: 0;
-  margin-end: 0;
+  margin-top: 1.67em;
+  margin-bottom: 1.67em;
+  margin-left: 0;
+  margin-right: 0;
   font-weight: bold;
 }
 
 h6 {
   display: block;
   font-size: 0.67em;
-  margin-before: 2.33em;
-  margin-after: 2.33em;
-  margin-start: 0;
-  margin-end: 0;
+  margin-top: 2.33em;
+  margin-bottom: 2.33em;
+  margin-left: 0;
+  margin-right: 0;
   font-weight: bold;
 }
 
@@ -226,10 +226,10 @@ hgroup {
 /*
 hr {
   display: block;
-  margin-before: 0.5em;
-  margin-after: 0.5em;
-  margin-start: auto;
-  margin-end: auto;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
   border-style: inset;
   border-width: 1px;
 } */
@@ -270,8 +270,8 @@ label {
 
 legend {
   display: block;
-  padding-start: 2px;
-  padding-end: 2px;
+  padding-left: 2px;
+  padding-right: 2px;
   border: none;
 }
 
@@ -292,11 +292,11 @@ mark {
 menu {
   display: block;
   list-style-type: disc;
-  margin-before: 1em;
-  margin-after: 1em;
-  margin-start: 0;
-  margin-end: 0;
-  padding-start: 40px;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 40px;
 }
 nav {
   display: block;
@@ -309,11 +309,11 @@ object:focus {
 ol {
   display: block;
   list-style-type: decimal;
-  margin-before: 1em;
-  margin-after: 1em;
-  margin-start: 0;
-  margin-end: 0;
-  padding-start: 40px;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 40px;
 }
 
 output {
@@ -324,10 +324,10 @@ output {
 }
 p {
   display: block;
-  margin-before: 1em;
-  margin-after: 1em;
-  margin-start: 0;
-  margin-end: 0;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: 0;
+  margin-right: 0;
 }
 param {
   display: none;
@@ -451,11 +451,11 @@ u {
 ul {
   display: block;
   list-style-type: disc;
-  margin-before: 1em;
-  margin-after: 1em;
-  margin-start: 0;
-  margin-end: 0;
-  padding-start: 40px;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 40px;
 }
 var {
   font-style: italic;
