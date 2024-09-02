@@ -68,7 +68,7 @@ class BrowserRenderTree {
   }
 
   RenderTreeObject _parse(Element element, CssStyle parentStyle) {
-    final rule = cssom.find(element.localName!);
+    final rule = cssom.find(element.localName!)?.clone();
 
     final CssStyle c = (rule != null)
         ? (rule.style
