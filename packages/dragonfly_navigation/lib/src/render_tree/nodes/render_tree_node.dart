@@ -43,6 +43,7 @@ class RenderTreeBox extends RenderTreeObject {
   final double? maxHeight;
   final double? minWidth;
   final double? minHeight;
+  final bool? isCentered;
 
   RenderTreeBox({
     required this.children,
@@ -69,6 +70,7 @@ class RenderTreeBox extends RenderTreeObject {
     required this.borderRadius,
     required this.minHeight,
     required this.minWidth,
+    required this.isCentered,
   });
 
   @override
@@ -143,6 +145,7 @@ class RenderTreeList extends RenderTreeBox {
     required super.borderRadius,
     required super.minHeight,
     required super.minWidth,
+    required super.isCentered,
   });
 }
 
@@ -172,6 +175,7 @@ class RenderTreeListItem extends RenderTreeBox {
     required super.borderRadius,
     required super.minHeight,
     required super.minWidth,
+    required super.isCentered,
   });
 }
 
@@ -204,6 +208,7 @@ class RenderTreeLink extends RenderTreeBox {
     required super.borderRadius,
     required super.minHeight,
     required super.minWidth,
+    required super.isCentered,
   });
 }
 
@@ -236,6 +241,7 @@ class RenderTreeImage extends RenderTreeBox {
     required super.borderRadius,
     required super.minHeight,
     required super.minWidth,
+    required super.isCentered,
   });
 }
 
@@ -270,6 +276,7 @@ class RenderTreeFlex extends RenderTreeBox {
     required super.borderRadius,
     required super.minHeight,
     required super.minWidth,
+    required super.isCentered,
   });
 }
 
@@ -304,5 +311,6 @@ class RenderTreeGrid extends RenderTreeBox {
     required super.borderRadius,
     required super.minHeight,
     required super.minWidth,
+    required super.isCentered,
   });
 }

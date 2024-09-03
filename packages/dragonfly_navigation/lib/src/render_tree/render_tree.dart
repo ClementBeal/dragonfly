@@ -112,6 +112,7 @@ class BrowserRenderTree {
         borderRadius: c.borderRadiusConverted,
         minHeight: c.minHeightConverted,
         minWidth: c.minWidthtConverted,
+        isCentered: c.isCentered,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -156,6 +157,7 @@ class BrowserRenderTree {
         borderRadius: c.borderRadiusConverted,
         minHeight: c.minHeightConverted,
         minWidth: c.minWidthtConverted,
+        isCentered: c.isCentered,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -209,6 +211,7 @@ class BrowserRenderTree {
         borderRadius: c.borderRadiusConverted,
         minHeight: c.minHeightConverted,
         minWidth: c.minWidthtConverted,
+        isCentered: c.isCentered,
         children: element.children.map((e) => _parse(e, c)).toList(),
       );
     } else if (displayProperty == "flex") {
@@ -238,6 +241,7 @@ class BrowserRenderTree {
         borderRadius: c.borderRadiusConverted,
         minHeight: c.minHeightConverted,
         minWidth: c.minWidthtConverted,
+        isCentered: c.isCentered,
         children: element.children.map((e) => _parse(e, c)).toList(),
       );
     } else if (displayProperty == "list-item") {
@@ -263,6 +267,7 @@ class BrowserRenderTree {
         borderRadius: c.borderRadiusConverted,
         minHeight: c.minHeightConverted,
         minWidth: c.minWidthtConverted,
+        isCentered: c.isCentered,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -312,6 +317,7 @@ class BrowserRenderTree {
           borderRadius: c.borderRadiusConverted,
           minHeight: c.minHeightConverted,
           minWidth: c.minWidthtConverted,
+          isCentered: c.isCentered,
           children: [
             if (text != "")
               RenderTreeText(
@@ -354,6 +360,7 @@ class BrowserRenderTree {
         borderRadius: c.borderRadiusConverted,
         minHeight: c.minHeightConverted,
         minWidth: c.minWidthtConverted,
+        isCentered: c.isCentered,
         children: [
           if (text != "")
             RenderTreeText(
