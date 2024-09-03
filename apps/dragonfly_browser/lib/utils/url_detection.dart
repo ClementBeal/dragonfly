@@ -24,10 +24,11 @@ String detectUrl(String input) {
 bool _isUrl(String input) {
   // Regex pattern to match typical URLs
   final urlPattern = RegExp(
-    r'^(https?://)?' // optional scheme
-    r'([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}' // domain name
-    r'(:\d+)?' // optional port
-    r'(\/\S*)?$', // optional path
+    r'^(https?://)?' // optional schene
+    r'(([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}' // www.blabla.com
+    r'|' // OR
+    r'[a-zA-Z0-9-]+(:\d+))' // localhost:8000 (with port number)
+    r'(\/\S*)?$', // optional path (/search)
   );
 
   return urlPattern.hasMatch(input);

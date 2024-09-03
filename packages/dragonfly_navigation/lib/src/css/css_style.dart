@@ -1,3 +1,5 @@
+import 'package:dragonfly_navigation/src/render_tree/render_tree.dart';
+
 class CssStyle {
   CssStyle({
     this.marginTop,
@@ -21,16 +23,21 @@ class CssStyle {
     this.isCentered,
     this.display,
     this.borderRadius,
-    this.borderLeft,
-    this.borderRight,
-    this.borderTop,
-    this.borderBottom,
-    this.gap,
+    this.borderLeftColor,
+    this.borderRightColor,
+    this.borderTopColor,
+    this.borderBottomColor,
+    this.rowGap,
+    this.columnGap,
     this.border,
     this.justifyContent,
     this.alignItems,
     this.minHeight,
     this.fontFamily,
+    this.borderLeftWidth,
+    this.borderRightWidth,
+    this.borderTopWidth,
+    this.borderBottomWidth,
   });
 
   double? lineHeight;
@@ -54,16 +61,140 @@ class CssStyle {
   String? listStyleType;
   String? display;
   String? borderRadius;
-  String? borderLeft;
-  String? borderRight;
-  String? borderTop;
-  String? borderBottom;
-  String? gap;
+
+  String? borderLeftWidth;
+  String? borderRightWidth;
+  String? borderTopWidth;
+  String? borderBottomWidth;
+
+  String? borderLeftColor;
+  String? borderRightColor;
+  String? borderTopColor;
+  String? borderBottomColor;
+
   String? border;
   String? justifyContent;
   String? alignItems;
   String? minHeight;
+  String? minWidth;
   String? fontFamily;
+
+  // grid
+  String? rowGap;
+  String? columnGap;
+
+  double? rowGapConverted;
+  double? columnGapConverted;
+
+  double? marginTopConverted;
+  double? marginBottomConverted;
+  double? marginLeftConverted;
+  double? marginRightConverted;
+  double? paddingTopConverted;
+  double? paddingBottomConverted;
+  double? paddingLeftConverted;
+  double? paddingRightConverted;
+  double? fontSizeConverted;
+
+  double? borderLeftWidthConverted;
+  double? borderRightWidthConverted;
+  double? borderTopWidthConverted;
+  double? borderBottomWidthConverted;
+  double? borderRadiusConverted;
+
+  double? maxWidthConverted;
+  double? maxHeightConverted;
+  double? minHeightConverted;
+  double? minWidthtConverted;
+
+  void convertUnits(double baseFontSize, double parentFontSize) {
+    marginTopConverted = (marginTop != null)
+        ? convertCssSizeToPixels(
+            cssValue: marginTop!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    marginBottomConverted = (marginBottom != null)
+        ? convertCssSizeToPixels(
+            cssValue: marginBottom!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    marginLeftConverted = (marginLeft != null)
+        ? convertCssSizeToPixels(
+            cssValue: marginLeft!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    marginRightConverted = (marginRight != null)
+        ? convertCssSizeToPixels(
+            cssValue: marginRight!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    paddingTopConverted = (paddingTop != null)
+        ? convertCssSizeToPixels(
+            cssValue: paddingTop!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    paddingBottomConverted = (paddingBottom != null)
+        ? convertCssSizeToPixels(
+            cssValue: paddingBottom!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    paddingLeftConverted = (paddingLeft != null)
+        ? convertCssSizeToPixels(
+            cssValue: paddingLeft!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    paddingRightConverted = (paddingRight != null)
+        ? convertCssSizeToPixels(
+            cssValue: paddingRight!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+
+    fontSizeConverted = (fontSize != null)
+        ? convertCssSizeToPixels(
+            cssValue: fontSize!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+
+    borderLeftWidthConverted = (borderLeftWidth != null)
+        ? convertCssSizeToPixels(
+            cssValue: borderLeftWidth!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    borderRightWidthConverted = (borderRightWidth != null)
+        ? convertCssSizeToPixels(
+            cssValue: borderRightWidth!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    borderTopWidthConverted = (borderTopWidth != null)
+        ? convertCssSizeToPixels(
+            cssValue: borderTopWidth!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    borderBottomWidthConverted = (borderBottomWidth != null)
+        ? convertCssSizeToPixels(
+            cssValue: borderBottomWidth!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+
+    maxWidthConverted = (maxWidth != null)
+        ? convertCssSizeToPixels(
+            cssValue: maxWidth!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    maxHeightConverted = (maxHeight != null)
+        ? convertCssSizeToPixels(
+            cssValue: maxHeight!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+
+    minWidthtConverted = (minWidth != null)
+        ? convertCssSizeToPixels(
+            cssValue: minWidth!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    minHeightConverted = (minHeight != null)
+        ? convertCssSizeToPixels(
+            cssValue: minHeight!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+
+    borderRadiusConverted = (borderRadius != null)
+        ? convertCssSizeToPixels(
+            cssValue: borderRadius!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+
+    rowGapConverted = (rowGap != null)
+        ? convertCssSizeToPixels(
+            cssValue: rowGap!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+    columnGapConverted = (columnGap != null)
+        ? convertCssSizeToPixels(
+            cssValue: columnGap!, baseFontSize: 16, parentFontSize: 16)
+        : null;
+  }
 
   void merge(CssStyle newTheme) {
     lineHeight = newTheme.lineHeight ?? lineHeight;
@@ -95,13 +226,20 @@ class CssStyle {
     display = newTheme.display ?? display;
     borderRadius = newTheme.borderRadius ?? borderRadius;
 
-    borderLeft = newTheme.borderLeft ?? borderLeft;
-    borderRight = newTheme.borderRight ?? borderRight;
-    borderTop = newTheme.borderTop ?? borderTop;
-    borderBottom = newTheme.borderBottom ?? borderBottom;
+    borderLeftColor = newTheme.borderLeftColor ?? borderLeftColor;
+    borderRightColor = newTheme.borderRightColor ?? borderRightColor;
+    borderTopColor = newTheme.borderTopColor ?? borderTopColor;
+    borderBottomColor = newTheme.borderBottomColor ?? borderBottomColor;
+
+    borderLeftWidth = newTheme.borderLeftWidth ?? borderLeftWidth;
+    borderRightWidth = newTheme.borderRightWidth ?? borderRightWidth;
+    borderTopWidth = newTheme.borderTopWidth ?? borderTopWidth;
+    borderBottomWidth = newTheme.borderBottomWidth ?? borderBottomWidth;
+
     border = newTheme.border ?? border;
 
-    gap = newTheme.gap ?? gap;
+    rowGap = newTheme.rowGap ?? rowGap;
+    columnGap = newTheme.columnGap ?? columnGap;
     justifyContent = newTheme.justifyContent ?? justifyContent;
     alignItems = newTheme.alignItems ?? alignItems;
   }
@@ -141,11 +279,16 @@ class CssStyle {
       isCentered: isCentered,
       display: display,
       borderRadius: borderRadius,
-      borderLeft: borderLeft,
-      borderRight: borderRight,
-      borderTop: borderTop,
-      borderBottom: borderBottom,
-      gap: gap,
+      borderLeftColor: borderLeftColor,
+      borderRightColor: borderRightColor,
+      borderTopColor: borderTopColor,
+      borderBottomColor: borderBottomColor,
+      borderLeftWidth: borderLeftWidth,
+      borderRightWidth: borderRightWidth,
+      borderTopWidth: borderTopWidth,
+      borderBottomWidth: borderBottomWidth,
+      rowGap: rowGap,
+      columnGap: columnGap,
       border: border,
       justifyContent: justifyContent,
       alignItems: alignItems,

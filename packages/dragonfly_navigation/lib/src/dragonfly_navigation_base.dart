@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
-import 'package:dragonfly_navigation/src/files/favicon.dart';
+import 'package:dragonfly_navigation/src/css/css_browser_theme.dart';
 import 'package:dragonfly_navigation/src/html/dom.dart';
 import 'package:html/dom.dart';
 
@@ -160,7 +160,7 @@ class Tab {
 
       _history.last = HtmlPage(
         document: document,
-        cssom: cssom,
+        cssom: cssom ?? CssomBuilder().parse(css),
         favicon: cachedFavicon,
         status: (document != null) ? PageStatus.success : PageStatus.error,
         url: url,
