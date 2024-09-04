@@ -15,3 +15,5 @@ class NavigationForwardIntent extends Intent {}
 class OpenDevToolsIntent extends Intent {}
 
 class ToggleDevToolsIntent extends Intent {}
+
+class OpenCommandPaletteIntent extends Intent {}
