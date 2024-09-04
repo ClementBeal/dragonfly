@@ -1,3 +1,4 @@
+import 'package:dragonfly/src/screens/command_palette/palette_commands.dart';
 import 'package:flutter/material.dart';
 
 Future<void> showCommandPalette(BuildContext context) async {
@@ -33,13 +34,24 @@ class CommandPaletteDialog extends StatelessWidget {
                       border: OutlineInputBorder(),
                     ),
                   ),
-                  ListTile(
-                    title: Text("Show history"),
-                    titleTextStyle: TextStyle(
-                      fontSize: 22,
-                    ),
-                    onTap: () {},
-                  ),
+                  ListView.separated(
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final command = paletteCommands[index];
+
+                        return ListTile(
+                          title: Text(command.title),
+                          titleTextStyle: TextStyle(
+                            fontSize: 22,
+                          ),
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            command.onSelected(context);
+                          },
+                        );
+                      },
+                      separatorBuilder: (context, index) => Divider(),
+                      itemCount: paletteCommands.length),
                 ],
               ),
             ),
