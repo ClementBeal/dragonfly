@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:dragonfly/shortcuts/shortcuts.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/browser/browser_screen.dart';
+import 'package:dragonfly/src/screens/command_palette/command_palette_dialog.dart';
 import 'package:dragonfly/src/screens/history/history_screen.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
 import 'package:dragonfly/src/widgets/docking.dart';
@@ -36,6 +37,8 @@ class LobbyScreen extends StatelessWidget {
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
               NavigationForwardIntent(),
           LogicalKeySet(LogicalKeyboardKey.f12): ToggleDevToolsIntent(),
+          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.alt,
+              LogicalKeyboardKey.keyP): OpenCommandPaletteIntent(),
         },
         child: Actions(
           actions: <Type, Action<Intent>>{
@@ -62,7 +65,10 @@ class LobbyScreen extends StatelessWidget {
             ToggleDevToolsIntent: CallbackAction<ToggleDevToolsIntent>(
               onInvoke: (intent) =>
                   context.read<BrowserInterfaceCubit>().toggleDevTools(),
-            )
+            ),
+            OpenCommandPaletteIntent: CallbackAction<OpenCommandPaletteIntent>(
+              onInvoke: (intent) => showCommandPalette(context),
+            ),
           },
           child: BlocBuilder<BrowserInterfaceCubit, BrowserInterfaceState>(
             builder: (context, state) => Column(

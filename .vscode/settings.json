@@ -1,3 +1,4 @@
 {
-  "dart.flutterSdkPath": ".fvm/versions/beta"
+  "dart.flutterSdkPath": "/home/clement/.puro/envs/beta/flutter",
+    "dart.sdkPath": "/home/clement/.puro/envs/beta/flutter/bin/cache/dart-sdk"
 }
