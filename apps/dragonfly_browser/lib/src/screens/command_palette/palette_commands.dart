@@ -1,3 +1,4 @@
+import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/history/history_screen.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
 import 'package:flutter/material.dart';
@@ -32,17 +33,16 @@ final paletteCommands = [
   PaletteCommand(
     title: "Open new tab",
     description: "Create a new browser tab.",
-    onSelected: (context) {},
+    onSelected: (context) {
+      context.read<BrowserCubit>().openNewTab(switchTab: true);
+    },
   ),
   PaletteCommand(
     title: "Close current tab",
     description: "Close the currently active tab.",
-    onSelected: (context) {},
-  ),
-  PaletteCommand(
-    title: "Reopen closed tab",
-    description: "Reopen the last closed tab.",
-    onSelected: (context) {},
+    onSelected: (context) {
+      context.read<BrowserCubit>().closeCurrentTab();
+    },
   ),
   PaletteCommand(
     title: "Bookmarks",
@@ -77,7 +77,9 @@ final paletteCommands = [
   PaletteCommand(
     title: "Reload page",
     description: "Refresh the current page.",
-    onSelected: (context) {},
+    onSelected: (context) {
+      context.read<BrowserCubit>().refresh();
+    },
   ),
   PaletteCommand(
     title: "Open Incognito tab",

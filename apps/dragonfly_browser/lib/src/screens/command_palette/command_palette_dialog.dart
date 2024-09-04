@@ -24,7 +24,7 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
       color: Colors.black.withOpacity(0.3),
       child: Center(
         child: ConstrainedBox(
-          constraints: BoxConstraints(
+          constraints: const BoxConstraints(
             maxWidth: 600,
             maxHeight: 700,
           ),
@@ -36,7 +36,7 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
                 children: [
                   TextField(
                     autofocus: true,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 32,
                     ),
                     onChanged: (value) {
@@ -44,7 +44,7 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
                         filter = value.toLowerCase();
                       });
                     },
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -64,7 +64,7 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
                             return ListTile(
                               title: Text(command.title),
                               subtitle: Text(command.description),
-                              titleTextStyle: TextStyle(
+                              titleTextStyle: const TextStyle(
                                 fontSize: 22,
                               ),
                               onTap: () {
@@ -73,7 +73,7 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
                               },
                             );
                           },
-                          separatorBuilder: (context, index) => Divider(),
+                          separatorBuilder: (context, index) => const Divider(),
                           itemCount: commandList.length);
                     }),
                   ),
