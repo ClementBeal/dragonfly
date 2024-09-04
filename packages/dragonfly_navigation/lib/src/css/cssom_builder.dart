@@ -92,23 +92,88 @@ class CssomBuilder {
       "background-color": (String value) => style.backgroundColor = value,
       "text-decoration": (String value) => style.textDecoration = value,
       "margin": (String value) => _applyMargin(style, value),
-      "max-width": (String value) => style.maxWidth = value,
+      "margin-left": (String value) => style.marginLeft = value,
+      "margin-top": (String value) => style.marginTop = value,
+      "margin-right": (String value) => style.marginRight = value,
+      "margin-bottom": (String value) => style.marginBottom = value,
       "padding": (String value) => _applyPadding(style, value),
+      "padding-left": (String value) => style.paddingLeft = value,
+      "padding-top": (String value) => style.paddingTop = value,
+      "padding-right": (String value) => style.paddingRight = value,
+      "padding-bottom": (String value) => style.paddingBottom = value,
       "text-align": (String value) => style.textAlign = value,
       "font-size": (String value) => style.fontSize = value,
       "font-weight": (String value) => style.fontWeight = value,
       "display": (String value) => style.display = value,
       "border-radius": (String value) => style.borderRadius = value,
-      "border-left": (String value) => style.borderLeft = value,
-      "border-right": (String value) => style.borderRight = value,
-      "border-top": (String value) => style.borderTop = value,
-      "border-bottom": (String value) => style.borderBottom = value,
-      "gap": (String value) => style.gap = value,
-      "border": (String value) => style.border = value,
+      "border-left": (String value) {
+        final tokens = value.split(" ");
+        style.borderLeftColor = tokens[2];
+        style.borderLeftWidth = tokens[0];
+      },
+      "border-right": (String value) {
+        final tokens = value.split(" ");
+        style.borderRightColor = tokens[2];
+        style.borderRightWidth = tokens[0];
+      },
+      "border-top": (String value) {
+        final tokens = value.split(" ");
+        style.borderTopColor = tokens[2];
+        style.borderTopWidth = tokens[0];
+      },
+      "border-bottom": (String value) {
+        final tokens = value.split(" ");
+        style.borderBottomColor = tokens[2];
+        style.borderBottomWidth = tokens[0];
+      },
+      "background": (String value) {
+        final tokens = value.split(" ");
+
+        if (tokens.length == 1) {
+          style.backgroundColor = tokens[0];
+        }
+      },
+      "border": (String value) {
+        if (value == "none") {
+          style.borderBottomWidth = null;
+          style.borderLeftWidth = null;
+          style.borderRightWidth = null;
+          style.borderTopWidth = null;
+
+          style.borderTopColor = null;
+          style.borderBottomColor = null;
+          style.borderLeftColor = null;
+          style.borderRightColor = null;
+
+          return;
+        }
+
+        final tokens = value.split(" ");
+        print(value);
+        style.borderBottomWidth = tokens[0];
+        style.borderLeftWidth = tokens[0];
+        style.borderRightWidth = tokens[0];
+        style.borderTopWidth = tokens[0];
+
+        style.borderTopColor = tokens[2];
+        style.borderBottomColor = tokens[2];
+        style.borderLeftColor = tokens[2];
+        style.borderRightColor = tokens[2];
+      },
       "justify-content": (String value) => style.justifyContent = value,
       "align-items": (String value) => style.alignItems = value,
       "min-height": (String value) => style.minHeight = value,
+      "min-width": (String value) => style.minWidth = value,
+      "max-height": (String value) => style.maxHeight = value,
+      "max-width": (String value) => style.maxWidth = value,
       "font-family": (String value) => style.fontFamily = value,
+      "list-style-type": (String value) => style.listStyleType = value,
+      "gap": (String value) {
+        style.rowGap = value;
+        style.columnGap = value;
+      },
+      "column-gap": (String value) => style.columnGap = value,
+      "row-gap": (String value) => style.rowGap = value,
     };
 
     final handler = propertyHandlers[declaration.property];
@@ -121,10 +186,7 @@ class CssomBuilder {
     final tokens = value.split(" ");
 
     if (tokens.length == 1 && value == "auto") {
-      style.marginTop = value;
-      style.marginBottom = value;
-      style.marginLeft = value;
-      style.marginRight = value;
+      style.isCentered = true;
     } else if (tokens.length == 1) {
       style.marginTop = value;
       style.marginBottom = value;
