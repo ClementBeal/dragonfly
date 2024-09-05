@@ -1,7 +1,9 @@
+import 'package:dragonfly/config/themes.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/browser/pages/cubit/file_explorer_cubit.dart';
 import 'package:dragonfly/src/screens/scaffold/browser_scaffold.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
+import 'package:dragonfly/src/screens/settings/cubit/settings_cubit.dart';
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -64,17 +66,21 @@ class _MainAppState extends State<MainApp> {
       providers: [
         BlocProvider(create: (context) => BrowserCubit()),
         BlocProvider(create: (context) => FileExplorerCubit()),
+        BlocProvider(create: (context) => SettingsCubit()),
         BlocProvider(create: (context) => BrowserInterfaceCubit()),
       ],
-      child: MaterialApp(
-        title: "Dragonfly",
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(colorSchemeSeed: Colors.cyanAccent),
-        darkTheme: ThemeData(
-          colorSchemeSeed: Colors.cyanAccent,
-          brightness: Brightness.dark,
+      child: BlocBuilder<SettingsCubit, SettingsState>(
+        buildWhen: (previous, current) =>
+            previous.themeMode != current.themeMode ||
+            previous.mainColor != current.mainColor,
+        builder: (context, state) => MaterialApp(
+          title: "Dragonfly",
+          debugShowCheckedModeBanner: false,
+          theme: getLightTheme(state.mainColor),
+          darkTheme: getDarkTheme(state.mainColor),
+          themeMode: state.themeMode,
+          home: const LobbyScreen(),
         ),
-        home: const LobbyScreen(),
       ),
     );
   }

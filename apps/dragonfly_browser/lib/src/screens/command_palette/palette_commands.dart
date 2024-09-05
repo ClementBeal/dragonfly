@@ -1,6 +1,7 @@
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/history/history_screen.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
+import 'package:dragonfly/src/screens/settings/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -72,7 +73,9 @@ final paletteCommands = [
   PaletteCommand(
     title: "Settings",
     description: "Adjust browser settings.",
-    onSelected: (context) {},
+    onSelected: (context) {
+      showSettingsScreen(context);
+    },
   ),
   PaletteCommand(
     title: "Reload page",
