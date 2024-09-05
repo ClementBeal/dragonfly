@@ -1,5 +1,4 @@
 import 'package:dragonfly/src/screens/settings/cubit/settings_cubit.dart';
-import 'package:dragonfly/src/screens/settings/pages/general_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -30,31 +29,32 @@ class SearchEngineSelector extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
+        const Text(
           'Search Engine',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
-        SizedBox(height: 8),
-        Text(
+        const SizedBox(height: 8),
+        const Text(
           'Choose your preferred search engine.',
           style: TextStyle(
             color: Colors.grey,
           ),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         BlocBuilder<SettingsCubit, SettingsState>(
           builder: (context, state) {
             return DropdownButton<String>(
               value: state.searchEngine,
-              items: [
+              items: const [
                 DropdownMenuItem(value: 'google', child: Text('Google')),
                 DropdownMenuItem(value: 'bing', child: Text('Bing')),
                 DropdownMenuItem(
                     value: 'duckduckgo', child: Text('DuckDuckGo')),
-                DropdownMenuItem(value: 'wikipedia', child: Text('Wikipedia')),
+                DropdownMenuItem(
+                    value: 'wikipedia', child: Text('Wikipedia')),
                 // Add more search engines as needed
               ],
               onChanged: (value) {

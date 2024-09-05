@@ -145,7 +145,7 @@ class _DownloadLocationSelectorState extends State<DownloadLocationSelector> {
         Row(
           children: [
             ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 600),
+              constraints: const BoxConstraints(maxWidth: 600),
               child: BlocListener<SettingsCubit, SettingsState>(
                 listener: (context, state) =>
                     controller.text = state.downloadLocation,
@@ -153,7 +153,7 @@ class _DownloadLocationSelectorState extends State<DownloadLocationSelector> {
                     previous.downloadLocation != current.downloadLocation,
                 child: TextField(
                   readOnly: true,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Download Location',
                     border: OutlineInputBorder(),
                   ),
@@ -161,7 +161,7 @@ class _DownloadLocationSelectorState extends State<DownloadLocationSelector> {
                 ),
               ),
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             FilledButton(
               onPressed: () async {
                 final newDownloadPath = await FilePicker.platform
@@ -177,7 +177,7 @@ class _DownloadLocationSelectorState extends State<DownloadLocationSelector> {
                       .setDownloadLocation(newDownloadPath);
                 }
               },
-              child: Text('Browse'),
+              child: const Text('Browse'),
             ),
           ],
         ),
@@ -196,21 +196,21 @@ class MainColorSelector extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Main Color',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
             ),
-            SizedBox(height: 8),
-            Text(
+            const SizedBox(height: 8),
+            const Text(
               'Choose the primary color for the app theme.',
               style: TextStyle(
                 color: Colors.grey,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Wrap(
               spacing: 8,
               children: Colors.accents

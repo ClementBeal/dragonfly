@@ -32,15 +32,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 children: [
                   ListTile(
-                    title: Text("General"),
-                    leading: Icon(Icons.settings),
+                    title: const Text("General"),
+                    leading: const Icon(Icons.settings),
                     onTap: () {
                       setState(() => selectedIndex = 0);
                     },
                   ),
                   ListTile(
-                    title: Text("Search"),
-                    leading: Icon(Icons.search),
+                    title: const Text("Search"),
+                    leading: const Icon(Icons.search),
                     onTap: () {
                       setState(() => selectedIndex = 1);
                     },

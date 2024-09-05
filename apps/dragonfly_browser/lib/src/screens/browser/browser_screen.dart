@@ -6,7 +6,6 @@ import 'package:dragonfly/src/screens/browser/pages/json/json_screen.dart';
 import 'package:dragonfly/src/screens/browser/pages/media_page/media_page_screen.dart';
 import 'package:dragonfly/src/screens/lobby/lobby_screen.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
-import 'package:dragonfly_navigation/src/dragonfly_navigation_base.dart';
 import 'package:flutter/material.dart' hide Element;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:desktop_drop/desktop_drop.dart';
@@ -178,7 +177,7 @@ class TreeRenderer extends StatelessWidget {
                       Container(
                         width: 6,
                         height: 6,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.black,
                         ),
