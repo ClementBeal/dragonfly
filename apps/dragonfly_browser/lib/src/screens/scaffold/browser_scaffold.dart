@@ -208,21 +208,21 @@ class BrowserActionBar extends StatelessWidget {
             ),
           ],
         ),
-        const Expanded(child: SearchBar()),
+        const Expanded(child: BrowserSearchBar()),
         const SettingsBar(),
       ],
     );
   }
 }
 
-class SearchBar extends StatefulWidget {
-  const SearchBar({super.key});
+class BrowserSearchBar extends StatefulWidget {
+  const BrowserSearchBar({super.key});
 
   @override
-  State<SearchBar> createState() => _SearchBarState();
+  State<BrowserSearchBar> createState() => _BrowserSearchBarState();
 }
 
-class _SearchBarState extends State<SearchBar> {
+class _BrowserSearchBarState extends State<BrowserSearchBar> {
   final _searchController = TextEditingController();
 
   @override
