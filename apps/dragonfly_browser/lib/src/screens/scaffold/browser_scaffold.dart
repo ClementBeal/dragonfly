@@ -7,6 +7,7 @@ import 'package:dragonfly/src/screens/browser/browser_screen.dart';
 import 'package:dragonfly/src/screens/command_palette/command_palette_dialog.dart';
 import 'package:dragonfly/src/screens/history/history_screen.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
+import 'package:dragonfly/src/screens/settings/settings_screen.dart';
 import 'package:dragonfly/src/widgets/docking.dart';
 import 'package:dragonfly/utils/extensions/list.dart';
 import 'package:dragonfly/utils/url_detection.dart';
@@ -313,7 +314,7 @@ class SettingsBar extends StatelessWidget {
             // TODO: Implement downloads action
             break;
           case 'Settings':
-            // TODO: Implement settings action
+            showSettingsScreen(context);
             break;
           case 'Quit':
             exit(0);
