@@ -40,6 +40,19 @@ class FileExplorerPage extends Page {
   }
 }
 
+class JsonPage extends Page {
+  JsonPage({
+    required super.url,
+    required super.status,
+    super.guid,
+  });
+
+  @override
+  String? getTitle() {
+    return p.basename(url);
+  }
+}
+
 class MediaPage extends Page {
   MediaPage(this.isLocalMedia, {required super.url, required super.status});
 
@@ -184,11 +197,18 @@ class Tab {
           url: url,
         );
       } else {
-        _history.last = MediaPage(
-          true,
-          url: Uri.parse(url).toFilePath(),
-          status: PageStatus.success,
-        );
+        if (p.extension(Uri.parse(url).toFilePath()) == ".json") {
+          _history.last = JsonPage(
+            url: Uri.parse(url).toFilePath(),
+            status: PageStatus.success,
+          );
+        } else {
+          _history.last = MediaPage(
+            true,
+            url: Uri.parse(url).toFilePath(),
+            status: PageStatus.success,
+          );
+        }
       }
     }
 
