@@ -287,6 +287,7 @@ class JsonArrayItem extends StatefulWidget {
 class _JsonArrayItemState extends State<JsonArrayItem> {
   bool isExpanded = true;
   bool isHovered = false;
+  late final isOneLine = !(widget.value is Map || widget is List);
 
   @override
   Widget build(BuildContext context) {
@@ -315,9 +316,12 @@ class _JsonArrayItemState extends State<JsonArrayItem> {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    isExpanded ? Icons.expand_more : Icons.expand_less,
-                  ),
+                  if (isOneLine)
+                    const SizedBox.square(dimension: 22)
+                  else
+                    Icon(
+                      isExpanded ? Icons.expand_more : Icons.expand_less,
+                    ),
                   Text(
                     '${widget.index}: ',
                     style: const TextStyle(
@@ -325,12 +329,13 @@ class _JsonArrayItemState extends State<JsonArrayItem> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  if (isOneLine) InteractiveJsonScreen(jsonObject: widget.value)
                 ],
               ),
             ),
           ),
         ),
-        if (isExpanded)
+        if (isExpanded && !isOneLine)
           Padding(
             padding: const EdgeInsets.only(left: 32.0),
             child: InteractiveJsonScreen(jsonObject: widget.value),
