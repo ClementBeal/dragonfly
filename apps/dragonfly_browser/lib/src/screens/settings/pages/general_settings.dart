@@ -14,6 +14,7 @@ class GeneralSettings extends StatelessWidget {
         spacing: 12,
         children: [
           WebsiteAppearance(),
+          MainColorSelector(),
           Divider(),
           DownloadLocationSelector(),
         ],
@@ -55,9 +56,9 @@ class WebsiteAppearance extends StatelessWidget {
               ],
               direction: Axis.horizontal,
               borderRadius: BorderRadius.circular(8),
-              selectedBorderColor: Colors.blue,
-              selectedColor: Colors.white,
-              fillColor: Colors.blue,
+              // selectedBorderColor: Colors.blue,
+              // selectedColor: Colors.white,
+              // fillColor: Colors.blue,
               children: const [
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
@@ -181,6 +182,64 @@ class _DownloadLocationSelectorState extends State<DownloadLocationSelector> {
           ],
         ),
       ],
+    );
+  }
+}
+
+class MainColorSelector extends StatelessWidget {
+  const MainColorSelector({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, state) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Main Color',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Choose the primary color for the app theme.',
+              style: TextStyle(
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 16),
+            Wrap(
+              spacing: 8,
+              children: Colors.accents
+                  .map(
+                    (e) => GestureDetector(
+                      onTap: () {
+                        context.read<SettingsCubit>().setMainColor(e);
+                      },
+                      child: Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            width: 2,
+                            color: HSLColor.fromColor(e)
+                                .withLightness(0.5)
+                                .toColor(),
+                          ),
+                          color: e,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+        );
+      },
     );
   }
 }

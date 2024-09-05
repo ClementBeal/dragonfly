@@ -9,6 +9,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       : super(
           SettingsState(
             themeMode: ThemeMode.system,
+            mainColor: Colors.green,
           ),
         );
 
@@ -26,5 +27,9 @@ class SettingsCubit extends Cubit<SettingsState> {
         downloadLocation: location,
       ),
     );
+  }
+
+  void setMainColor(Color color) {
+    emit(state.copyWith(mainColor: color));
   }
 }

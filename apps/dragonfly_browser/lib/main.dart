@@ -1,3 +1,4 @@
+import 'package:dragonfly/config/themes.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/browser/pages/cubit/file_explorer_cubit.dart';
 import 'package:dragonfly/src/screens/scaffold/browser_scaffold.dart';
@@ -70,15 +71,13 @@ class _MainAppState extends State<MainApp> {
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         buildWhen: (previous, current) =>
-            previous.themeMode != current.themeMode,
+            previous.themeMode != current.themeMode ||
+            previous.mainColor != current.mainColor,
         builder: (context, state) => MaterialApp(
           title: "Dragonfly",
           debugShowCheckedModeBanner: false,
-          theme: ThemeData(colorSchemeSeed: Colors.cyanAccent),
-          darkTheme: ThemeData(
-            colorSchemeSeed: Colors.cyanAccent,
-            brightness: Brightness.dark,
-          ),
+          theme: getLightTheme(state.mainColor),
+          darkTheme: getDarkTheme(state.mainColor),
           themeMode: state.themeMode,
           home: const LobbyScreen(),
         ),
