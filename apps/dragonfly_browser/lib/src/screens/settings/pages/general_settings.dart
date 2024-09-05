@@ -1,4 +1,5 @@
 import 'package:dragonfly/src/screens/settings/cubit/settings_cubit.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -7,10 +8,14 @@ class GeneralSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return const SingleChildScrollView(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 12,
         children: [
           WebsiteAppearance(),
+          Divider(),
+          DownloadLocationSelector(),
         ],
       ),
     );
@@ -27,21 +32,21 @@ class WebsiteAppearance extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Appearance',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
             ),
-            SizedBox(height: 8),
-            Text(
+            const SizedBox(height: 8),
+            const Text(
               'Choose your preferred website appearance.',
               style: TextStyle(
                 color: Colors.grey,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ToggleButtons(
               isSelected: [
                 state.themeMode == ThemeMode.system,
@@ -53,17 +58,17 @@ class WebsiteAppearance extends StatelessWidget {
               selectedBorderColor: Colors.blue,
               selectedColor: Colors.white,
               fillColor: Colors.blue,
-              children: [
+              children: const [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: EdgeInsets.symmetric(horizontal: 16),
                   child: Text('Auto'),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: EdgeInsets.symmetric(horizontal: 16),
                   child: Text('Light'),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: EdgeInsets.symmetric(horizontal: 16),
                   child: Text('Dark'),
                 ),
               ],
@@ -86,6 +91,96 @@ class WebsiteAppearance extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+class DownloadLocationSelector extends StatefulWidget {
+  const DownloadLocationSelector({super.key});
+
+  @override
+  State<DownloadLocationSelector> createState() =>
+      _DownloadLocationSelectorState();
+}
+
+class _DownloadLocationSelectorState extends State<DownloadLocationSelector> {
+  late TextEditingController controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller = TextEditingController(
+      text: context.read<SettingsCubit>().state.downloadLocation,
+    );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Download folder',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Choose where will be stored the downloaded files',
+          style: TextStyle(
+            color: Colors.grey,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 600),
+              child: BlocListener<SettingsCubit, SettingsState>(
+                listener: (context, state) =>
+                    controller.text = state.downloadLocation,
+                listenWhen: (previous, current) =>
+                    previous.downloadLocation != current.downloadLocation,
+                child: TextField(
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    labelText: 'Download Location',
+                    border: OutlineInputBorder(),
+                  ),
+                  controller: controller,
+                ),
+              ),
+            ),
+            SizedBox(width: 16),
+            FilledButton(
+              onPressed: () async {
+                final newDownloadPath = await FilePicker.platform
+                    .getDirectoryPath(
+                        initialDirectory: context
+                            .read<SettingsCubit>()
+                            .state
+                            .downloadLocation);
+
+                if (newDownloadPath != null) {
+                  context
+                      .read<SettingsCubit>()
+                      .setDownloadLocation(newDownloadPath);
+                }
+              },
+              child: Text('Browse'),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
