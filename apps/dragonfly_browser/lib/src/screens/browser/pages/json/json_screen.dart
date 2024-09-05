@@ -233,13 +233,6 @@ class JsonArrayWidget extends StatefulWidget {
 }
 
 class JsonArrayWidgetState extends State<JsonArrayWidget> {
-  final Map<int, bool> _expandedState = {};
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -248,40 +241,58 @@ class JsonArrayWidgetState extends State<JsonArrayWidget> {
       itemCount: widget.json.length,
       itemBuilder: (context, index) {
         final value = widget.json[index];
-        final isExpanded = _expandedState.putIfAbsent(index, () => true);
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _expandedState[index] = !isExpanded;
-                });
-              },
-              child: Row(
-                children: [
-                  Icon(
-                    isExpanded ? Icons.expand_more : Icons.expand_less,
-                  ),
-                  Text(
-                    '$index: ',
-                    style: const TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (isExpanded)
-              Padding(
-                padding: const EdgeInsets.only(left: 32.0),
-                child: InteractiveJsonScreen(jsonObject: value),
-              ),
-          ],
-        );
+        return JsonArrayItem(value: value, index: index);
       },
+    );
+  }
+}
+
+class JsonArrayItem extends StatefulWidget {
+  const JsonArrayItem({super.key, required this.value, required this.index});
+
+  final dynamic value;
+  final int index;
+
+  @override
+  State<JsonArrayItem> createState() => _JsonArrayItemState();
+}
+
+class _JsonArrayItemState extends State<JsonArrayItem> {
+  bool isExpanded = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              isExpanded = !isExpanded;
+            });
+          },
+          child: Row(
+            children: [
+              Icon(
+                isExpanded ? Icons.expand_more : Icons.expand_less,
+              ),
+              Text(
+                '${widget.index}: ',
+                style: const TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (isExpanded)
+          Padding(
+            padding: const EdgeInsets.only(left: 32.0),
+            child: InteractiveJsonScreen(jsonObject: widget.value),
+          ),
+      ],
     );
   }
 }
