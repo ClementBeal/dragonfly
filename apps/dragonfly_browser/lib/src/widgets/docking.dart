@@ -66,10 +66,10 @@ class _DockingAreaState extends State<DockingArea> {
             null => DecoratedBox(
                 decoration: BoxDecoration(
                   // shape: BoxShape.circle,
-                  color: Colors.blue.shade600.withOpacity(0.4),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
                   border: Border.all(
                     width: 4,
-                    color: Colors.blue.shade600,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 child: SizedBox(
@@ -78,7 +78,7 @@ class _DockingAreaState extends State<DockingArea> {
                   child: Center(
                     child: Icon(
                       Icons.add,
-                      color: Colors.blue.shade600,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                 ),
@@ -114,7 +114,7 @@ class RedockableWidget extends StatelessWidget {
         color: Colors.transparent,
         child: CircleAvatar(
           radius: 30,
-          backgroundColor: Colors.blueAccent.withOpacity(0.7),
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
           child: const Icon(
             Icons.drag_handle,
             color: Colors.white,

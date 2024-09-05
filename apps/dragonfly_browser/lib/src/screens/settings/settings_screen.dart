@@ -1,4 +1,5 @@
 import 'package:dragonfly/src/screens/settings/pages/general_settings.dart';
+import 'package:dragonfly/src/screens/settings/pages/search_settings.dart';
 import 'package:flutter/material.dart';
 
 Future<void> showSettingsScreen(BuildContext context) async {
@@ -50,7 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             flex: 8,
             child: IndexedStack(
               index: selectedIndex,
-              children: [
+              children: const [
                 GeneralSettings(),
                 SearchSettings(),
               ],
@@ -59,14 +60,5 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
-  }
-}
-
-class SearchSettings extends StatelessWidget {
-  const SearchSettings({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
   }
 }
