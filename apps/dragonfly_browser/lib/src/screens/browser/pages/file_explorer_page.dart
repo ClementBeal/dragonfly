@@ -98,10 +98,10 @@ class FileExplorerCard extends StatelessWidget {
                                         .read<FileExplorerCubit>()
                                         .toggleShowHiddenFiles(tab.guid);
                                   },
-                                  child:
-                                      (state.showHiddenFiles[tab.guid] ?? false)
-                                          ? const Text("Do not show hidden files")
-                                          : const Text("Show hidden files"),
+                                  child: (state.showHiddenFiles[tab.guid] ??
+                                          false)
+                                      ? const Text("Do not show hidden files")
+                                      : const Text("Show hidden files"),
                                 ),
                               ),
                             ],
@@ -163,22 +163,29 @@ class ExplorerResultListView extends StatelessWidget {
                 spacing: 4,
                 children: [
                   FileSystemEntityIcon(result: e),
-                  TextButton(
-                    onPressed: () async {
-                      final extension = e.path.toFilePath().split(".").last;
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () async {
+                        final extension = e.path.toFilePath().split(".").last;
 
-                      if (e.fileType == FileType.file &&
-                          !audioExtensions.contains(extension) &&
-                          !videoExtensions.contains(extension) &&
-                          !imageExtensions.contains(extension)) {
-                        launchUrl(e.path);
-                      } else {
-                        context.read<BrowserCubit>().navigateToPage(
-                              e.path.toFilePath(),
-                            );
-                      }
-                    },
-                    child: Text(e.name),
+                        if (e.fileType == FileType.file &&
+                            (extension != "json" &&
+                                !audioExtensions.contains(extension) &&
+                                !videoExtensions.contains(extension) &&
+                                !imageExtensions.contains(extension))) {
+                          launchUrl(e.path);
+                        } else {
+                          context.read<BrowserCubit>().navigateToPage(
+                                e.path.toFilePath(),
+                              );
+                        }
+                      },
+                      child: Text(
+                        e.name,
+                        textAlign: TextAlign.start,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ),
                 ],
               ),
