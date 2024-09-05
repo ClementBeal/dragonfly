@@ -1,3 +1,4 @@
+import 'package:dragonfly/src/screens/settings/pages/general_settings.dart';
 import 'package:flutter/material.dart';
 
 Future<void> showSettingsScreen(BuildContext context) async {
@@ -58,15 +59,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
-  }
-}
-
-class GeneralSettings extends StatelessWidget {
-  const GeneralSettings({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
   }
 }
 
