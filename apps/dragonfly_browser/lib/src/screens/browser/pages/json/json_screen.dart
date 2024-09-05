@@ -157,16 +157,6 @@ class JsonObjectWidget extends StatefulWidget {
 }
 
 class JsonObjectWidgetState extends State<JsonObjectWidget> {
-  late final Map<String, bool> _expandedState;
-
-  @override
-  void initState() {
-    super.initState();
-    _expandedState = {
-      for (var key in widget.json.keys) key: true
-    }; // All expanded by default
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -175,21 +165,62 @@ class JsonObjectWidgetState extends State<JsonObjectWidget> {
       children: widget.json.entries.map((entry) {
         final key = entry.key;
         final value = entry.value;
-        final isExpandable = value is Map || value is List;
-        final isExpanded = _expandedState[key]!;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            GestureDetector(
-              onTap: isExpandable
-                  ? () {
-                      setState(() {
-                        _expandedState[key] = !isExpanded;
-                      });
-                    }
-                  : null,
+        return JsonObjectItem(
+          keyName: key,
+          value: value,
+        );
+      }).toList(),
+    );
+  }
+}
+
+class JsonObjectItem extends StatefulWidget {
+  const JsonObjectItem({
+    super.key,
+    required this.keyName,
+    required this.value,
+  });
+
+  final String keyName;
+  final dynamic value;
+
+  @override
+  State<JsonObjectItem> createState() => _JsonObjectItemState();
+}
+
+class _JsonObjectItemState extends State<JsonObjectItem> {
+  late bool isExpandable = widget.value is Map || widget.value is List;
+  bool isExpanded = true;
+  bool isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        MouseRegion(
+          onEnter: (event) {
+            setState(() => isHovered = true);
+          },
+          onExit: (event) {
+            setState(() => isHovered = false);
+          },
+          child: GestureDetector(
+            onTap: isExpandable
+                ? () {
+                    setState(() {
+                      isExpanded = !isExpanded;
+                    });
+                  }
+                : null,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: (isHovered)
+                    ? Theme.of(context).colorScheme.primaryContainer
+                    : null,
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -200,47 +231,43 @@ class JsonObjectWidgetState extends State<JsonObjectWidget> {
                   else
                     const SizedBox.square(dimension: 22),
                   Text(
-                    '$key:   ',
+                    '${widget.keyName}:   ',
                     style: const TextStyle(
                       color: Colors.blue,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   if (!isExpandable)
-                    Expanded(child: InteractiveJsonScreen(jsonObject: value)),
+                    Expanded(
+                        child: InteractiveJsonScreen(jsonObject: widget.value)),
                 ],
               ),
             ),
-            if (isExpandable)
-              Padding(
-                padding: const EdgeInsets.only(left: 12.0),
-                child: InteractiveJsonScreen(jsonObject: value),
-              ),
-          ],
-        );
-      }).toList(),
+          ),
+        ),
+        if (isExpandable)
+          Padding(
+            padding: const EdgeInsets.only(left: 12.0),
+            child: InteractiveJsonScreen(jsonObject: widget.value),
+          ),
+      ],
     );
   }
 }
 
-class JsonArrayWidget extends StatefulWidget {
+class JsonArrayWidget extends StatelessWidget {
   const JsonArrayWidget({required this.json, super.key});
 
   final List json;
 
   @override
-  JsonArrayWidgetState createState() => JsonArrayWidgetState();
-}
-
-class JsonArrayWidgetState extends State<JsonArrayWidget> {
-  @override
   Widget build(BuildContext context) {
     return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
-      itemCount: widget.json.length,
+      itemCount: json.length,
       itemBuilder: (context, index) {
-        final value = widget.json[index];
+        final value = json[index];
         return JsonArrayItem(value: value, index: index);
       },
     );
@@ -259,6 +286,7 @@ class JsonArrayItem extends StatefulWidget {
 
 class _JsonArrayItemState extends State<JsonArrayItem> {
   bool isExpanded = true;
+  bool isHovered = false;
 
   @override
   Widget build(BuildContext context) {
@@ -266,25 +294,40 @@ class _JsonArrayItemState extends State<JsonArrayItem> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              isExpanded = !isExpanded;
-            });
+        MouseRegion(
+          onEnter: (event) {
+            setState(() => isHovered = true);
           },
-          child: Row(
-            children: [
-              Icon(
-                isExpanded ? Icons.expand_more : Icons.expand_less,
+          onExit: (event) {
+            setState(() => isHovered = false);
+          },
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                isExpanded = !isExpanded;
+              });
+            },
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: (isHovered)
+                    ? Theme.of(context).colorScheme.primaryContainer
+                    : null,
               ),
-              Text(
-                '${widget.index}: ',
-                style: const TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                ),
+              child: Row(
+                children: [
+                  Icon(
+                    isExpanded ? Icons.expand_more : Icons.expand_less,
+                  ),
+                  Text(
+                    '${widget.index}: ',
+                    style: const TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
         if (isExpanded)
