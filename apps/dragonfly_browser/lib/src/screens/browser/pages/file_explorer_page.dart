@@ -15,7 +15,7 @@ class FileExplorerPageScreen extends StatelessWidget {
       {super.key, required this.page, required this.tab});
 
   final FileExplorerPage page;
-  final Tab tab;
+  final Tab? tab;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class FileExplorerCard extends StatelessWidget {
   });
 
   final FileExplorerPage page;
-  final Tab tab;
+  final Tab? tab;
 
   @override
   Widget build(BuildContext context) {
@@ -78,16 +78,17 @@ class FileExplorerCard extends StatelessWidget {
                         )
                       else
                         const SizedBox.shrink(),
-                      if (hasHiddenFile)
+                      if (hasHiddenFile && tab != null)
                         BlocBuilder<FileExplorerCubit, FileExplorerState>(
                           builder: (context, state) => Row(
                             children: [
                               Checkbox(
-                                value: state.showHiddenFiles[tab.guid] ?? false,
+                                value:
+                                    state.showHiddenFiles[tab!.guid] ?? false,
                                 onChanged: (value) {
                                   context
                                       .read<FileExplorerCubit>()
-                                      .toggleShowHiddenFiles(tab.guid);
+                                      .toggleShowHiddenFiles(tab!.guid);
                                 },
                               ),
                               MouseRegion(
@@ -96,9 +97,9 @@ class FileExplorerCard extends StatelessWidget {
                                   onTap: () {
                                     context
                                         .read<FileExplorerCubit>()
-                                        .toggleShowHiddenFiles(tab.guid);
+                                        .toggleShowHiddenFiles(tab!.guid);
                                   },
-                                  child: (state.showHiddenFiles[tab.guid] ??
+                                  child: (state.showHiddenFiles[tab!.guid] ??
                                           false)
                                       ? const Text("Do not show hidden files")
                                       : const Text("Show hidden files"),
@@ -113,7 +114,8 @@ class FileExplorerCard extends StatelessWidget {
                       builder: (context, state) {
                     var results = page.result;
 
-                    if ((state.showHiddenFiles[tab.guid] ?? false) == false) {
+                    if (tab != null &&
+                        (state.showHiddenFiles[tab!.guid] ?? false) == false) {
                       results = results
                           .whereNot((f) => f.name.startsWith("."))
                           .toList();

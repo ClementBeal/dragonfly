@@ -6,7 +6,7 @@ import 'package:dragonfly/src/screens/browser/pages/json/json_screen.dart';
 import 'package:dragonfly/src/screens/browser/pages/media_page/media_page_screen.dart';
 import 'package:dragonfly/src/screens/lobby/lobby_screen.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
-import 'package:flutter/material.dart' hide Element;
+import 'package:flutter/material.dart' hide Element, Page, Tab;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 
@@ -48,52 +48,63 @@ class BrowserScreen extends StatelessWidget {
           builder: (context, state) {
             final tab = state.currentTab;
 
-            if (tab == null || tab.currentPage == null) {
-              return const LobbyScreen();
-            }
+            final currentPage = tab?.currentPage;
 
-            final currentPage = tab.currentPage!;
-
-            return switch (currentPage.status) {
-              PageStatus.loading =>
-                const Center(child: CircularProgressIndicator()),
-              PageStatus.error => const Center(
-                  child: Text("Error"),
-                ),
-              PageStatus.success => SizedBox.expand(
-                  child: switch (currentPage) {
-                    FileExplorerPage p => FileExplorerPageScreen(
-                        page: p,
-                        tab: tab,
-                      ),
-                    HtmlPage page => CSSOMProvider(
-                        cssom: currentPage.cssom ?? cssomBuilder.browserStyle!,
-                        child: (currentPage.document!.documentElement != null)
-                            ? Builder(builder: (context) {
-                                // TO DO
-                                // dirty hack for testing purpose
-                                // it has to be moded to a special package
-                                // called `dragonfly_renderer`
-
-                                final renderTree = BrowserRenderTree(
-                                  dom: currentPage.document!,
-                                  cssom: currentPage.cssom!,
-                                  initialRoute: page.url,
-                                ).parse();
-
-                                return TreeRenderer(renderTree.child);
-                              })
-                            : const SizedBox.shrink(),
-                      ),
-                    MediaPage p => MediaPageScreen(page: p),
-                    JsonPage p => JsonScreen(page: p),
-                  },
-                ),
-            };
+            return RenderPageWidget(
+              page: currentPage,
+            );
           },
         ),
       ),
     );
+  }
+}
+
+class RenderPageWidget extends StatelessWidget {
+  const RenderPageWidget({super.key, required this.page, this.tab});
+
+  final Page? page;
+  final Tab? tab;
+
+  @override
+  Widget build(BuildContext context) {
+    if (page == null) return const LobbyScreen();
+
+    return switch (page!.status) {
+      PageStatus.loading => const Center(child: CircularProgressIndicator()),
+      PageStatus.error => const Center(
+          child: Text("Error"),
+        ),
+      PageStatus.success => SizedBox.expand(
+          child: switch (page!) {
+            FileExplorerPage p => FileExplorerPageScreen(
+                page: p,
+                tab: tab,
+              ),
+            HtmlPage page => CSSOMProvider(
+                cssom: page.cssom ?? cssomBuilder.browserStyle!,
+                child: (page.document!.documentElement != null)
+                    ? Builder(builder: (context) {
+                        // TO DO
+                        // dirty hack for testing purpose
+                        // it has to be moded to a special package
+                        // called `dragonfly_renderer`
+
+                        final renderTree = BrowserRenderTree(
+                          dom: page.document!,
+                          cssom: page.cssom!,
+                          initialRoute: page.url,
+                        ).parse();
+
+                        return TreeRenderer(renderTree.child);
+                      })
+                    : const SizedBox.shrink(),
+              ),
+            MediaPage p => MediaPageScreen(page: p),
+            JsonPage p => JsonScreen(page: p),
+          },
+        ),
+    };
   }
 }
 

@@ -8,6 +8,7 @@ class SearchSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 12,
@@ -53,8 +54,7 @@ class SearchEngineSelector extends StatelessWidget {
                 DropdownMenuItem(value: 'bing', child: Text('Bing')),
                 DropdownMenuItem(
                     value: 'duckduckgo', child: Text('DuckDuckGo')),
-                DropdownMenuItem(
-                    value: 'wikipedia', child: Text('Wikipedia')),
+                DropdownMenuItem(value: 'wikipedia', child: Text('Wikipedia')),
                 // Add more search engines as needed
               ],
               onChanged: (value) {

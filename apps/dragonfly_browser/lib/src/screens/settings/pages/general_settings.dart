@@ -9,6 +9,7 @@ class GeneralSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 12,
@@ -144,8 +145,7 @@ class _DownloadLocationSelectorState extends State<DownloadLocationSelector> {
         const SizedBox(height: 16),
         Row(
           children: [
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
+            Expanded(
               child: BlocListener<SettingsCubit, SettingsState>(
                 listener: (context, state) =>
                     controller.text = state.downloadLocation,
@@ -213,6 +213,7 @@ class MainColorSelector extends StatelessWidget {
             const SizedBox(height: 16),
             Wrap(
               spacing: 8,
+              runSpacing: 8,
               children: Colors.accents
                   .map(
                     (e) => GestureDetector(
