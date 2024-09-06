@@ -18,12 +18,17 @@ class Tab {
   late final String guid;
   final List<Page> _history = [];
   int _currentIndex = -1;
+  bool isPinned = false;
 
   Tab() {
     guid = Uuid().v4();
   }
 
   Page? get currentPage => _currentIndex >= 0 ? _history[_currentIndex] : null;
+
+  void togglePin() {
+    isPinned = !isPinned;
+  }
 
   Future<void> navigateTo(String url, Function() onNavigationDone) async {
     if (_currentIndex < _history.length - 1) {

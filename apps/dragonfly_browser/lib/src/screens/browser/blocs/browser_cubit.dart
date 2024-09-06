@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -69,5 +71,11 @@ class BrowserCubit extends Cubit<Browser> {
         : state.tabs[index + 1];
 
     emit(state.copyWith(currentTabGuid: nextTab.guid));
+  }
+
+  void togglePin(String tagId) {
+    state.tabs.firstWhereOrNull((e) => e.guid == tagId)?.togglePin();
+
+    emit(state.copyWith());
   }
 }

@@ -1,5 +1,6 @@
-
+import 'package:collection/collection.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
+import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
 import 'package:dragonfly/src/screens/scaffold/widgets/favicon_icon.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Tab;
@@ -14,6 +15,12 @@ class BrowserTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<BrowserCubit, Browser>(
       builder: (context, state) {
+        final sortedTabs = state.tabs.sorted((a, b) {
+          if (a.isPinned) return -1;
+          if (b.isPinned) return 1;
+          return 0;
+        });
+
         // Use a column if isVertical is true, otherwise use a row.
         if (!isInsideColumn) {
           return SizedBox(
@@ -51,9 +58,9 @@ class BrowserTabBar extends StatelessWidget {
                   Expanded(
                     child: ListView.builder(
                       shrinkWrap: true,
-                      itemCount: state.tabs.length,
+                      itemCount: sortedTabs.length,
                       itemBuilder: (context, index) {
-                        final tab = state.tabs[index];
+                        final tab = sortedTabs[index];
                         final isActive = tab.guid == state.currentTabGuid;
 
                         return VerticalTab(
@@ -83,21 +90,26 @@ class BrowserTabBar extends StatelessWidget {
                   child: ListView.builder(
                     shrinkWrap: true,
                     scrollDirection: Axis.horizontal,
-                    itemCount: state.tabs.length,
+                    itemCount: sortedTabs.length,
                     itemBuilder: (context, index) {
-                      final tab = state.tabs[index];
+                      final tab = sortedTabs[index];
                       final isActive = tab.guid == state.currentTabGuid;
 
-                      return FlatTab(
-                        tab: tab,
-                        isActive: isActive,
-                        onTap: () {
-                          context.read<BrowserCubit>().switchToTab(tab.guid);
+                      return GestureDetector(
+                        onSecondaryTapDown: (details) {
+                          showTabMenu(context, tab, details);
                         },
-                        onClose: () {
-                          context.read<BrowserCubit>().closeTab(tab.guid);
-                        },
-                        isVertical: isInsideColumn,
+                        child: FlatTab(
+                          tab: tab,
+                          isActive: isActive,
+                          onTap: () {
+                            context.read<BrowserCubit>().switchToTab(tab.guid);
+                          },
+                          onClose: () {
+                            context.read<BrowserCubit>().closeTab(tab.guid);
+                          },
+                          isVertical: isInsideColumn,
+                        ),
                       );
                     },
                   ),
@@ -175,6 +187,7 @@ class FlatTab extends StatelessWidget {
                 mainAxisSize: isVertical ? MainAxisSize.max : MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  if (tab.isPinned) const Icon(Icons.lock),
                   if (tab.currentPage?.status == PageStatus.loading)
                     const Padding(
                       padding: EdgeInsets.only(right: 8.0),
@@ -240,46 +253,45 @@ class VerticalTab extends StatelessWidget {
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
           onTap: onTap,
-          child: Card(
-            color: isActive
-                ? Colors.blue.shade700.withOpacity(0.4)
-                : Colors.transparent,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: Card(
+              color: isActive
+                  ? Colors.blue.shade700.withOpacity(0.4)
+                  : Colors.transparent,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Stack(
                   children: [
-                    if (tab.currentPage?.status == PageStatus.loading)
-                      const Padding(
-                        padding: EdgeInsets.only(right: 8.0),
-                        child: SizedBox.square(
-                          dimension: 15,
-                          child: CircularProgressIndicator(),
-                        ),
-                      )
-                    else
-                      SizedBox.square(
-                        dimension: 20,
-                        child: BrowserImageRender(
-                          (tab.currentPage as HtmlPage?)?.favicon,
-                          onEmpty: () => const Icon(Icons.language),
+                    Center(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          if (tab.currentPage?.status == PageStatus.loading)
+                            const Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: SizedBox.square(
+                                dimension: 15,
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                          else
+                            BrowserImageRender(
+                              (tab.currentPage as HtmlPage?)?.favicon,
+                              onEmpty: () => const Icon(Icons.language),
+                            ),
+                        ],
+                      ),
+                    ),
+                    if (tab.isPinned)
+                      const Align(
+                        alignment: Alignment.topLeft,
+                        child: Icon(
+                          Icons.lock,
+                          size: 12,
                         ),
                       ),
-
-                    // Expanded(
-                    //   child: Text(
-                    //     tab.currentPage?.getTitle() ?? "No title",
-                    //     maxLines: 1,
-                    //     overflow: TextOverflow.ellipsis,
-                    //     style: TextStyle(
-                    //       color: Colors.white,
-                    //       fontWeight:
-                    //           isActive ? FontWeight.bold : FontWeight.normal,
-                    //     ),
-                    //   ),
-                    // ),
                   ],
                 ),
               ),
@@ -289,4 +301,45 @@ class VerticalTab extends StatelessWidget {
       ),
     );
   }
+}
+
+void showTabMenu(BuildContext context, Tab tab, details) {
+  showMenu(
+    context: context,
+    position: RelativeRect.fromLTRB(
+      details.globalPosition.dx,
+      details.globalPosition.dy,
+      details.globalPosition.dx,
+      details.globalPosition.dy,
+    ),
+    items: [
+      PopupMenuItem(
+        value: 'newTab',
+        child: const Text('New Tab'),
+        onTap: () => context.read<BrowserCubit>().openNewTab(switchTab: true),
+      ),
+      PopupMenuItem(
+        value: 'refresh',
+        child: const Text('Refresh'),
+        onTap: () => context.read<BrowserCubit>().refresh(),
+      ),
+      PopupMenuItem(
+        value: 'duplicate',
+        child: const Text('Duplicate'),
+        onTap: () {},
+      ),
+      PopupMenuItem(
+        value: 'pin',
+        child: const Text('Pin'),
+        onTap: () => context.read<BrowserCubit>().togglePin(tab.guid),
+      ),
+      PopupMenuItem(
+        value: 'close',
+        child: const Text('Close'),
+        onTap: () {
+          context.read<BrowserCubit>().closeTab(tab.guid);
+        },
+      ),
+    ],
+  );
 }
