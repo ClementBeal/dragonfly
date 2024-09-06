@@ -70,4 +70,16 @@ class BrowserCubit extends Cubit<Browser> {
 
     emit(state.copyWith(currentTabGuid: nextTab.guid));
   }
+
+  void togglePin(String tagId) {
+    state.togglePin(tagId);
+
+    emit(state.copyWith());
+  }
+
+  void updateTabOrder(String tabId, int newOrder) {
+    state.changeTabOrder(tabId, newOrder);
+
+    emit(state.copyWith());
+  }
 }

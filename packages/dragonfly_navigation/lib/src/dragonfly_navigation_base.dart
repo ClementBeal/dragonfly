@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:dragonfly_navigation/src/css/css_browser_theme.dart';
@@ -13,100 +14,22 @@ import 'package:uuid/uuid.dart';
 
 enum PageStatus { loading, error, success }
 
-sealed class Page {
-  late final String guid;
-  final String url;
-  final PageStatus status;
-
-  Page({
-    required this.url,
-    required this.status,
-    String? guid,
-  }) {
-    this.guid = guid ?? Uuid().v4();
-  }
-
-  String? getTitle();
-}
-
-class FileExplorerPage extends Page {
-  FileExplorerPage(this.result, {required super.url, required super.status});
-
-  final List<ExplorationResult> result;
-
-  @override
-  String? getTitle() {
-    return "Index of ${url.toString()}";
-  }
-}
-
-class JsonPage extends Page {
-  JsonPage({
-    required super.url,
-    required super.status,
-    super.guid,
-  });
-
-  @override
-  String? getTitle() {
-    return p.basename(url);
-  }
-}
-
-class MediaPage extends Page {
-  MediaPage(this.isLocalMedia, {required super.url, required super.status});
-
-  final bool isLocalMedia;
-
-  @override
-  String? getTitle() {
-    return p.basename(url);
-  }
-}
-
-class HtmlPage extends Page {
-  final Document? document;
-  final CssomTree? cssom;
-  final BrowserImage? favicon;
-
-  HtmlPage(
-      {required super.url,
-      required super.status,
-      super.guid,
-      this.favicon,
-      required this.document,
-      required this.cssom});
-
-  HtmlPage copyWith({
-    Document? document,
-    PageStatus? status,
-    CssomTree? cssom,
-  }) {
-    return HtmlPage(
-      url: url,
-      guid: guid,
-      document: document ?? this.document,
-      cssom: cssom ?? this.cssom,
-      status: status ?? this.status,
-    );
-  }
-
-  @override
-  String? getTitle() {
-    return document?.getElementsByTagName("title").firstOrNull?.text.trim();
-  }
-}
-
 class Tab {
   late final String guid;
   final List<Page> _history = [];
   int _currentIndex = -1;
+  bool isPinned = false;
+  int order;
 
-  Tab() {
+  Tab({required this.order}) {
     guid = Uuid().v4();
   }
 
   Page? get currentPage => _currentIndex >= 0 ? _history[_currentIndex] : null;
+
+  void togglePin() {
+    isPinned = !isPinned;
+  }
 
   Future<void> navigateTo(String url, Function() onNavigationDone) async {
     if (_currentIndex < _history.length - 1) {
@@ -303,7 +226,9 @@ class Browser {
   }
 
   void openNewTab(String? initialUrl, {bool switchTab = true}) {
-    final newTab = Tab();
+    final lastOrder =
+        tabs.where((e) => !e.isPinned).map((e) => e.order).maxOrNull;
+    final newTab = Tab(order: (lastOrder ?? -1) + 1);
 
     if (initialUrl != null) {
       newTab.navigateTo(initialUrl, onUpdate ?? () {});
@@ -335,6 +260,58 @@ class Browser {
 
   void switchToTab(String guid) {
     currentTabGuid = guid;
+  }
+
+  void changeTabOrder(String tabId, int newOrder) {
+    final tab = tabs.firstWhereOrNull((e) => e.guid == tabId);
+
+    if (tab == null) return;
+
+    // move right
+    if (tab.order < newOrder) {
+      tabs
+          .where(
+              (e) => !e.isPinned && tab.order < e.order && e.order <= newOrder)
+          .forEach(
+            (e) => e.order--,
+          );
+      tab.order = newOrder;
+    }
+    // move left
+    else {
+      tabs
+          .where(
+              (e) => !e.isPinned && newOrder <= e.order && e.order < tab.order)
+          .forEach(
+            (e) => e.order++,
+          );
+      tab.order = newOrder;
+    }
+  }
+
+  void togglePin(String tabId) {
+    final tab = tabs.firstWhereOrNull((e) => e.guid == tabId);
+
+    if (tab != null) {
+      final oldOrder = tab.order;
+      final maxPinOrder =
+          (tabs.where((e) => e.isPinned).map((e) => e.order).maxOrNull ?? -1) +
+              1;
+      tab.togglePin();
+
+      if (tab.isPinned) {
+        tab.order = maxPinOrder;
+
+        tabs.where((e) => !e.isPinned && e.order >= oldOrder).forEach(
+              (element) => element.order--,
+            );
+      } else {
+        tab.order = -1;
+        tabs.where((e) => !e.isPinned).forEach(
+              (element) => element.order++,
+            );
+      }
+    }
   }
 }
 

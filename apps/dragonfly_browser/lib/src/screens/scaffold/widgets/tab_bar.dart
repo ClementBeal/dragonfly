@@ -1,4 +1,4 @@
-
+import 'package:collection/collection.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/scaffold/widgets/favicon_icon.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
@@ -14,6 +14,13 @@ class BrowserTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<BrowserCubit, Browser>(
       builder: (context, state) {
+        final sortedTabs = state.tabs.sorted((a, b) {
+          if (a.isPinned) return -1;
+          if (b.isPinned) return 1;
+
+          return a.order.compareTo(b.order);
+        });
+
         // Use a column if isVertical is true, otherwise use a row.
         if (!isInsideColumn) {
           return SizedBox(
@@ -49,26 +56,23 @@ class BrowserTabBar extends StatelessWidget {
                     endIndent: 8,
                   ),
                   Expanded(
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: state.tabs.length,
-                      itemBuilder: (context, index) {
-                        final tab = state.tabs[index];
-                        final isActive = tab.guid == state.currentTabGuid;
-
-                        return VerticalTab(
-                          tab: tab,
-                          isActive: isActive,
-                          onTap: () {
-                            context.read<BrowserCubit>().switchToTab(tab.guid);
-                          },
-                          onClose: () {
-                            context.read<BrowserCubit>().closeTab(tab.guid);
-                          },
-                          isVertical: isInsideColumn,
-                        );
-                      },
-                    ),
+                    child: ReorderableTabListView(
+                        scrollDirection: Axis.vertical,
+                        isInsideColumn: false,
+                        sortedTabs: sortedTabs,
+                        builder: (tab, isActive) => VerticalTab(
+                              tab: tab,
+                              isActive: isActive,
+                              onTap: () {
+                                context
+                                    .read<BrowserCubit>()
+                                    .switchToTab(tab.guid);
+                              },
+                              onClose: () {
+                                context.read<BrowserCubit>().closeTab(tab.guid);
+                              },
+                              isVertical: isInsideColumn,
+                            )),
                   ),
                 ],
               ),
@@ -80,26 +84,21 @@ class BrowserTabBar extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
+                  child: ReorderableTabListView(
                     scrollDirection: Axis.horizontal,
-                    itemCount: state.tabs.length,
-                    itemBuilder: (context, index) {
-                      final tab = state.tabs[index];
-                      final isActive = tab.guid == state.currentTabGuid;
-
-                      return FlatTab(
-                        tab: tab,
-                        isActive: isActive,
-                        onTap: () {
-                          context.read<BrowserCubit>().switchToTab(tab.guid);
-                        },
-                        onClose: () {
-                          context.read<BrowserCubit>().closeTab(tab.guid);
-                        },
-                        isVertical: isInsideColumn,
-                      );
-                    },
+                    sortedTabs: sortedTabs,
+                    isInsideColumn: true,
+                    builder: (tab, isActive) => FlatTab(
+                      tab: tab,
+                      isActive: isActive,
+                      onTap: () {
+                        context.read<BrowserCubit>().switchToTab(tab.guid);
+                      },
+                      onClose: () {
+                        context.read<BrowserCubit>().closeTab(tab.guid);
+                      },
+                      isVertical: isInsideColumn,
+                    ),
                   ),
                 ),
                 Padding(
@@ -175,6 +174,7 @@ class FlatTab extends StatelessWidget {
                 mainAxisSize: isVertical ? MainAxisSize.max : MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  if (tab.isPinned) const Icon(Icons.lock),
                   if (tab.currentPage?.status == PageStatus.loading)
                     const Padding(
                       padding: EdgeInsets.only(right: 8.0),
@@ -240,46 +240,45 @@ class VerticalTab extends StatelessWidget {
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
           onTap: onTap,
-          child: Card(
-            color: isActive
-                ? Colors.blue.shade700.withOpacity(0.4)
-                : Colors.transparent,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: Card(
+              color: isActive
+                  ? Colors.blue.shade700.withOpacity(0.4)
+                  : Colors.transparent,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Stack(
                   children: [
-                    if (tab.currentPage?.status == PageStatus.loading)
-                      const Padding(
-                        padding: EdgeInsets.only(right: 8.0),
-                        child: SizedBox.square(
-                          dimension: 15,
-                          child: CircularProgressIndicator(),
-                        ),
-                      )
-                    else
-                      SizedBox.square(
-                        dimension: 20,
-                        child: BrowserImageRender(
-                          (tab.currentPage as HtmlPage?)?.favicon,
-                          onEmpty: () => const Icon(Icons.language),
+                    Center(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          if (tab.currentPage?.status == PageStatus.loading)
+                            const Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: SizedBox.square(
+                                dimension: 15,
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                          else
+                            BrowserImageRender(
+                              (tab.currentPage as HtmlPage?)?.favicon,
+                              onEmpty: () => const Icon(Icons.language),
+                            ),
+                        ],
+                      ),
+                    ),
+                    if (tab.isPinned)
+                      const Align(
+                        alignment: Alignment.topLeft,
+                        child: Icon(
+                          Icons.lock,
+                          size: 12,
                         ),
                       ),
-
-                    // Expanded(
-                    //   child: Text(
-                    //     tab.currentPage?.getTitle() ?? "No title",
-                    //     maxLines: 1,
-                    //     overflow: TextOverflow.ellipsis,
-                    //     style: TextStyle(
-                    //       color: Colors.white,
-                    //       fontWeight:
-                    //           isActive ? FontWeight.bold : FontWeight.normal,
-                    //     ),
-                    //   ),
-                    // ),
                   ],
                 ),
               ),
@@ -287,6 +286,122 @@ class VerticalTab extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+void showTabMenu(BuildContext context, Tab tab, details) {
+  showMenu(
+    context: context,
+    position: RelativeRect.fromLTRB(
+      details.globalPosition.dx,
+      details.globalPosition.dy,
+      details.globalPosition.dx,
+      details.globalPosition.dy,
+    ),
+    items: [
+      PopupMenuItem(
+        value: 'newTab',
+        child: const Text('New Tab'),
+        onTap: () => context.read<BrowserCubit>().openNewTab(switchTab: true),
+      ),
+      PopupMenuItem(
+        value: 'refresh',
+        child: const Text('Refresh'),
+        onTap: () => context.read<BrowserCubit>().refresh(),
+      ),
+      PopupMenuItem(
+        value: 'duplicate',
+        child: const Text('Duplicate'),
+        onTap: () {},
+      ),
+      PopupMenuItem(
+        value: 'pin',
+        child: const Text('Pin'),
+        onTap: () => context.read<BrowserCubit>().togglePin(tab.guid),
+      ),
+      PopupMenuItem(
+        value: 'close',
+        child: const Text('Close'),
+        onTap: () {
+          context.read<BrowserCubit>().closeTab(tab.guid);
+        },
+      ),
+    ],
+  );
+}
+
+class ReorderableTabListView extends StatelessWidget {
+  final List<Tab> sortedTabs; // Your sorted tab list
+  final bool isInsideColumn;
+  final Widget Function(Tab tab, bool isActive) builder;
+  final Axis scrollDirection;
+
+  const ReorderableTabListView({
+    required this.sortedTabs,
+    required this.isInsideColumn,
+    required this.builder,
+    super.key,
+    required this.scrollDirection,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final pinnedTabs = sortedTabs.where((tab) => tab.isPinned).sorted(
+          (a, b) => a.order.compareTo(b.order),
+        );
+    final nonPinnedTabs = sortedTabs.where((tab) => !tab.isPinned).sorted(
+          (a, b) => a.order.compareTo(b.order),
+        );
+
+    return ReorderableListView(
+      scrollDirection: scrollDirection,
+      buildDefaultDragHandles: false,
+      header: ListView.builder(
+        scrollDirection: scrollDirection,
+        shrinkWrap: true,
+        itemCount: pinnedTabs.length,
+        itemBuilder: (context, index) {
+          final tab = pinnedTabs[index];
+
+          final isActive =
+              tab.guid == context.read<BrowserCubit>().state.currentTabGuid;
+
+          return GestureDetector(
+            onSecondaryTapDown: (details) {
+              showTabMenu(context, tab, details);
+            },
+            child: builder(tab, isActive),
+          );
+        },
+      ),
+      onReorder: (int oldIndex, int newIndex) {
+        final movedTab = context
+            .read<BrowserCubit>()
+            .state
+            .tabs
+            .firstWhere((e) => e.order == oldIndex);
+
+        context.read<BrowserCubit>().updateTabOrder(
+              movedTab.guid,
+              (newIndex > oldIndex) ? newIndex - 1 : newIndex,
+            );
+      },
+      children: nonPinnedTabs.mapIndexed((i, tab) {
+        final isActive =
+            tab.guid == context.read<BrowserCubit>().state.currentTabGuid;
+
+        return ReorderableDragStartListener(
+          key: ValueKey(tab.guid),
+          index: i,
+          child: GestureDetector(
+            onSecondaryTapDown: (details) {
+              showTabMenu(context, tab, details);
+            },
+            child: builder(tab, isActive),
+          ),
+        );
+      }).toList(),
     );
   }
 }
