@@ -54,53 +54,77 @@ Future<void> showMobileTabs(BuildContext context) async {
     showDragHandle: true,
     constraints: BoxConstraints.expand(),
     backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-    builder: (context) => Column(
-      children: [
-        BlocBuilder<BrowserCubit, Browser>(
-          builder: (context, state) => Expanded(
-            child: GridView.builder(
-              shrinkWrap: true,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-              ),
-              itemCount: state.tabs.length,
-              itemBuilder: (context, index) {
-                final tab = state.tabs[index];
+    builder: (context) => Scaffold(
+      floatingActionButton: FloatingActionButton(
+        shape: CircleBorder(),
+        onPressed: () {
+          context.read<BrowserCubit>().openNewTab(
+                switchTab: true,
+              );
+        },
+        child: Icon(
+          Icons.add,
+        ),
+      ),
+      body: Column(
+        children: [
+          BlocBuilder<BrowserCubit, Browser>(
+            builder: (context, state) => Expanded(
+              child: GridView.builder(
+                shrinkWrap: true,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                ),
+                itemCount: state.tabs.length,
+                itemBuilder: (context, index) {
+                  final tab = state.tabs[index];
 
-                return Card(
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            tab.currentPage?.getTitle() ?? "",
-                          ),
-                        ),
-                        Expanded(
-                          child: ClipRect(
-                            child: RenderPageWidget(
-                              page: tab.currentPage,
-                              tab: tab,
+                  return GestureDetector(
+                    onTap: () {
+                      context.read<BrowserCubit>().switchToTab(tab.guid);
+                    },
+                    child: Card(
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                      shape: RoundedRectangleBorder(
+                        side: (state.currentTab == tab)
+                            ? BorderSide(
+                                width: 2,
+                                color: Theme.of(context).colorScheme.primary,
+                              )
+                            : BorderSide.none,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Align(
+                              alignment: Alignment.topLeft,
+                              child: Text(
+                                tab.currentPage?.getTitle() ?? "",
+                              ),
                             ),
-                          ),
+                            Expanded(
+                              child: ClipRect(
+                                child: RenderPageWidget(
+                                  page: tab.currentPage,
+                                  tab: tab,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }
