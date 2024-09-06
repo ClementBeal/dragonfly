@@ -7,9 +7,11 @@ import 'package:dragonfly/src/screens/browser/browser_screen.dart';
 import 'package:dragonfly/src/screens/command_palette/command_palette_dialog.dart';
 import 'package:dragonfly/src/screens/history/history_screen.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
+import 'package:dragonfly/src/screens/scaffold/mobile/mobile_scaffold.dart';
 import 'package:dragonfly/src/screens/settings/settings_screen.dart';
 import 'package:dragonfly/src/widgets/docking.dart';
 import 'package:dragonfly/utils/extensions/list.dart';
+import 'package:dragonfly/utils/responsiveness.dart';
 import 'package:dragonfly/utils/url_detection.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart' hide Tab;
@@ -71,102 +73,120 @@ class LobbyScreen extends StatelessWidget {
               onInvoke: (intent) => showCommandPalette(context),
             ),
           },
-          child: BlocBuilder<BrowserInterfaceCubit, BrowserInterfaceState>(
-            builder: (context, state) => Column(
-              children: [
-                // top
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: state.topDocks
-                      .mapIndexed<Widget>(
-                        (i, e) => RedockableWidget(
-                          position: i,
-                          interface: e,
-                          dock: Dock.top,
-                          child: getWidgetFromRedockableInterface(e, true),
-                        ),
-                      )
-                      .addAfterEach(
-                        (i) => DockingArea(
-                          isInsideColumn: true,
-                          dock: Dock.top,
-                          position: i,
-                        ),
-                      )
-                      .toList(),
-                ),
-                // left center right
-                Expanded(
-                  child: Row(
-                    children: [
-                      Row(
-                        children: state.leftDocks
-                            .mapIndexed<Widget>(
-                              (i, e) => RedockableWidget(
-                                position: i,
-                                interface: e,
-                                dock: Dock.left,
-                                child:
-                                    getWidgetFromRedockableInterface(e, false),
-                              ),
-                            )
-                            .addAfterEach(
-                              (i) => DockingArea(
-                                isInsideColumn: false,
-                                dock: Dock.left,
-                                position: i,
-                              ),
-                            )
-                            .toList(),
-                      ),
-                      const Expanded(
-                        child: BrowserScreen(),
-                      ),
-                      // right
-                      Row(
-                          children: state.rightDocks
-                              .mapIndexed<Widget>(
-                                (i, e) => RedockableWidget(
-                                  position: i,
-                                  interface: e,
-                                  dock: Dock.right,
-                                  child: getWidgetFromRedockableInterface(
-                                      e, false),
-                                ),
-                              )
-                              .addAfterEach(
-                                (i) => DockingArea(
-                                  isInsideColumn: false,
-                                  dock: Dock.right,
-                                  position: i,
-                                ),
-                              )
-                              .toList()),
-                    ],
-                  ),
-                ),
-                // bottom
-                Column(
-                  children: state.bottomDocks
-                      .mapIndexed<Widget>((i, e) => RedockableWidget(
-                          position: i,
-                          interface: e,
-                          dock: Dock.bottom,
-                          child: getWidgetFromRedockableInterface(e, true)))
-                      .addAfterEach(
-                        (i) => DockingArea(
-                          isInsideColumn: true,
-                          dock: Dock.bottom,
-                          position: i,
-                        ),
-                      )
-                      .toList(),
-                ),
-              ],
-            ),
-          ),
+          child: Builder(builder: (context) {
+            return switch (getScreenSize(context)) {
+              ScreenSize.small || ScreenSize.medium => MobileScaffold(),
+              ScreenSize.big || ScreenSize.huge => DesktopScaffold(),
+            };
+          }),
         ),
       ),
+    );
+  }
+}
+
+class DesktopScaffold extends StatelessWidget {
+  const DesktopScaffold({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BrowserInterfaceCubit, BrowserInterfaceState>(
+      builder: (context, state) {
+        return Column(
+          children: [
+            // top
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: state.topDocks
+                  .mapIndexed<Widget>(
+                    (i, e) {
+                      return RedockableWidget(
+                        position: i,
+                        interface: e,
+                        dock: Dock.top,
+                        child: getWidgetFromRedockableInterface(e, true),
+                      );
+                    },
+                  )
+                  .addAfterEach(
+                    (i) => DockingArea(
+                      isInsideColumn: true,
+                      dock: Dock.top,
+                      position: i,
+                    ),
+                  )
+                  .toList(),
+            ),
+            // left center right
+            Expanded(
+              child: Row(
+                children: [
+                  Row(
+                    children: state.leftDocks
+                        .mapIndexed<Widget>(
+                          (i, e) => RedockableWidget(
+                            position: i,
+                            interface: e,
+                            dock: Dock.left,
+                            child: getWidgetFromRedockableInterface(e, false),
+                          ),
+                        )
+                        .addAfterEach(
+                          (i) => DockingArea(
+                            isInsideColumn: false,
+                            dock: Dock.left,
+                            position: i,
+                          ),
+                        )
+                        .toList(),
+                  ),
+                  const Expanded(
+                    child: BrowserScreen(),
+                  ),
+                  // right
+                  Row(
+                      children: state.rightDocks
+                          .mapIndexed<Widget>(
+                            (i, e) => RedockableWidget(
+                              position: i,
+                              interface: e,
+                              dock: Dock.right,
+                              child: getWidgetFromRedockableInterface(e, false),
+                            ),
+                          )
+                          .addAfterEach(
+                            (i) => DockingArea(
+                              isInsideColumn: false,
+                              dock: Dock.right,
+                              position: i,
+                            ),
+                          )
+                          .toList()),
+                ],
+              ),
+            ),
+            // bottom
+            Column(
+              children: state.bottomDocks
+                  .mapIndexed<Widget>((i, e) => RedockableWidget(
+                      position: i,
+                      interface: e,
+                      dock: Dock.bottom,
+                      child: getWidgetFromRedockableInterface(e, true)))
+                  .addAfterEach(
+                    (i) => DockingArea(
+                      isInsideColumn: true,
+                      dock: Dock.bottom,
+                      position: i,
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -217,7 +237,12 @@ class BrowserActionBar extends StatelessWidget {
 }
 
 class BrowserSearchBar extends StatefulWidget {
-  const BrowserSearchBar({super.key});
+  const BrowserSearchBar({
+    super.key,
+    this.isMobile = false,
+  });
+
+  final bool isMobile;
 
   @override
   State<BrowserSearchBar> createState() => _BrowserSearchBarState();
@@ -253,37 +278,43 @@ class _BrowserSearchBarState extends State<BrowserSearchBar> {
           },
           decoration: InputDecoration(
             filled: true,
-            // fillColor: const Color(0xff4f4d4f),
             border: const OutlineInputBorder(
               borderRadius: BorderRadius.all(
                 Radius.circular(8),
               ),
             ),
-            prefix: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(onPressed: () {}, icon: const Icon(Icons.lock_open)),
-              ],
-            ),
-            suffix: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton.filled(
-                  onPressed: () {
-                    var uri = Uri.parse(_searchController.text);
+            prefix: (widget.isMobile)
+                ? null
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                          onPressed: () {}, icon: const Icon(Icons.lock_open)),
+                    ],
+                  ),
+            suffix: (widget.isMobile)
+                ? null
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton.filled(
+                        onPressed: () {
+                          var uri = Uri.parse(_searchController.text);
 
-                    context.read<BrowserCubit>().navigateToPage(uri.toString());
-                  },
-                  icon: const Icon(Icons.arrow_forward),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.star_border),
-                ),
-              ],
-            ),
+                          context
+                              .read<BrowserCubit>()
+                              .navigateToPage(uri.toString());
+                        },
+                        icon: const Icon(Icons.arrow_forward),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.star_border),
+                      ),
+                    ],
+                  ),
           ),
         ),
       ),
@@ -373,9 +404,12 @@ class _WindowControlWidgetState extends State<WindowControlWidget> {
         ),
         IconButton(
           onPressed: () async {
-            await (windowManager.isMaximized())
-                ? windowManager.unmaximize()
-                : windowManager.maximize();
+            if (await windowManager.isMaximized()) {
+              windowManager.setSize(Size(400, 820));
+              await windowManager.unmaximize();
+            } else {
+              windowManager.maximize();
+            }
           },
           icon: const Icon(
             Icons.window,
