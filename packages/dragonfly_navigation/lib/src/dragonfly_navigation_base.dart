@@ -1,10 +1,10 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:dragonfly_navigation/src/css/css_browser_theme.dart';
 import 'package:dragonfly_navigation/src/html/dom.dart';
-import 'package:dragonfly_navigation/src/pages/a_page.dart';
 import 'package:html/dom.dart';
 
 import 'package:http/http.dart' as http;
@@ -19,8 +19,9 @@ class Tab {
   final List<Page> _history = [];
   int _currentIndex = -1;
   bool isPinned = false;
+  int order;
 
-  Tab() {
+  Tab({required this.order}) {
     guid = Uuid().v4();
   }
 
@@ -225,7 +226,9 @@ class Browser {
   }
 
   void openNewTab(String? initialUrl, {bool switchTab = true}) {
-    final newTab = Tab();
+    final lastOrder =
+        tabs.where((e) => !e.isPinned).map((e) => e.order).maxOrNull;
+    final newTab = Tab(order: (lastOrder ?? -1) + 1);
 
     if (initialUrl != null) {
       newTab.navigateTo(initialUrl, onUpdate ?? () {});
@@ -257,6 +260,79 @@ class Browser {
 
   void switchToTab(String guid) {
     currentTabGuid = guid;
+  }
+
+  void changeTabOrder(String tabId, int newOrder) {
+    final tab = tabs.firstWhereOrNull((e) => e.guid == tabId);
+
+    print("$newOrder |||");
+
+    if (tab == null) return;
+
+    // move right
+    if (tab.order < newOrder) {
+      tabs
+          .where(
+              (e) => !e.isPinned && tab.order < e.order && e.order <= newOrder)
+          .forEach(
+            (e) => e.order--,
+          );
+      tab.order = newOrder;
+    }
+    // move left
+    else {
+      tabs
+          .where(
+              (e) => !e.isPinned && newOrder <= e.order && e.order < tab.order)
+          .forEach(
+            (e) => e.order++,
+          );
+      tab.order = newOrder;
+    }
+
+    for (var a in tabs.where((e) => !e.isPinned).sorted(
+          (a, b) => a.order.compareTo(b.order),
+        )) {
+      print(a.order);
+    }
+  }
+
+  void togglePin(String tabId) {
+    final tab = tabs.firstWhereOrNull((e) => e.guid == tabId);
+
+    if (tab != null) {
+      final oldOrder = tab.order;
+      final maxPinOrder =
+          (tabs.where((e) => e.isPinned).map((e) => e.order).maxOrNull ?? -1) +
+              1;
+      tab.togglePin();
+
+      if (tab.isPinned) {
+        tab.order = maxPinOrder;
+
+        tabs.where((e) => !e.isPinned && e.order >= oldOrder).forEach(
+              (element) => element.order--,
+            );
+      } else {
+        tab.order = -1;
+        tabs.where((e) => !e.isPinned).forEach(
+              (element) => element.order++,
+            );
+      }
+    }
+
+    for (var t in tabs.where((e) => !e.isPinned).sorted(
+          (a, b) => a.order.compareTo(b.order),
+        )) {
+      print(t.order);
+    }
+    print("---pineed");
+    for (var t in tabs.where((e) => e.isPinned).sorted(
+          (a, b) => a.order.compareTo(b.order),
+        )) {
+      print(t.order);
+    }
+    print("-------");
   }
 }
 
