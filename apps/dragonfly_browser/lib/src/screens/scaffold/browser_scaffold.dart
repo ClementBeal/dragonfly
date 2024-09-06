@@ -328,7 +328,7 @@ class SettingsBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
-      icon: const Icon(Icons.density_medium),
+      icon: const Icon(Icons.more_vert),
       onSelected: (String item) {
         // Handle menu item selection here
         switch (item) {
