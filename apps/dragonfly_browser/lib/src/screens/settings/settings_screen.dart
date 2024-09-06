@@ -7,7 +7,7 @@ Future<void> showSettingsScreen(BuildContext context) async {
   return showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    shape: ContinuousRectangleBorder(),
+    shape: const ContinuousRectangleBorder(),
     constraints: const BoxConstraints.expand(),
     builder: (context) => const SettingsScreen(),
   );

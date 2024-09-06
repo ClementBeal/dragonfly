@@ -75,8 +75,8 @@ class LobbyScreen extends StatelessWidget {
           },
           child: Builder(builder: (context) {
             return switch (getScreenSize(context)) {
-              ScreenSize.small || ScreenSize.medium => MobileScaffold(),
-              ScreenSize.big || ScreenSize.huge => DesktopScaffold(),
+              ScreenSize.small || ScreenSize.medium => const MobileScaffold(),
+              ScreenSize.big || ScreenSize.huge => const DesktopScaffold(),
             };
           }),
         ),
@@ -405,7 +405,7 @@ class _WindowControlWidgetState extends State<WindowControlWidget> {
         IconButton(
           onPressed: () async {
             if (await windowManager.isMaximized()) {
-              windowManager.setSize(Size(400, 820));
+              windowManager.setSize(const Size(400, 820));
               await windowManager.unmaximize();
             } else {
               windowManager.maximize();

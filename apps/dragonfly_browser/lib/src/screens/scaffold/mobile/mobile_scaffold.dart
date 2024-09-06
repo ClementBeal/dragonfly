@@ -5,14 +5,17 @@ import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+
 class MobileScaffold extends StatelessWidget {
   const MobileScaffold({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       children: [
-        Expanded(child: BrowserScreen()),
+        Expanded(
+          child: BrowserScreen(),
+        ),
         SizedBox(
           height: 40,
           child: MobileSearchBar(),
@@ -29,7 +32,7 @@ class MobileSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(
+        const Expanded(
           child: BrowserSearchBar(isMobile: true),
         ),
         BlocBuilder<BrowserCubit, Browser>(
@@ -42,7 +45,7 @@ class MobileSearchBar extends StatelessWidget {
             ),
           ),
         ),
-        SettingsBar(),
+        const SettingsBar(),
       ],
     );
   }
@@ -52,17 +55,17 @@ Future<void> showMobileTabs(BuildContext context) async {
   return showModalBottomSheet(
     context: context,
     showDragHandle: true,
-    constraints: BoxConstraints.expand(),
+    constraints: const BoxConstraints.expand(),
     backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
     builder: (context) => Scaffold(
       floatingActionButton: FloatingActionButton(
-        shape: CircleBorder(),
+        shape: const CircleBorder(),
         onPressed: () {
           context.read<BrowserCubit>().openNewTab(
                 switchTab: true,
               );
         },
-        child: Icon(
+        child: const Icon(
           Icons.add,
         ),
       ),
