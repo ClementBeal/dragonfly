@@ -265,8 +265,6 @@ class Browser {
   void changeTabOrder(String tabId, int newOrder) {
     final tab = tabs.firstWhereOrNull((e) => e.guid == tabId);
 
-    print("$newOrder |||");
-
     if (tab == null) return;
 
     // move right
@@ -288,12 +286,6 @@ class Browser {
             (e) => e.order++,
           );
       tab.order = newOrder;
-    }
-
-    for (var a in tabs.where((e) => !e.isPinned).sorted(
-          (a, b) => a.order.compareTo(b.order),
-        )) {
-      print(a.order);
     }
   }
 
@@ -320,19 +312,6 @@ class Browser {
             );
       }
     }
-
-    for (var t in tabs.where((e) => !e.isPinned).sorted(
-          (a, b) => a.order.compareTo(b.order),
-        )) {
-      print(t.order);
-    }
-    print("---pineed");
-    for (var t in tabs.where((e) => e.isPinned).sorted(
-          (a, b) => a.order.compareTo(b.order),
-        )) {
-      print(t.order);
-    }
-    print("-------");
   }
 }
 
