@@ -376,8 +376,14 @@ class ReorderableTabListView extends StatelessWidget {
         },
       ),
       onReorder: (int oldIndex, int newIndex) {
+        final movedTab = context
+            .read<BrowserCubit>()
+            .state
+            .tabs
+            .firstWhere((e) => e.order == oldIndex);
+
         context.read<BrowserCubit>().updateTabOrder(
-              sortedTabs[oldIndex].guid,
+              movedTab.guid,
               (newIndex > oldIndex) ? newIndex - 1 : newIndex,
             );
       },
