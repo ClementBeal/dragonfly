@@ -20,7 +20,8 @@ static void my_application_activate(GApplication* application) {
   GtkWindow* window =
       GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
 
-  gtk_window_set_title(window, "dragonfly");
+  gtk_window_set_title(window, "Dragonfly");
+  gtk_window_maximize(window);
   gtk_window_set_resizable(window, TRUE); // Allow resizing
 
   gtk_widget_show(GTK_WIDGET(window));

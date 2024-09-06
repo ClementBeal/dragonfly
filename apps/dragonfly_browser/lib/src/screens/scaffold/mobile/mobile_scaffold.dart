@@ -72,7 +72,7 @@ Future<void> showMobileTabs(BuildContext context) async {
             builder: (context, state) => Expanded(
               child: GridView.builder(
                 shrinkWrap: true,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 8,
@@ -107,7 +107,7 @@ Future<void> showMobileTabs(BuildContext context) async {
                               ),
                             ),
                             Expanded(
-                              child: ClipRect(
+                              child: FittedBox(
                                 child: RenderPageWidget(
                                   page: tab.currentPage,
                                   tab: tab,
