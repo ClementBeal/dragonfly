@@ -4,6 +4,7 @@ import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:dragonfly_navigation/src/css/css_browser_theme.dart';
 import 'package:dragonfly_navigation/src/html/dom.dart';
+import 'package:dragonfly_navigation/src/pages/a_page.dart';
 import 'package:html/dom.dart';
 
 import 'package:http/http.dart' as http;
@@ -12,90 +13,6 @@ import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
 enum PageStatus { loading, error, success }
-
-sealed class Page {
-  late final String guid;
-  final String url;
-  final PageStatus status;
-
-  Page({
-    required this.url,
-    required this.status,
-    String? guid,
-  }) {
-    this.guid = guid ?? Uuid().v4();
-  }
-
-  String? getTitle();
-}
-
-class FileExplorerPage extends Page {
-  FileExplorerPage(this.result, {required super.url, required super.status});
-
-  final List<ExplorationResult> result;
-
-  @override
-  String? getTitle() {
-    return "Index of ${url.toString()}";
-  }
-}
-
-class JsonPage extends Page {
-  JsonPage({
-    required super.url,
-    required super.status,
-    super.guid,
-  });
-
-  @override
-  String? getTitle() {
-    return p.basename(url);
-  }
-}
-
-class MediaPage extends Page {
-  MediaPage(this.isLocalMedia, {required super.url, required super.status});
-
-  final bool isLocalMedia;
-
-  @override
-  String? getTitle() {
-    return p.basename(url);
-  }
-}
-
-class HtmlPage extends Page {
-  final Document? document;
-  final CssomTree? cssom;
-  final BrowserImage? favicon;
-
-  HtmlPage(
-      {required super.url,
-      required super.status,
-      super.guid,
-      this.favicon,
-      required this.document,
-      required this.cssom});
-
-  HtmlPage copyWith({
-    Document? document,
-    PageStatus? status,
-    CssomTree? cssom,
-  }) {
-    return HtmlPage(
-      url: url,
-      guid: guid,
-      document: document ?? this.document,
-      cssom: cssom ?? this.cssom,
-      status: status ?? this.status,
-    );
-  }
-
-  @override
-  String? getTitle() {
-    return document?.getElementsByTagName("title").firstOrNull?.text.trim();
-  }
-}
 
 class Tab {
   late final String guid;

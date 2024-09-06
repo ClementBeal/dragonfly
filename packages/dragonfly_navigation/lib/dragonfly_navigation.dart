@@ -4,16 +4,9 @@
 library;
 
 export 'src/dragonfly_navigation_base.dart'
-    show
-        Browser,
-        HtmlPage,
-        MediaPage,
-        JsonPage,
-        Tab,
-        PageStatus,
-        cssomBuilder,
-        Page,
-        FileExplorerPage;
+    show Browser, Tab, PageStatus, cssomBuilder;
+export 'src/pages/a_page.dart'
+    show Page, FileExplorerPage, HtmlPage, JsonPage, MediaPage;
 export 'src/css/css_theme.dart' show FontSize, FontSizeType;
 export 'src/css/cssom_builder.dart'
     show CSSRule, CssomBuilder, CssomNode, CssomTree;
