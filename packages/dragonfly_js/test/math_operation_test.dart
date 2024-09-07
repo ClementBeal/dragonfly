@@ -49,6 +49,76 @@ void main() {
           });
         }
       });
+
+      group('Subtraction', () {
+        final subtractionData = [
+          ('5 - 2', 3),
+          ('2 - 5', -3),
+          ('0 - 5', -5),
+          ('-2 - 3', -5),
+          ('5 - -2', 7),
+          ('10 - 3.5', 6.5),
+          ('-2.5 - 1.8', -4.3),
+        ];
+
+        for (var data in subtractionData) {
+          test('${data.$1} = ${data.$2}', () {
+            final interpreter = JavascriptInterpreter();
+
+            final code = data.$1;
+            final result = interpreter.execute(code);
+
+            expect(data.$2, equals(result));
+          });
+        }
+      });
+
+      group('Multiplication', () {
+        final multiplicationData = [
+          ('5 * 2', 10),
+          ('2 * -5', -10),
+          ('0 * 5', 0),
+          ('-2 * 3', -6),
+          ('5 * -2', -10),
+          ('10 * 3.5', 35),
+          ('-2.5 * 1.8', -4.5),
+        ];
+
+        for (var data in multiplicationData) {
+          test('${data.$1} = ${data.$2}', () {
+            final interpreter = JavascriptInterpreter();
+
+            final code = data.$1;
+            final result = interpreter.execute(code);
+
+            expect(data.$2, equals(result));
+          });
+        }
+      });
+
+      group('Division', () {
+        final divisionData = [
+          ('10 / 2', 5),
+          ('-10 / 2', -5),
+          ('10 / -2', -5),
+          ('-10 / -2', 5),
+          ('5 / 2', 2.5),
+          ('0 / 5', 0),
+          ('-5 / 2', -2.5),
+          ('-2.5 / 0.5', -5),
+        ];
+
+        for (var data in divisionData) {
+          test('${data.$1} = ${data.$2}', () {
+            final interpreter = JavascriptInterpreter();
+
+            final code = data.$1;
+            final result = interpreter.execute(code);
+
+            expect(data.$2, equals(result));
+          });
+        }
+      });
     },
   );
 }

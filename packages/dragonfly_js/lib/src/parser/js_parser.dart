@@ -34,11 +34,17 @@ class JavascriptGrammar extends GrammarDefinition {
 
   Parser negativeOperator() => char('-');
 
-  Parser mathOperator() => char("+").map(
-        (value) => switch (value) {
-          _ => Operator.plus,
-        },
-      );
+  Parser mathOperator() => char('+')
+      .or(char('-'))
+      .or(char('*'))
+      .or(char('/'))
+      .map((value) => switch (value) {
+            '+' => Operator.plus,
+            '-' => Operator.minus,
+            '*' => Operator.multiply,
+            '/' => Operator.divide,
+            _ => throw Exception('Unknown operator: $value'),
+          });
 
   // Tokens
 
