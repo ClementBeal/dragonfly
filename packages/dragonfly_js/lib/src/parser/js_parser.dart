@@ -9,16 +9,30 @@ class JavascriptGrammar extends GrammarDefinition {
         ),
       );
 
-  Parser compilationUnit() => ref0(mathExpression).star();
+  Parser compilationUnit() =>
+      (ref0(mathExpression) | ref0(unaryExpression) | ref0(numberPrimitive))
+          .star();
 
   // Math
 
   Parser mathExpression() =>
-      ref0(number) &
+      ref0(numberPrimitive) &
       hiddenWhitespace() &
       mathOperator() &
       hiddenWhitespace() &
-      ref0(number);
+      ref0(numberPrimitive);
+
+  Parser unaryExpression() =>
+      (ref0(negativeOperator) & ref0(numberPrimitive)).map(
+        (value) {
+          return UnaryExpressionNode(
+            value[0],
+            value[1],
+          );
+        },
+      );
+
+  Parser negativeOperator() => char('-');
 
   Parser mathOperator() => char("+").map(
         (value) => switch (value) {
@@ -27,9 +41,19 @@ class JavascriptGrammar extends GrammarDefinition {
       );
 
   // Tokens
-  Parser number() => digit().plus().map(
-        (value) => NumberNode(num.parse(value.join(""))),
-      );
+
+  Parser<void> numberPrimitive() => <Parser<void>>[
+        char('-').optional(),
+        [char('0'), digit().plus()].toChoiceParser(),
+        [char('.'), digit().plus()].toSequenceParser().optional(),
+        [anyOf('eE'), anyOf('-+').optional(), digit().plus()]
+            .toSequenceParser()
+            .optional()
+      ].toSequenceParser().flatten().map(
+            (value) => NumberNode(
+              num.parse(value),
+            ),
+          );
 
   // Tokens
 

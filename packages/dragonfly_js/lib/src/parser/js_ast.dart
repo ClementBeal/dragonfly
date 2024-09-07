@@ -39,6 +39,25 @@ class NumberNode extends Tree {
   }
 }
 
+class UnaryExpressionNode extends Tree {
+  final String operator;
+  final Tree child;
+
+  UnaryExpressionNode(this.operator, this.child);
+
+  @override
+  dynamic evaluate() {
+    if (operator == "-") {
+      return -child.evaluate();
+    } else if (operator == "+") {
+      return child.evaluate();
+    }
+
+    throw Exception(
+        'Wrong operator for the unary expression. Received "$operator" (only "+" and "-" are allowed)');
+  }
+}
+
 class OperationNode extends Tree {
   final Operator operator;
   final Tree left;

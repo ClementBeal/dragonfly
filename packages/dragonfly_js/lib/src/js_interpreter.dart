@@ -1,4 +1,3 @@
-import 'package:dragonfly_js/src/parser/js_ast.dart';
 import 'package:dragonfly_js/src/parser/js_parser.dart';
 
 class JavascriptInterpreter {
