@@ -2,19 +2,29 @@ import 'package:dragonfly_js/dragonfly_js.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('Math operations', () {
-    late final JavascriptInterpreter interpreter;
+  group(
+    'Math operations',
+    () {
+      group('Addition', () {
+        final additionData = [
+          (2, 3, 5),
+          (0, 5, 5),
+          (2, 3, 5),
+          (523, 3, 526),
+          (222, 222, 444),
+        ];
 
-    setUp(() {
-      interpreter = JavascriptInterpreter();
-    });
+        for (var data in additionData) {
+          test('${data.$1} + ${data.$2}  = ${data.$3}', () {
+            final interpreter = JavascriptInterpreter();
 
-    test('Addition integers', () {
-      const code = "2 + 3";
+            final code = "${data.$1} + ${data.$2}";
+            final result = interpreter.execute(code);
 
-      final result = interpreter.execute(code);
-
-      expect(result, equals(5));
-    });
-  });
+            expect(data.$3, equals(result));
+          });
+        }
+      });
+    },
+  );
 }
