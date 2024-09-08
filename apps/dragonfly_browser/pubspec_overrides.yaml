@@ -1,8 +1,10 @@
-# melos_managed_dependency_overrides: dragonfly_css_parser,dragonfly_browservault,dragonfly_navigation
+# melos_managed_dependency_overrides: dragonfly_css_parser,dragonfly_browservault,dragonfly_navigation,dragonfly_js
 dependency_overrides:
   dragonfly_browservault:
     path: ../../packages/dragonfly_browservault
   dragonfly_css_parser:
     path: ../../packages/dragonfly_css_parser
+  dragonfly_js:
+    path: ../../packages/dragonfly_js
   dragonfly_navigation:
     path: ../../packages/dragonfly_navigation

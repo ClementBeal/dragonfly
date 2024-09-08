@@ -175,6 +175,13 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  dragonfly_js:
+    dependency: "direct overridden"
+    description:
+      path: "../../packages/dragonfly_js"
+      relative: true
+    source: path
+    version: "0.0.1"
   dragonfly_navigation:
     dependency: "direct main"
     description:

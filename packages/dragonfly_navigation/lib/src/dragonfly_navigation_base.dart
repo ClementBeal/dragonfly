@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
+import 'package:dragonfly_js/dragonfly_js.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:dragonfly_navigation/src/css/css_browser_theme.dart';
 import 'package:dragonfly_navigation/src/html/dom.dart';
@@ -16,6 +17,7 @@ enum PageStatus { loading, error, success }
 
 class Tab {
   late final String guid;
+  late final JavascriptInterpreter interpreter;
   final List<Page> _history = [];
   int _currentIndex = -1;
   bool isPinned = false;
@@ -23,6 +25,7 @@ class Tab {
 
   Tab({required this.order}) {
     guid = Uuid().v4();
+    interpreter = JavascriptInterpreter();
   }
 
   Page? get currentPage => _currentIndex >= 0 ? _history[_currentIndex] : null;
