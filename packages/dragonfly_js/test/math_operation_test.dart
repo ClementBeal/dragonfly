@@ -15,7 +15,7 @@ void main() {
             final code = "$data";
             final result = interpreter.execute(code);
 
-            expect(data, equals(result));
+            expect(result, equals(data));
           });
         }
       });
@@ -45,7 +45,7 @@ void main() {
             final code = data.$1;
             final result = interpreter.execute(code);
 
-            expect(data.$2, equals(result));
+            expect(result, equals(data.$2));
           });
         }
       });
@@ -68,7 +68,7 @@ void main() {
             final code = data.$1;
             final result = interpreter.execute(code);
 
-            expect(data.$2, equals(result));
+            expect(result, equals(data.$2));
           });
         }
       });
@@ -91,7 +91,7 @@ void main() {
             final code = data.$1;
             final result = interpreter.execute(code);
 
-            expect(data.$2, equals(result));
+            expect(result, equals(data.$2));
           });
         }
       });
@@ -115,7 +115,33 @@ void main() {
             final code = data.$1;
             final result = interpreter.execute(code);
 
-            expect(data.$2, equals(result));
+            expect(result, equals(data.$2));
+          });
+        }
+      });
+
+      group('With parentheses', () {
+        final parenthesesData = [
+          ('(5 + 2)', 7),
+          ('3 * (2 + 5)', 21),
+          ('((2 + 3) * (4 - 1))', 15),
+          ('(6 / (2 + 1))', 2),
+          ('(4 + (3 * (2 - 1)))', 7),
+          ('(((1 + 2) * 3) - (4 / 2))', 7),
+          ('(8 - (3 + 2) * 2)', -2),
+          ('((7 + 2) / (3 + 6))', 1),
+          ('((2 + 3) * (4 / 2) - 1)', 9),
+          ('(1 + (2 * (3 + (4 / 2))))', 11),
+        ];
+
+        for (var data in parenthesesData) {
+          test('${data.$1} = ${data.$2}', () {
+            final interpreter = JavascriptInterpreter();
+
+            final code = data.$1;
+            final result = interpreter.execute(code);
+
+            expect(result, equals(data.$2));
           });
         }
       });

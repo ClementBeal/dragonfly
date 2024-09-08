@@ -3,52 +3,56 @@ import 'package:petitparser/petitparser.dart';
 
 class JavascriptGrammar extends GrammarDefinition {
   @override
-  Parser start() => ref0(compilationUnit).end().castList<Tree>().map(
+  Parser start() => ref0(compilationUnit).star().end().castList<Tree>().map(
         (value) => ProgramNode(
           children: value,
         ),
       );
 
   Parser compilationUnit() =>
-      (ref0(mathExpression) | ref0(unaryExpression) | ref0(numberPrimitive))
-          .star();
+      (ref0(expression) | ref0(parentheses) | ref0(numberPrimitive))
+          .map((value) => value);
 
-  // Math
+  // Top-level expression parser considering precedence
+  Parser expression() => ref0(additiveExpression);
 
-  Parser mathExpression() =>
-      ref0(numberPrimitive) &
-      hiddenWhitespace() &
-      mathOperator() &
-      hiddenWhitespace() &
-      ref0(numberPrimitive);
+  // Addition and subtraction (lower precedence)
+  Parser additiveExpression() => ref0(multiplicativeExpression)
+      .plusSeparated(ref0(additiveOperator))
+      .map((value) => _buildExpressionTree(value.sequential.toList()));
 
-  Parser unaryExpression() =>
-      (ref0(negativeOperator) & ref0(numberPrimitive)).map(
-        (value) {
-          return UnaryExpressionNode(
-            value[0],
-            value[1],
-          );
-        },
-      );
+  // Multiplication and division (higher precedence)
+  Parser multiplicativeExpression() => ref0(atomicExpression)
+      .plusSeparated(ref0(multiplicativeOperator))
+      .map((value) => _buildExpressionTree(value.sequential.toList()));
 
-  Parser negativeOperator() => char('-');
+  // Atomic expressions (numbers or expressions within parentheses)
+  Parser atomicExpression() => ref0(numberPrimitive) | ref0(parentheses);
 
-  Parser mathOperator() => char('+')
-      .or(char('-'))
-      .or(char('*'))
-      .or(char('/'))
-      .map((value) => switch (value) {
-            '+' => Operator.plus,
-            '-' => Operator.minus,
-            '*' => Operator.multiply,
-            '/' => Operator.divide,
-            _ => throw Exception('Unknown operator: $value'),
-          });
+  // Parentheses to handle grouped expressions
+  Parser parentheses() => (char('(') & ref0(expression) & char(')'))
+      .pick(1)
+      .map((value) => ParenthesesNode(child: value));
 
-  // Tokens
+  // Operator parsers with different precedence
+  Parser additiveOperator() => anyOf('+-').trim().map((value) {
+        return OperatorNode(switch (value) {
+          "+" => Operator.plus,
+          "-" => Operator.minus,
+          _ => throw Exception('Unknown operator: $value'),
+        });
+      });
 
-  Parser<void> numberPrimitive() => <Parser<void>>[
+  Parser multiplicativeOperator() => anyOf('*/').trim().map((value) {
+        return OperatorNode(switch (value) {
+          "*" => Operator.multiply,
+          "/" => Operator.divide,
+          _ => throw Exception('Unknown operator: $value'),
+        });
+      });
+
+  // Number primitive (e.g., 42, -3.14, etc.)
+  Parser numberPrimitive() => <Parser>[
         char('-').optional(),
         [char('0'), digit().plus()].toChoiceParser(),
         [char('.'), digit().plus()].toSequenceParser().optional(),
@@ -61,47 +65,44 @@ class JavascriptGrammar extends GrammarDefinition {
             ),
           );
 
-  // Tokens
+  // Helper function to build the expression tree
+  Tree _buildExpressionTree(List<dynamic> elements) {
+    Tree left = elements.first as Tree;
 
-  Parser newlineLexicalToken() => pattern('\n\r');
+    for (int i = 1; i < elements.length; i += 2) {
+      var operatorNode = elements[i] as OperatorNode;
+      var right = elements[i + 1] as Tree;
+      left = ExpressionNode([left, operatorNode, right]);
+    }
 
-  // -----------------------------------------------------------------
-  // Whitespace and comments.
-  // -----------------------------------------------------------------
-  Parser hiddenWhitespace() => ref0(hiddenStuffWhitespace).plus();
+    return left;
+  }
 
+  // Whitespace and comments
+
+  Parser<void> hiddenWhitespace() => ref0(hiddenStuffWhitespace).plus();
   Parser hiddenStuffWhitespace() =>
       ref0(visibleWhitespace) |
       ref0(singleLineComment) |
       ref0(multiLineComment);
 
   Parser visibleWhitespace() => whitespace();
-
   Parser singleLineComment() =>
       string('//') &
       ref0(newlineLexicalToken).neg().star() &
       ref0(newlineLexicalToken).optional();
-
   Parser multiLineComment() =>
       string('/*') &
       (ref0(multiLineComment) | string('*/').neg()).star() &
       string('*/');
-}
 
-class JavascriptGrammarDefinition extends JavascriptGrammar {
-  @override
-  Parser mathExpression() => super.mathExpression().map(
-        (value) => OperationNode(
-          operator: value[2],
-          left: value[0],
-          right: value[4],
-        ),
-      );
+  // Newline
+  Parser newlineLexicalToken() => pattern('\n\r');
 }
 
 class JavascriptParser {
   Tree parse(String code) {
-    final a = JavascriptGrammarDefinition();
+    final a = JavascriptGrammar();
     final parser = a.build();
 
     return parser.parse(code).value;
