@@ -43,7 +43,7 @@ class ExpressionNode extends Tree {
   dynamic evaluate() {
     // Evaluate all elements, handle nested operations
     final values = [];
-    var currentOperator;
+    Operator? currentOperator;
 
     for (var element in elements) {
       if (element is OperatorNode) {

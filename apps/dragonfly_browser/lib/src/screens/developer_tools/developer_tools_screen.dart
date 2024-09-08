@@ -70,8 +70,8 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
                 ),
                 Expanded(
                     child: switch (selectedTool) {
-                  DeveloperTool.network => NetworkToolScreen(),
-                  DeveloperTool.console => ConsoleScreen(),
+                  DeveloperTool.network => const NetworkToolScreen(),
+                  DeveloperTool.console => const ConsoleScreen(),
                 }),
               ],
             ),
