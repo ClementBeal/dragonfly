@@ -1,9 +1,10 @@
+import 'package:dragonfly/src/screens/developer_tools/tools/console/console_screen.dart';
 import 'package:dragonfly/src/screens/developer_tools/tools/network/network_tool_screen.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-enum DeveloperTool { network }
+enum DeveloperTool { network, console }
 
 class DeveloperToolsScreen extends StatefulWidget {
   const DeveloperToolsScreen({super.key, required this.isInsideColumn});
@@ -15,7 +16,7 @@ class DeveloperToolsScreen extends StatefulWidget {
 }
 
 class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
-  DeveloperTool selectedTool = DeveloperTool.network;
+  DeveloperTool selectedTool = DeveloperTool.console;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +56,11 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
                       ),
                       const SizedBox(width: 8),
                       IconWithTool(
+                        icon: Icons.computer,
+                        label: "Console",
+                        isSelected: selectedTool == DeveloperTool.console,
+                      ),
+                      IconWithTool(
                         icon: Icons.sync_alt_outlined,
                         label: "Network",
                         isSelected: selectedTool == DeveloperTool.network,
@@ -62,7 +68,11 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
                     ],
                   ),
                 ),
-                const Expanded(child: NetworkToolScreen()),
+                Expanded(
+                    child: switch (selectedTool) {
+                  DeveloperTool.network => NetworkToolScreen(),
+                  DeveloperTool.console => ConsoleScreen(),
+                }),
               ],
             ),
           ),
@@ -95,12 +105,15 @@ class IconWithTool extends StatelessWidget {
               )
             : BorderSide.none,
       )),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon),
-          Text(label),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon),
+            Text(label),
+          ],
+        ),
       ),
     );
   }
