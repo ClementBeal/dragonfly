@@ -19,7 +19,7 @@ class _ConsoleScreenState extends State<ConsoleScreen> {
         ListView.separated(
           shrinkWrap: true,
           itemCount: messages.length,
-          separatorBuilder: (context, index) => Divider(),
+          separatorBuilder: (context, index) => const Divider(),
           itemBuilder: (context, index) => Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(messages[index].toString()),
@@ -30,7 +30,6 @@ class _ConsoleScreenState extends State<ConsoleScreen> {
           child: ConsoleTextField(
             onScriptExecuted: (output) {
               messages.add(output);
-              print(output);
               setState(() {});
             },
           ),
@@ -79,7 +78,6 @@ class _ConsoleTextFieldState extends State<ConsoleTextField> {
 
               if (currentTab != null) {
                 final output = currentTab.interpreter.execute(value);
-                print(output);
                 widget.onScriptExecuted(output);
               }
             },
