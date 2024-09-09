@@ -6,6 +6,7 @@ An attempt to build a web browser with Flutter.
 
 ```bash
 git clone https://github.com/ClementBeal/dragonfly.git
+cd dragonfly
 dart pub global activate melos
 melos boostrap
 cd apps/dragonfly_browser
@@ -17,6 +18,7 @@ If you want to test with some pages that work more or less, run the following co
 ```
 melos run browser_website
 ```
+
 # Project strucure
 
 `apps/dragonfly_browser` : the browser project. The UI is there
@@ -56,7 +58,7 @@ Once we have the DOM and the CSSOM, we can render the page. Almost all the nodes
 
 The browser can open tabs and navigate through them and through the history. It can render a bit of HTML and CSS. It's hard to implement all the properties because there's hundreds now.
 
-I haven't implemented a JS interpreter yet. 
+I haven't implemented a JS interpreter yet.
 
 ## Wanna contribute?
 
