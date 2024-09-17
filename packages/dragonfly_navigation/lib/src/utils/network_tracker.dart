@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:async';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 
@@ -8,11 +8,15 @@ import 'package:http/http.dart' as http;
 class NetworkTracker {
   late final List<NetworkRequest> history;
   late final http.Client httpClient;
+  late Stream<NetworkRequest> requestStream;
+  late StreamController<NetworkRequest> _requestStreamController;
 
   NetworkTracker({
     http.Client? httpClient,
   }) {
     history = [];
+    _requestStreamController = StreamController.broadcast();
+    requestStream = _requestStreamController.stream;
     this.httpClient = httpClient ?? http.Client();
   }
 
@@ -41,6 +45,8 @@ class NetworkTracker {
 
       history.add(networkRequest);
 
+      _requestStreamController.sink.add(networkRequest);
+
       final response = await httpClient.send(
         request,
       );
@@ -52,6 +58,14 @@ class NetworkTracker {
         headers: response.headers,
         body: responseBody,
       );
+
+      history
+          .firstWhere(
+            (e) => e == networkRequest,
+          )
+          .response = responseToReturn;
+
+      _requestStreamController.sink.add(networkRequest);
 
       return responseToReturn;
     } catch (e) {
@@ -70,13 +84,14 @@ class NetworkTracker {
 /// Store the all the information of a network request.
 /// May contains a [response].
 class NetworkRequest {
-  late final NetworkResponse? response;
+  late NetworkResponse? response;
   final String url;
   final Map<String, String> headers;
   late final DateTime timestamp;
 
   NetworkRequest({required this.url, required this.headers}) {
     timestamp = DateTime.now();
+    response = null;
   }
 }
 

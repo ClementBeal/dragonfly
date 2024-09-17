@@ -89,6 +89,67 @@ void main() {
         expect(response.headers, isEmpty);
         expect(response.body, [0, 1, 2]);
       });
+
+      test("The history must contain the response", () async {
+        final tracker = NetworkTracker(
+          httpClient: HTTPClientMock(
+            [
+              http.StreamedResponse(
+                Stream.fromIterable(
+                  [
+                    [0, 1, 2],
+                  ],
+                ),
+                200,
+              ),
+            ],
+          ),
+        );
+
+        final response = await tracker.request("url", "GET", {});
+
+        expect(tracker.history.length, 1);
+        expect(tracker.history.first.response, response);
+
+        expect(response, isNotNull);
+        expect(response!.statusCode, 200);
+        expect(response.headers, isEmpty);
+        expect(response.body, [0, 1, 2]);
+      });
+
+      test("The history must contain the response", () async {
+        final tracker = NetworkTracker(
+          httpClient: HTTPClientMock(
+            [
+              http.StreamedResponse(
+                Stream.fromIterable(
+                  [
+                    [0, 1, 2],
+                  ],
+                ),
+                200,
+              ),
+            ],
+          ),
+        );
+
+        final List<NetworkRequest> streamMessages = [];
+
+        final subscription = tracker.requestStream.listen((message) {
+          streamMessages.add(message);
+        });
+
+        final response = await tracker.request("url", "GET", {});
+
+        await Future.delayed(Duration(milliseconds: 100));
+        subscription.cancel();
+
+        expect(streamMessages.length, 2);
+
+        final lastMessage = streamMessages.last;
+
+        expect(lastMessage.response, response);
+      });
     },
   );
 }
