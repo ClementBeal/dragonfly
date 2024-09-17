@@ -45,10 +45,12 @@ class NetworkTracker {
         request,
       );
 
+      final responseBody = await response.stream.toBytes();
+
       final responseToReturn = NetworkResponse(
         statusCode: response.statusCode,
         headers: response.headers,
-        body: Uint8List(0),
+        body: responseBody,
       );
 
       return responseToReturn;

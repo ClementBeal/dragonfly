@@ -46,9 +46,7 @@ void main() {
             [
               http.StreamedResponse(
                 Stream.fromIterable(
-                  [
-                    [0],
-                  ],
+                  [],
                 ),
                 200,
               ),
@@ -64,6 +62,32 @@ void main() {
         expect(response!.statusCode, 200);
         expect(response.headers, isEmpty);
         expect(response.body, isEmpty);
+      });
+
+      test("Very basic GET request ; no headers ; body", () async {
+        final tracker = NetworkTracker(
+          httpClient: HTTPClientMock(
+            [
+              http.StreamedResponse(
+                Stream.fromIterable(
+                  [
+                    [0, 1, 2],
+                  ],
+                ),
+                200,
+              ),
+            ],
+          ),
+        );
+
+        final response = await tracker.request("url", "GET", {});
+
+        expect(tracker.history.length, 1);
+
+        expect(response, isNotNull);
+        expect(response!.statusCode, 200);
+        expect(response.headers, isEmpty);
+        expect(response.body, [0, 1, 2]);
       });
     },
   );
