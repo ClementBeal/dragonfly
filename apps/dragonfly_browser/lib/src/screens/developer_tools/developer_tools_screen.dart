@@ -34,7 +34,7 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
             ),
           ),
           child: SizedBox(
-            width: (!widget.isInsideColumn) ? 200 : null,
+            width: (!widget.isInsideColumn) ? 400 : null,
             height: (widget.isInsideColumn) ? 200 : null,
             child: Column(
               children: [
@@ -55,15 +55,29 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      IconWithTool(
-                        icon: Icons.computer,
-                        label: "Console",
-                        isSelected: selectedTool == DeveloperTool.console,
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedTool = DeveloperTool.console;
+                          });
+                        },
+                        child: IconWithTool(
+                          icon: Icons.computer,
+                          label: "Console",
+                          isSelected: selectedTool == DeveloperTool.console,
+                        ),
                       ),
-                      IconWithTool(
-                        icon: Icons.sync_alt_outlined,
-                        label: "Network",
-                        isSelected: selectedTool == DeveloperTool.network,
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedTool = DeveloperTool.network;
+                          });
+                        },
+                        child: IconWithTool(
+                          icon: Icons.sync_alt_outlined,
+                          label: "Network",
+                          isSelected: selectedTool == DeveloperTool.network,
+                        ),
                       ),
                     ],
                   ),
