@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
@@ -6,6 +7,7 @@ import 'package:dragonfly_js/dragonfly_js.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:dragonfly_navigation/src/css/css_browser_theme.dart';
 import 'package:dragonfly_navigation/src/html/dom.dart';
+import 'package:dragonfly_navigation/src/utils/network_tracker.dart';
 import 'package:html/dom.dart';
 
 import 'package:http/http.dart' as http;
@@ -22,6 +24,7 @@ class Tab {
   int _currentIndex = -1;
   bool isPinned = false;
   int order;
+  final NetworkTracker tracker = NetworkTracker();
 
   Tab({required this.order}) {
     guid = Uuid().v4();
@@ -53,11 +56,15 @@ class Tab {
       );
       _currentIndex++;
 
-      final document = await getHttp(uriRequest);
+      final htmlRequest = await tracker.request(url, "GET", {});
+
+      Document? document;
       CssomTree? cssom;
       BrowserImage? cachedFavicon;
 
-      if (document != null) {
+      if (htmlRequest != null) {
+        document = DomBuilder.parse(utf8.decode(htmlRequest.body));
+
         final linkCssNode =
             document.querySelectorAll('link[rel="stylesheet"]').firstOrNull;
 
