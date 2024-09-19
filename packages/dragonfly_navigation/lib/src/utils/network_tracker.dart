@@ -57,6 +57,8 @@ class NetworkTracker {
         statusCode: response.statusCode,
         headers: response.headers,
         body: responseBody,
+        contentLengthCompressed: responseBody.length,
+        contentLengthUncompressed: responseBody.length,
       );
 
       history
@@ -101,9 +103,16 @@ class NetworkResponse {
   final Map<String, String> headers;
   final Uint8List body;
   late final DateTime timestamp;
+  final int contentLengthUncompressed;
+  final int contentLengthCompressed;
 
-  NetworkResponse(
-      {required this.statusCode, required this.headers, required this.body}) {
+  NetworkResponse({
+    required this.statusCode,
+    required this.headers,
+    required this.body,
+    required this.contentLengthUncompressed,
+    required this.contentLengthCompressed,
+  }) {
     timestamp = DateTime.now();
   }
 }

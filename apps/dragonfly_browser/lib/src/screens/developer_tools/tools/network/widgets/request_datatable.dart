@@ -142,8 +142,10 @@ class _NetworkRequestDataTableState extends State<NetworkRequestDataTable> {
                       ),
                     ),
                     DataCell(Text("text/html")),
-                    DataCell(Text("15 KB")),
-                    DataCell(Text("15 KB")),
+                    DataCell(Text(
+                        (e.response?.contentLengthCompressed ?? 0).toString())),
+                    DataCell(Text(
+                        (e.response?.contentLengthCompressed ?? 0).toString())),
                     DataCell(RequestDurationCell(
                       request: e,
                     )),
