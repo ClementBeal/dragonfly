@@ -174,7 +174,7 @@ class NetworkRequestDataRow extends StatelessWidget {
                   Text("${tracker.history.length} request(s)"),
                   VerticalDivider(),
                   Text(
-                      "${formatBytes(totalDownloadedCompressed, decimals: 2)} / ${formatBytes(totalDownloadedUncompressed, decimals: 2)} transfered"),
+                      "${formatBytes(totalDownloadedCompressed, decimals: 0)} / ${formatBytes(totalDownloadedUncompressed, decimals: 0)} transfered"),
                   VerticalDivider(),
                   Text("Finish : ${finishIn.inMilliseconds}ms"),
                 ],
