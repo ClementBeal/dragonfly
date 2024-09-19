@@ -350,6 +350,7 @@ class _HeadersTableState extends State<HeadersTable> {
         if (isOpen)
           ListView.separated(
             shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
             itemCount: widget.headers.length,
             separatorBuilder: (context, index) => SizedBox(height: 4),
             itemBuilder: (context, index) {
