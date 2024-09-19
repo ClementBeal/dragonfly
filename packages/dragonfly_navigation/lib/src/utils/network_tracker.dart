@@ -93,7 +93,9 @@ class NetworkRequest {
   final String url;
   final Map<String, String> headers;
   final String method;
+
   late final DateTime timestamp;
+  late final int headersLength;
 
   NetworkRequest({
     required this.url,
@@ -102,6 +104,13 @@ class NetworkRequest {
   }) {
     timestamp = DateTime.now();
     response = null;
+
+    headersLength = headers.entries.fold(
+          0,
+          (previousValue, element) =>
+              previousValue + element.key.length + element.value.length,
+        ) +
+        6 * headers.length;
   }
 }
 
@@ -109,8 +118,10 @@ class NetworkRequest {
 class NetworkResponse {
   final int statusCode;
   final Map<String, String> headers;
+
   final Uint8List body;
   late final DateTime timestamp;
+  late final int headersLength;
   final int contentLengthUncompressed;
   final int contentLengthCompressed;
 
@@ -122,5 +133,12 @@ class NetworkResponse {
     required this.contentLengthCompressed,
   }) {
     timestamp = DateTime.now();
+
+    headersLength = headers.entries.fold(
+          0,
+          (previousValue, element) =>
+              previousValue + element.key.length + element.value.length,
+        ) +
+        6 * headers.length;
   }
 }

@@ -31,6 +31,7 @@ void main() {
             NetworkRequest(
               url: "random url",
               headers: {},
+              method: "GET",
             ),
           );
 

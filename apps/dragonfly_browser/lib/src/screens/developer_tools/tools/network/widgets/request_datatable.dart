@@ -287,12 +287,14 @@ class RequestDetailsPanel extends StatelessWidget {
           HeadersTable(
             title: "Request headers",
             headers: request.headers,
+            headerLength: request.headersLength,
           ),
           Divider(),
           if (request.response != null)
             HeadersTable(
               title: "Response headers",
               headers: request.response!.headers,
+              headerLength: request.response!.headersLength,
             ),
         ],
       ),
@@ -305,9 +307,11 @@ class HeadersTable extends StatefulWidget {
     super.key,
     required this.headers,
     required this.title,
+    required this.headerLength,
   });
 
   final Map<String, String> headers;
+  final int headerLength;
   final String title;
 
   @override
@@ -319,12 +323,6 @@ class _HeadersTableState extends State<HeadersTable> {
 
   @override
   Widget build(BuildContext context) {
-    final headerWeigth = widget.headers.entries.fold(
-      0,
-      (previousValue, element) =>
-          previousValue + element.key.length + element.value.length,
-    );
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -341,7 +339,7 @@ class _HeadersTableState extends State<HeadersTable> {
                   child: Icon(
                       (isOpen) ? Icons.arrow_drop_down : Icons.arrow_right)),
               Text(
-                "${widget.title} (${formatBytes(headerWeigth, decimals: 0)})",
+                "${widget.title} (${formatBytes(widget.headerLength, decimals: 0)})",
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
