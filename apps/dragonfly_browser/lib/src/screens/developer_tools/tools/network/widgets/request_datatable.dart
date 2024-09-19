@@ -171,8 +171,10 @@ class _NetworkRequestDataTableState extends State<NetworkRequestDataTable> {
             ),
           ),
           if (selectedRequest != null)
-            RequestDetailsPanel(
-              request: selectedRequest!,
+            SelectionArea(
+              child: RequestDetailsPanel(
+                request: selectedRequest!,
+              ),
             ),
         ],
       ),
@@ -342,35 +344,69 @@ class _HeadersTableState extends State<HeadersTable> {
         ),
         if (isOpen)
           ListView.separated(
-            padding: EdgeInsets.symmetric(horizontal: 24),
             shrinkWrap: true,
             itemCount: widget.headers.length,
             separatorBuilder: (context, index) => SizedBox(height: 4),
             itemBuilder: (context, index) {
               final entry = widget.headers.entries.elementAt(index);
 
-              return RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: capitalizeHttpHeader(entry.key),
-                      style: TextStyle(
-                        color: Colors.blue,
-                      ),
-                    ),
-                    TextSpan(text: "   :   "),
-                    TextSpan(
-                      text: entry.value,
-                      style: TextStyle(
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              );
+              return HeaderTableRow(entry: entry);
             },
           ),
       ],
+    );
+  }
+}
+
+class HeaderTableRow extends StatefulWidget {
+  const HeaderTableRow({
+    super.key,
+    required this.entry,
+  });
+
+  final MapEntry<String, String> entry;
+
+  @override
+  State<HeaderTableRow> createState() => _HeaderTableRowState();
+}
+
+class _HeaderTableRowState extends State<HeaderTableRow> {
+  bool isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (event) => setState(() => isHovered = true),
+      onExit: (event) => setState(() => isHovered = false),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: (isHovered)
+              ? Theme.of(context).colorScheme.surfaceContainerHigh
+              : null,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: capitalizeHttpHeader(widget.entry.key),
+                  style: TextStyle(
+                    color: Colors.blue,
+                  ),
+                ),
+                TextSpan(text: "   :   "),
+                TextSpan(
+                  text: widget.entry.value,
+                  style: TextStyle(
+                    color: Theme.of(context).disabledColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
