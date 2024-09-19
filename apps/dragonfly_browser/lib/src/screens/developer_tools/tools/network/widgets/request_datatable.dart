@@ -67,6 +67,7 @@ class _NetworkRequestDataTableState extends State<NetworkRequestDataTable> {
         children: [
           Expanded(
             child: DataTable2(
+              showCheckboxColumn: false,
               columnSpacing: 12,
               horizontalMargin: 12,
               minWidth: 600,
@@ -262,41 +263,51 @@ class RequestDetailsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Row(
-            spacing: 12,
-            children: [
-              Text(request.method),
-              Expanded(child: TextWithTooltip(request.url)),
-            ],
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            width: 2,
+            color: Colors.green.shade800,
           ),
-          Divider(),
-          Table(
-            children: [
-              TableRow(
-                children: [
-                  Text("Status"),
-                  Text(request.response!.statusCode.toString()),
-                ],
-              ),
-            ],
-          ),
-          Divider(),
-          HeadersTable(
-            title: "Request headers",
-            headers: request.headers,
-            headerLength: request.headersLength,
-          ),
-          Divider(),
-          if (request.response != null)
-            HeadersTable(
-              title: "Response headers",
-              headers: request.response!.headers,
-              headerLength: request.response!.headersLength,
+        ),
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              spacing: 12,
+              children: [
+                Text(request.method),
+                Expanded(child: TextWithTooltip(request.url)),
+              ],
             ),
-        ],
+            Divider(),
+            Table(
+              children: [
+                TableRow(
+                  children: [
+                    Text("Status"),
+                    Text(request.response!.statusCode.toString()),
+                  ],
+                ),
+              ],
+            ),
+            Divider(),
+            HeadersTable(
+              title: "Request headers",
+              headers: request.headers,
+              headerLength: request.headersLength,
+            ),
+            Divider(),
+            if (request.response != null)
+              HeadersTable(
+                title: "Response headers",
+                headers: request.response!.headers,
+                headerLength: request.response!.headersLength,
+              ),
+          ],
+        ),
       ),
     );
   }
