@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
@@ -22,6 +23,7 @@ class Tab {
   int _currentIndex = -1;
   bool isPinned = false;
   int order;
+  final NetworkTracker tracker = NetworkTracker();
 
   Tab({required this.order}) {
     guid = Uuid().v4();
@@ -53,11 +55,15 @@ class Tab {
       );
       _currentIndex++;
 
-      final document = await getHttp(uriRequest);
+      final htmlRequest = await tracker.request(url, "GET", {});
+
+      Document? document;
       CssomTree? cssom;
       BrowserImage? cachedFavicon;
 
-      if (document != null) {
+      if (htmlRequest != null) {
+        document = DomBuilder.parse(utf8.decode(htmlRequest.body));
+
         final linkCssNode =
             document.querySelectorAll('link[rel="stylesheet"]').firstOrNull;
 
@@ -93,7 +99,14 @@ class Tab {
 
         if (linkCssNode != null) {
           final href = linkCssNode.attributes["href"];
-          cssom = await getCss(Uri.parse(url).replace(path: href));
+          final a = await tracker.request(
+              Uri.parse(url).replace(path: href).toString(), "GET", {});
+
+          try {
+            cssom = cssomBuilder.parse(utf8.decode(a!.body));
+          } catch (e) {
+            cssom = null;
+          }
         }
       }
 
@@ -161,9 +174,16 @@ class Tab {
       if (document != null) {
         final linkCssNode =
             document.querySelectorAll('link[rel="stylesheet"]').firstOrNull;
+
         if (linkCssNode != null) {
           final href = linkCssNode.attributes["href"];
-          cssom = await getCss(Uri.parse(url).replace(path: href));
+          final a = await tracker.request(
+              Uri.parse(url).replace(path: href).toString(), "GET", {});
+          try {
+            cssom = cssomBuilder.parse(utf8.decode(a!.body));
+          } catch (e) {
+            cssom = null;
+          }
         }
       }
 
@@ -329,23 +349,6 @@ Future<Document?> getHttp(Uri uri) async {
 
     // TODO : check the errors (404, etc)
     return DomBuilder.parse(page.body);
-  } catch (e) {
-    print(e);
-    // TODO : bad error handling but tired of that s***
-    return null;
-  }
-}
-
-Future<CssomTree?> getCss(Uri uri) async {
-  try {
-    final page = await http.get(
-      uri,
-      headers: {
-        "User-Agent": "DragonFly/1.0",
-      },
-    );
-
-    return cssomBuilder.parse(page.body);
   } catch (e) {
     print(e);
     // TODO : bad error handling but tired of that s***

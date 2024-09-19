@@ -1,5 +1,9 @@
+import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
+import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
 import 'package:dragonfly/src/screens/developer_tools/tools/network/widgets/request_datatable.dart';
+import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NetworkToolScreen extends StatelessWidget {
   const NetworkToolScreen({super.key});
@@ -15,6 +19,7 @@ class NetworkToolScreen extends StatelessWidget {
         Expanded(
           child: NetworkRequestDataTable(),
         ),
+        NetworkRequestDataRow(),
       ],
     );
   }
@@ -56,16 +61,29 @@ class _ContentRequestSelectionBarState
     return Container(
       height: 50,
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: ListView.builder(
-        itemCount: contentRequests.length,
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) => GestureDetector(
-          onTap: () => _updateSelection(index),
-          child: ContentRequestSelection(
-            contentType: contentRequests[index],
-            isSelected: selectedContent[index],
+      child: Row(
+        spacing: 12,
+        children: [
+          GestureDetector(
+            onTap: () {
+              context.read<BrowserCubit>().cleanNetworkTool();
+            },
+            child: Icon(Icons.delete),
           ),
-        ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: contentRequests.length,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) => GestureDetector(
+                onTap: () => _updateSelection(index),
+                child: ContentRequestSelection(
+                  contentType: contentRequests[index],
+                  isSelected: selectedContent[index],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -104,6 +122,67 @@ class ContentRequestSelection extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class NetworkRequestDataRow extends StatelessWidget {
+  const NetworkRequestDataRow({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BrowserCubit, Browser>(
+      builder: (context, state) {
+        final tracker = state.currentTab?.tracker;
+
+        if (tracker == null || tracker.history.isEmpty) {
+          return const Row();
+        }
+
+        final firstRequest = tracker.history.first;
+        final finishIn = (firstRequest.response == null)
+            ? Duration.zero
+            : firstRequest.response!.timestamp
+                .difference(firstRequest.timestamp);
+        final totalDownloadedUncompressed = tracker.history.fold(
+          0,
+          (previousValue, element) =>
+              previousValue +
+              (element.response?.contentLengthUncompressed ?? 0),
+        );
+        final totalDownloadedCompressed = tracker.history.fold(
+          0,
+          (previousValue, element) =>
+              previousValue + (element.response?.contentLengthCompressed ?? 0),
+        );
+
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(
+                width: 2,
+                color: Colors.green.shade800,
+              ),
+            ),
+          ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(
+                children: [
+                  Text("${tracker.history.length} request(s)"),
+                  VerticalDivider(),
+                  Text(
+                      "${formatBytes(totalDownloadedCompressed, decimals: 0)} / ${formatBytes(totalDownloadedUncompressed, decimals: 0)} transfered"),
+                  VerticalDivider(),
+                  Text("Finish : ${finishIn.inMilliseconds}ms"),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
