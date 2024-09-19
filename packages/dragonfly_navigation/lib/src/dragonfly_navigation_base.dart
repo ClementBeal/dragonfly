@@ -7,7 +7,6 @@ import 'package:dragonfly_js/dragonfly_js.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:dragonfly_navigation/src/css/css_browser_theme.dart';
 import 'package:dragonfly_navigation/src/html/dom.dart';
-import 'package:dragonfly_navigation/src/utils/network_tracker.dart';
 import 'package:html/dom.dart';
 
 import 'package:http/http.dart' as http;
@@ -100,7 +99,9 @@ class Tab {
 
         if (linkCssNode != null) {
           final href = linkCssNode.attributes["href"];
-          cssom = await getCss(Uri.parse(url).replace(path: href));
+          final a = await tracker.request(
+              Uri.parse(url).replace(path: href).toString(), "GET", {});
+          cssom = cssomBuilder.parse(utf8.decode(a!.body));
         }
       }
 
