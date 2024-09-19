@@ -101,7 +101,12 @@ class Tab {
           final href = linkCssNode.attributes["href"];
           final a = await tracker.request(
               Uri.parse(url).replace(path: href).toString(), "GET", {});
-          cssom = cssomBuilder.parse(utf8.decode(a!.body));
+
+          try {
+            cssom = cssomBuilder.parse(utf8.decode(a!.body));
+          } catch (e) {
+            cssom = null;
+          }
         }
       }
 
@@ -169,9 +174,16 @@ class Tab {
       if (document != null) {
         final linkCssNode =
             document.querySelectorAll('link[rel="stylesheet"]').firstOrNull;
+
         if (linkCssNode != null) {
           final href = linkCssNode.attributes["href"];
-          cssom = await getCss(Uri.parse(url).replace(path: href));
+          final a = await tracker.request(
+              Uri.parse(url).replace(path: href).toString(), "GET", {});
+          try {
+            cssom = cssomBuilder.parse(utf8.decode(a!.body));
+          } catch (e) {
+            cssom = null;
+          }
         }
       }
 
@@ -337,23 +349,6 @@ Future<Document?> getHttp(Uri uri) async {
 
     // TODO : check the errors (404, etc)
     return DomBuilder.parse(page.body);
-  } catch (e) {
-    print(e);
-    // TODO : bad error handling but tired of that s***
-    return null;
-  }
-}
-
-Future<CssomTree?> getCss(Uri uri) async {
-  try {
-    final page = await http.get(
-      uri,
-      headers: {
-        "User-Agent": "DragonFly/1.0",
-      },
-    );
-
-    return cssomBuilder.parse(page.body);
   } catch (e) {
     print(e);
     // TODO : bad error handling but tired of that s***
