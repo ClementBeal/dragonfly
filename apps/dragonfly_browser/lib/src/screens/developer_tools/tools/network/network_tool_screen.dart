@@ -1,5 +1,9 @@
+import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/developer_tools/tools/network/widgets/request_datatable.dart';
+import 'package:dragonfly/src/screens/settings/cubit/settings_cubit.dart';
+import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NetworkToolScreen extends StatelessWidget {
   const NetworkToolScreen({super.key});
@@ -56,16 +60,29 @@ class _ContentRequestSelectionBarState
     return Container(
       height: 50,
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: ListView.builder(
-        itemCount: contentRequests.length,
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) => GestureDetector(
-          onTap: () => _updateSelection(index),
-          child: ContentRequestSelection(
-            contentType: contentRequests[index],
-            isSelected: selectedContent[index],
+      child: Row(
+        spacing: 12,
+        children: [
+          GestureDetector(
+            onTap: () {
+              context.read<BrowserCubit>().cleanNetworkTool();
+            },
+            child: Icon(Icons.delete),
           ),
-        ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: contentRequests.length,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) => GestureDetector(
+                onTap: () => _updateSelection(index),
+                child: ContentRequestSelection(
+                  contentType: contentRequests[index],
+                  isSelected: selectedContent[index],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

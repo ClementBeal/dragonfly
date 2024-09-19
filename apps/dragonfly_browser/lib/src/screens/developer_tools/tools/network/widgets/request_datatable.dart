@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:data_table_2/data_table_2.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
+import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -43,8 +44,6 @@ class _NetworkRequestDataTableState extends State<NetworkRequestDataTable> {
           setState(() {
             requests = [...requests, event];
           });
-
-          print(event);
         },
       );
     });
@@ -60,7 +59,6 @@ class _NetworkRequestDataTableState extends State<NetworkRequestDataTable> {
   Widget build(BuildContext context) {
     return BlocListener<BrowserCubit, Browser>(
       listener: (context, state) {
-        print(state.currentTab);
         listenNewTracker();
       },
       child: DataTable2(
@@ -68,7 +66,7 @@ class _NetworkRequestDataTableState extends State<NetworkRequestDataTable> {
         horizontalMargin: 12,
         minWidth: 600,
         columns: const [
-          DataColumn(
+          DataColumn2(
             label: Text(
               "Status",
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -80,7 +78,8 @@ class _NetworkRequestDataTableState extends State<NetworkRequestDataTable> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-          DataColumn(
+          DataColumn2(
+            size: ColumnSize.L,
             label: Text(
               "Domain",
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -92,7 +91,8 @@ class _NetworkRequestDataTableState extends State<NetworkRequestDataTable> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-          DataColumn(
+          DataColumn2(
+            size: ColumnSize.L,
             label: Text(
               "URL",
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -116,7 +116,8 @@ class _NetworkRequestDataTableState extends State<NetworkRequestDataTable> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-          DataColumn(
+          DataColumn2(
+            size: ColumnSize.S,
             label: Text(
               "Duration",
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -129,23 +130,27 @@ class _NetworkRequestDataTableState extends State<NetworkRequestDataTable> {
                     DataCell(
                       StatusCodeChip(statusCode: e.response?.statusCode ?? 0),
                     ),
-                    DataCell(Text("GET")),
-                    DataCell(Text(Uri.parse(e.url).host)),
-                    DataCell(Text(Uri.parse(e.url).path)),
+                    DataCell(TextDatacell("GET")),
+                    DataCell(TextDatacell(Uri.parse(e.url).host)),
+                    DataCell(TextDatacell(Uri.parse(e.url).path)),
+                    DataCell(TextDatacell(e.url)),
+                    DataCell(TextDatacell("text/html")),
                     DataCell(
-                      Tooltip(
-                        child: Text(
-                          e.url,
-                          overflow: TextOverflow.ellipsis,
+                      TextDatacell(
+                        formatBytes(
+                          e.response?.contentLengthCompressed ?? 0,
+                          decimals: 0,
                         ),
-                        message: e.url,
                       ),
                     ),
-                    DataCell(Text("text/html")),
-                    DataCell(Text(
-                        (e.response?.contentLengthCompressed ?? 0).toString())),
-                    DataCell(Text(
-                        (e.response?.contentLengthCompressed ?? 0).toString())),
+                    DataCell(
+                      TextDatacell(
+                        formatBytes(
+                          e.response?.contentLengthUncompressed ?? 0,
+                          decimals: 0,
+                        ),
+                      ),
+                    ),
                     DataCell(RequestDurationCell(
                       request: e,
                     )),
@@ -201,6 +206,27 @@ class StatusCodeChip extends StatelessWidget {
             color: Colors.white,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class TextDatacell extends StatelessWidget {
+  const TextDatacell(this.text, {super.key});
+
+  final String? text;
+
+  @override
+  Widget build(BuildContext context) {
+    if (text == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Tooltip(
+      message: text,
+      child: Text(
+        text!,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

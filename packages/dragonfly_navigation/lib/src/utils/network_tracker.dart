@@ -53,6 +53,8 @@ class NetworkTracker {
 
       final responseBody = await response.stream.toBytes();
 
+      print(response.headers);
+
       final responseToReturn = NetworkResponse(
         statusCode: response.statusCode,
         headers: response.headers,

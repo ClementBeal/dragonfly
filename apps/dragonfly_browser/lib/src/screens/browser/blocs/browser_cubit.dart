@@ -82,4 +82,9 @@ class BrowserCubit extends Cubit<Browser> {
 
     emit(state.copyWith());
   }
+
+  void cleanNetworkTool() {
+    state.currentTab?.tracker.clear();
+    emit(state.copyWith());
+  }
 }
