@@ -38,9 +38,12 @@ class NetworkTracker {
         request.headers[v.key] = v.value;
       }
 
+      request.headers["User-Agent"] = "DragonFly/1.0";
+
       final networkRequest = NetworkRequest(
         url: url,
-        headers: headers,
+        headers: request.headers,
+        method: method,
       );
 
       history.add(networkRequest);
@@ -52,8 +55,6 @@ class NetworkTracker {
       );
 
       final responseBody = await response.stream.toBytes();
-
-      print(response.headers);
 
       final responseToReturn = NetworkResponse(
         statusCode: response.statusCode,
@@ -91,9 +92,14 @@ class NetworkRequest {
   late NetworkResponse? response;
   final String url;
   final Map<String, String> headers;
+  final String method;
   late final DateTime timestamp;
 
-  NetworkRequest({required this.url, required this.headers}) {
+  NetworkRequest({
+    required this.url,
+    required this.headers,
+    required this.method,
+  }) {
     timestamp = DateTime.now();
     response = null;
   }

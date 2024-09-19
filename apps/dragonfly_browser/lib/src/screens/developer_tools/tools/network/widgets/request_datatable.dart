@@ -19,6 +19,8 @@ class _NetworkRequestDataTableState extends State<NetworkRequestDataTable> {
   late List<NetworkRequest> requests;
   StreamSubscription<NetworkRequest>? stream;
 
+  NetworkRequest? selectedRequest;
+
   @override
   void initState() {
     super.initState();
@@ -61,102 +63,118 @@ class _NetworkRequestDataTableState extends State<NetworkRequestDataTable> {
       listener: (context, state) {
         listenNewTracker();
       },
-      child: DataTable2(
-        columnSpacing: 12,
-        horizontalMargin: 12,
-        minWidth: 600,
-        columns: const [
-          DataColumn2(
-            label: Text(
-              "Status",
-              style: TextStyle(fontWeight: FontWeight.bold),
+      child: Column(
+        children: [
+          Expanded(
+            child: DataTable2(
+              columnSpacing: 12,
+              horizontalMargin: 12,
+              minWidth: 600,
+              columns: const [
+                DataColumn2(
+                  label: Text(
+                    "Status",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    "Method",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                DataColumn2(
+                  size: ColumnSize.L,
+                  label: Text(
+                    "Domain",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    "File",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                DataColumn2(
+                  size: ColumnSize.L,
+                  label: Text(
+                    "URL",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    "Type",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    "Transferred",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    "Size",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                DataColumn2(
+                  size: ColumnSize.S,
+                  label: Text(
+                    "Duration",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+              rows: requests
+                  .map((e) => DataRow(
+                        onSelectChanged: (value) {
+                          setState(() {
+                            selectedRequest = (value ?? false) ? e : null;
+                          });
+                        },
+                        cells: [
+                          DataCell(
+                            StatusCodeChip(
+                                statusCode: e.response?.statusCode ?? 0),
+                          ),
+                          DataCell(TextWithTooltip("GET")),
+                          DataCell(TextWithTooltip(Uri.parse(e.url).host)),
+                          DataCell(TextWithTooltip(Uri.parse(e.url).path)),
+                          DataCell(TextWithTooltip(e.url)),
+                          DataCell(TextWithTooltip("text/html")),
+                          DataCell(
+                            TextWithTooltip(
+                              formatBytes(
+                                e.response?.contentLengthCompressed ?? 0,
+                                decimals: 0,
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            TextWithTooltip(
+                              formatBytes(
+                                e.response?.contentLengthUncompressed ?? 0,
+                                decimals: 0,
+                              ),
+                            ),
+                          ),
+                          DataCell(RequestDurationCell(
+                            request: e,
+                          )),
+                        ],
+                      ))
+                  .toList(),
             ),
           ),
-          DataColumn(
-            label: Text(
-              "Method",
-              style: TextStyle(fontWeight: FontWeight.bold),
+          if (selectedRequest != null)
+            RequestDetailsPanel(
+              request: selectedRequest!,
             ),
-          ),
-          DataColumn2(
-            size: ColumnSize.L,
-            label: Text(
-              "Domain",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          DataColumn(
-            label: Text(
-              "File",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          DataColumn2(
-            size: ColumnSize.L,
-            label: Text(
-              "URL",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          DataColumn(
-            label: Text(
-              "Type",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          DataColumn(
-            label: Text(
-              "Transferred",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          DataColumn(
-            label: Text(
-              "Size",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          DataColumn2(
-            size: ColumnSize.S,
-            label: Text(
-              "Duration",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
         ],
-        rows: requests
-            .map((e) => DataRow(
-                  cells: [
-                    DataCell(
-                      StatusCodeChip(statusCode: e.response?.statusCode ?? 0),
-                    ),
-                    DataCell(TextDatacell("GET")),
-                    DataCell(TextDatacell(Uri.parse(e.url).host)),
-                    DataCell(TextDatacell(Uri.parse(e.url).path)),
-                    DataCell(TextDatacell(e.url)),
-                    DataCell(TextDatacell("text/html")),
-                    DataCell(
-                      TextDatacell(
-                        formatBytes(
-                          e.response?.contentLengthCompressed ?? 0,
-                          decimals: 0,
-                        ),
-                      ),
-                    ),
-                    DataCell(
-                      TextDatacell(
-                        formatBytes(
-                          e.response?.contentLengthUncompressed ?? 0,
-                          decimals: 0,
-                        ),
-                      ),
-                    ),
-                    DataCell(RequestDurationCell(
-                      request: e,
-                    )),
-                  ],
-                ))
-            .toList(),
       ),
     );
   }
@@ -211,8 +229,8 @@ class StatusCodeChip extends StatelessWidget {
   }
 }
 
-class TextDatacell extends StatelessWidget {
-  const TextDatacell(this.text, {super.key});
+class TextWithTooltip extends StatelessWidget {
+  const TextWithTooltip(this.text, {super.key});
 
   final String? text;
 
@@ -230,4 +248,140 @@ class TextDatacell extends StatelessWidget {
       ),
     );
   }
+}
+
+class RequestDetailsPanel extends StatelessWidget {
+  const RequestDetailsPanel({super.key, required this.request});
+
+  final NetworkRequest request;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          spacing: 12,
+          children: [
+            Text(request.method),
+            Expanded(child: TextWithTooltip(request.url)),
+          ],
+        ),
+        Divider(),
+        Table(
+          children: [
+            TableRow(
+              children: [
+                Text("Status"),
+                Text(request.response!.statusCode.toString()),
+              ],
+            ),
+          ],
+        ),
+        Divider(),
+        HeadersTable(
+          title: "Request headers",
+          headers: request.headers,
+        ),
+        Divider(),
+        if (request.response != null)
+          HeadersTable(
+            title: "Response headers",
+            headers: request.response!.headers,
+          ),
+      ],
+    );
+  }
+}
+
+class HeadersTable extends StatefulWidget {
+  const HeadersTable({
+    super.key,
+    required this.headers,
+    required this.title,
+  });
+
+  final Map<String, String> headers;
+  final String title;
+
+  @override
+  State<HeadersTable> createState() => _HeadersTableState();
+}
+
+class _HeadersTableState extends State<HeadersTable> {
+  bool isOpen = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final headerWeigth = widget.headers.entries.fold(
+      0,
+      (previousValue, element) =>
+          previousValue + element.key.length + element.value.length,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            children: [
+              GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      isOpen = !isOpen;
+                    });
+                  },
+                  child: Icon(
+                      (isOpen) ? Icons.arrow_drop_down : Icons.arrow_right)),
+              Text(
+                "${widget.title} (${formatBytes(headerWeigth, decimals: 0)})",
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ),
+        ),
+        if (isOpen)
+          ListView.separated(
+            padding: EdgeInsets.symmetric(horizontal: 24),
+            shrinkWrap: true,
+            itemCount: widget.headers.length,
+            separatorBuilder: (context, index) => SizedBox(height: 4),
+            itemBuilder: (context, index) {
+              final entry = widget.headers.entries.elementAt(index);
+
+              return RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: capitalizeHttpHeader(entry.key),
+                      style: TextStyle(
+                        color: Colors.blue,
+                      ),
+                    ),
+                    TextSpan(text: "   :   "),
+                    TextSpan(
+                      text: entry.value,
+                      style: TextStyle(
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+      ],
+    );
+  }
+}
+
+String capitalizeHttpHeader(String header) {
+  if (header.isEmpty) {
+    return header; // Return empty string if input is empty
+  }
+  return header
+      .split('-')
+      .map((part) => part.trim().toLowerCase())
+      .map((part) => part[0].toUpperCase() + part.substring(1))
+      .join('-');
 }
