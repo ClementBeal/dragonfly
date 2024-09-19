@@ -1,7 +1,5 @@
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/developer_tools/tools/network/widgets/request_datatable.dart';
-import 'package:dragonfly/src/screens/settings/cubit/settings_cubit.dart';
-import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

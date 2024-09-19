@@ -172,8 +172,11 @@ class _NetworkRequestDataTableState extends State<NetworkRequestDataTable> {
           ),
           if (selectedRequest != null)
             SelectionArea(
-              child: RequestDetailsPanel(
-                request: selectedRequest!,
+              child: SizedBox(
+                height: 220,
+                child: RequestDetailsPanel(
+                  request: selectedRequest!,
+                ),
               ),
             ),
         ],
@@ -259,38 +262,40 @@ class RequestDetailsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          spacing: 12,
-          children: [
-            Text(request.method),
-            Expanded(child: TextWithTooltip(request.url)),
-          ],
-        ),
-        Divider(),
-        Table(
-          children: [
-            TableRow(
-              children: [
-                Text("Status"),
-                Text(request.response!.statusCode.toString()),
-              ],
-            ),
-          ],
-        ),
-        Divider(),
-        HeadersTable(
-          title: "Request headers",
-          headers: request.headers,
-        ),
-        Divider(),
-        if (request.response != null)
-          HeadersTable(
-            title: "Response headers",
-            headers: request.response!.headers,
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Row(
+            spacing: 12,
+            children: [
+              Text(request.method),
+              Expanded(child: TextWithTooltip(request.url)),
+            ],
           ),
-      ],
+          Divider(),
+          Table(
+            children: [
+              TableRow(
+                children: [
+                  Text("Status"),
+                  Text(request.response!.statusCode.toString()),
+                ],
+              ),
+            ],
+          ),
+          Divider(),
+          HeadersTable(
+            title: "Request headers",
+            headers: request.headers,
+          ),
+          Divider(),
+          if (request.response != null)
+            HeadersTable(
+              title: "Response headers",
+              headers: request.response!.headers,
+            ),
+        ],
+      ),
     );
   }
 }
