@@ -2,43 +2,31 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 
-/// The [NetworkTracker] keeps an history of all the requests.
-///
-/// Each new request and its update are sent via a stream.
+/// Tracks all network requests and responses.
+/// Each request and its updates are broadcast via a stream.
 class NetworkTracker {
-  late final List<NetworkRequest> history;
+  final List<NetworkRequest> history = [];
+  final _requestStreamController = StreamController<NetworkRequest>.broadcast();
+
   late final http.Client httpClient;
-  late Stream<NetworkRequest> requestStream;
-  late StreamController<NetworkRequest> _requestStreamController;
 
   NetworkTracker({
     http.Client? httpClient,
-  }) {
-    history = [];
-    _requestStreamController = StreamController.broadcast();
-    requestStream = _requestStreamController.stream;
-    this.httpClient = httpClient ?? http.Client();
-  }
+  }) : httpClient = httpClient ?? http.Client();
 
-  /// Launch a request to the specified [url] and with the specified [headers]
-  ///
-  /// All the exceptions will be caught.
+  Stream<NetworkRequest> get requestStream => _requestStreamController.stream;
+
+  /// Sends a request to the specified [url] using the given [method] and [headers].
+  /// Any exceptions will be caught, and null will be returned in case of errors.
   Future<NetworkResponse?> request(
     String url,
     String method,
     Map<String, String> headers,
   ) async {
     try {
-      final request = http.Request(
-        method,
-        Uri.parse(url),
-      );
-
-      for (var v in headers.entries) {
-        request.headers[v.key] = v.value;
-      }
-
-      request.headers["User-Agent"] = "DragonFly/1.0";
+      final request = http.Request(method, Uri.parse(url))
+        ..headers.addAll(headers)
+        ..headers["User-Agent"] = "DragonFly/1.0";
 
       final networkRequest = NetworkRequest(
         url: url,
@@ -47,16 +35,12 @@ class NetworkTracker {
       );
 
       history.add(networkRequest);
-
       _requestStreamController.sink.add(networkRequest);
 
-      final response = await httpClient.send(
-        request,
-      );
-
+      final response = await httpClient.send(request);
       final responseBody = await response.stream.toBytes();
 
-      final responseToReturn = NetworkResponse(
+      final networkResponse = NetworkResponse(
         statusCode: response.statusCode,
         headers: response.headers,
         body: responseBody,
@@ -64,15 +48,10 @@ class NetworkTracker {
         contentLengthUncompressed: responseBody.length,
       );
 
-      history
-          .firstWhere(
-            (e) => e == networkRequest,
-          )
-          .response = responseToReturn;
-
+      networkRequest.response = networkResponse;
       _requestStreamController.sink.add(networkRequest);
 
-      return responseToReturn;
+      return networkResponse;
     } catch (e) {
       return null;
     }
@@ -81,15 +60,13 @@ class NetworkTracker {
   /// Clear the history
   ///
   /// Must be called each time than the browser makes a new request
-  void clear() {
-    history.clear();
-  }
+  void clear() => history.clear();
 }
 
 /// Store the all the information of a network request.
 /// May contains a [response].
 class NetworkRequest {
-  late NetworkResponse? response;
+  NetworkResponse? response;
   final String url;
   final Map<String, String> headers;
   final String method;
@@ -103,14 +80,15 @@ class NetworkRequest {
     required this.method,
   }) {
     timestamp = DateTime.now();
-    response = null;
 
+    // the `fold` is summing the length of the key and the value
+    // because the structure is like this "...": "..."
+    //                                    |   ||||   |
+    // we have to add 6 characters for each entry
     headersLength = headers.entries.fold(
-          0,
-          (previousValue, element) =>
-              previousValue + element.key.length + element.value.length,
-        ) +
-        6 * headers.length;
+      0,
+      (sum, header) => sum + header.key.length + header.value.length + 6,
+    );
   }
 }
 
@@ -134,11 +112,13 @@ class NetworkResponse {
   }) {
     timestamp = DateTime.now();
 
+    // the `fold` is summing the length of the key and the value
+    // because the structure is like this "...": "..."
+    //                                    |   ||||   |
+    // we have to add 6 characters for each entry
     headersLength = headers.entries.fold(
-          0,
-          (previousValue, element) =>
-              previousValue + element.key.length + element.value.length,
-        ) +
-        6 * headers.length;
+      0,
+      (sum, header) => sum + header.key.length + header.value.length + 6,
+    );
   }
 }
