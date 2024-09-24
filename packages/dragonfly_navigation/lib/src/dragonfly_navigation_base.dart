@@ -70,7 +70,7 @@ class Tab {
         final titleTags = document.getElementsByTagName("title");
 
         if (titleTags.isNotEmpty) {
-          navigationHistory.addLink(uriRequest, titleTags.first.text);
+          navigationHistory.addLink(uriRequest, titleTags.first.text.trim());
         }
 
         final linkCssNode =
