@@ -24,8 +24,12 @@ class Tab {
   bool isPinned = false;
   int order;
   final NetworkTracker tracker = NetworkTracker();
+  final NavigationHistory navigationHistory;
 
-  Tab({required this.order}) {
+  Tab({
+    required this.order,
+    required this.navigationHistory,
+  }) {
     guid = Uuid().v4();
     interpreter = JavascriptInterpreter();
   }
@@ -63,6 +67,11 @@ class Tab {
 
       if (htmlRequest != null) {
         document = DomBuilder.parse(utf8.decode(htmlRequest.body));
+        final titleTags = document.getElementsByTagName("title");
+
+        if (titleTags.isNotEmpty) {
+          navigationHistory.addLink(uriRequest, titleTags.first.text);
+        }
 
         final linkCssNode =
             document.querySelectorAll('link[rel="stylesheet"]').firstOrNull;
@@ -230,8 +239,13 @@ class Browser {
   late List<Tab> tabs;
   String? currentTabGuid;
   Function()? onUpdate;
+  NavigationHistory navigationHistory;
 
-  Browser({List<Tab>? tabs, this.currentTabGuid}) {
+  Browser(
+    this.navigationHistory, {
+    List<Tab>? tabs,
+    this.currentTabGuid,
+  }) {
     this.tabs = tabs ?? [];
   }
 
@@ -243,6 +257,7 @@ class Browser {
 
   Browser copyWith({List<Tab>? tabs, String? currentTabGuid}) {
     return Browser(
+      navigationHistory,
       tabs: tabs ?? this.tabs,
       currentTabGuid: currentTabGuid ?? this.currentTabGuid,
     )..onUpdate = onUpdate;
@@ -251,7 +266,10 @@ class Browser {
   void openNewTab(String? initialUrl, {bool switchTab = true}) {
     final lastOrder =
         tabs.where((e) => !e.isPinned).map((e) => e.order).maxOrNull;
-    final newTab = Tab(order: (lastOrder ?? -1) + 1);
+    final newTab = Tab(
+      order: (lastOrder ?? -1) + 1,
+      navigationHistory: navigationHistory,
+    );
 
     if (initialUrl != null) {
       newTab.navigateTo(initialUrl, onUpdate ?? () {});

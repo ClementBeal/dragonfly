@@ -1,8 +1,9 @@
+import 'package:dragonfly/main.dart';
 import 'package:dragonfly_navigation/dragonfly_navigation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BrowserCubit extends Cubit<Browser> {
-  BrowserCubit() : super(Browser()) {
+  BrowserCubit(super.initialState) {
     state.onUpdate = _onUpdate;
   }
 

@@ -20,7 +20,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final dbManager = DatabaseManager();
-  dbManager.initializeInMemory();
+  final db = dbManager.initializeInMemory();
+
+  navigationHistory = NavigationHistory(db);
 
   await windowManager.ensureInitialized();
   Highlighter.initialize(['../../../assets/languages/html']);
@@ -64,7 +66,13 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => BrowserCubit()),
+        BlocProvider(
+          create: (context) => BrowserCubit(
+            Browser(
+              navigationHistory,
+            ),
+          ),
+        ),
         BlocProvider(create: (context) => FileExplorerCubit()),
         BlocProvider(create: (context) => SettingsCubit()),
         BlocProvider(create: (context) => BrowserInterfaceCubit()),

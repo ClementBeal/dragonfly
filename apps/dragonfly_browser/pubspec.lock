@@ -162,7 +162,7 @@ packages:
     source: hosted
     version: "0.4.4"
   dragonfly_browservault:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       path: "../../packages/dragonfly_browservault"
       relative: true
