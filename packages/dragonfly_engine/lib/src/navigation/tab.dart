@@ -180,7 +180,10 @@ class Tab {
         url: url,
       );
 
-      final document = await getHttp(Uri.parse(url));
+      final httpRequest = await tracker.request(url, "GET", {});
+      final document = (httpRequest != null)
+          ? DomBuilder.parse(String.fromCharCodes(httpRequest.body))
+          : null;
       CssomTree? cssom;
 
       if (document != null) {
@@ -202,7 +205,7 @@ class Tab {
       _history.last = HtmlPage(
         document: document,
         cssom: cssom,
-        status: (document != null) ? PageStatus.success : PageStatus.error,
+        status: (httpRequest != null) ? PageStatus.success : PageStatus.error,
         url: url,
       );
     } else if (scheme == "file") {
@@ -222,14 +225,14 @@ class Tab {
     onNavigationDone();
   }
 
+  bool canGoBack() => _currentIndex > 0;
+  bool canGoForward() => _currentIndex < _history.length - 1;
+
   void goBack() {
     if (canGoBack()) {
       _currentIndex--;
     }
   }
-
-  bool canGoBack() => _currentIndex > 0;
-  bool canGoForward() => _currentIndex < _history.length - 1;
 
   void goForward() {
     if (canGoForward()) {
@@ -239,21 +242,3 @@ class Tab {
 }
 
 final cssomBuilder = CssomBuilder();
-
-Future<Document?> getHttp(Uri uri) async {
-  try {
-    final page = await http.get(
-      uri,
-      headers: {
-        "User-Agent": "DragonFly/1.0",
-      },
-    );
-
-    // TODO : check the errors (404, etc)
-    return DomBuilder.parse(page.body);
-  } catch (e) {
-    print(e);
-    // TODO : bad error handling but tired of that s***
-    return null;
-  }
-}
