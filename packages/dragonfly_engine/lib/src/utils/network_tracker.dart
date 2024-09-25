@@ -46,7 +46,6 @@ class NetworkTracker {
       NetworkResponse networkResponse;
 
       if (cachedImage != null) {
-        print("It's in the cache");
         final body = await File.fromUri(cachedImage!.path).readAsBytes();
 
         networkResponse = NetworkResponse(
