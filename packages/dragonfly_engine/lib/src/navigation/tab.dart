@@ -199,6 +199,9 @@ class Tab {
   void togglePin() => isPinned = !isPinned;
 
   /// Checks if the tab can navigate back in history.
+  bool canRefresh() => _currentIndex >= 0;
+
+  /// Checks if the tab can navigate back in history.
   bool canGoBack() => _currentIndex > 0;
 
   /// Checks if the tab can navigate forward in history.

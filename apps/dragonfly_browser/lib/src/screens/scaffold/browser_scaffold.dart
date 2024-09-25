@@ -222,9 +222,16 @@ class BrowserActionBar extends StatelessWidget {
               ),
             ),
             IconButton(
-              onPressed: () {
-                context.read<BrowserCubit>().refresh();
-              },
+              onPressed: (context
+                          .watch<BrowserCubit>()
+                          .state
+                          .currentTab
+                          ?.canRefresh() ??
+                      false)
+                  ? () {
+                      context.read<BrowserCubit>().refresh();
+                    }
+                  : null,
               icon: const Icon(Icons.refresh),
             ),
           ],
