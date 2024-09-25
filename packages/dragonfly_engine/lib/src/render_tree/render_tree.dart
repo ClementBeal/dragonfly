@@ -91,7 +91,7 @@ class BrowserRenderTree {
 
     if (element.localName! == "a") {
       return RenderTreeLink(
-        link: element.attributes["href"]!,
+        link: element.attributes["href"] ?? "",
         marginBottom: c.marginBottomConverted,
         marginLeft: c.marginLeftConverted,
         marginTop: c.marginTopConverted,

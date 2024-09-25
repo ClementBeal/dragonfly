@@ -212,6 +212,17 @@ class Tab {
   Future<Uint8List?> downloadImage(
     String imageUrl,
   ) async {
+    if (imageUrl.startsWith("data:")) {
+      final base64Data = imageUrl.split(',').last;
+
+      try {
+        return base64Decode(base64Data);
+      } catch (e) {
+        print("Error decoding base64 image: $e");
+        return null;
+      }
+    }
+
     final baseUri = _history.last.uri;
     // Resolve the image URL to a full URI.
     Uri goodUrl;
