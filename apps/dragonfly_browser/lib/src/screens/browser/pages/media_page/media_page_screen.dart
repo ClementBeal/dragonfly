@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:dragonfly/src/constants/file_constants.dart';
 import 'package:flutter/material.dart';
-import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_engine/dragonfly_engine.dart';
 
 class MediaPageScreen extends StatelessWidget {
   const MediaPageScreen({super.key, required this.page});

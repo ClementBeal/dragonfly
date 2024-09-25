@@ -1,7 +1,7 @@
 import 'package:dragonfly/main.dart';
 import 'package:dragonfly/src/screens/scaffold/widgets/favicon_icon.dart';
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
-import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 

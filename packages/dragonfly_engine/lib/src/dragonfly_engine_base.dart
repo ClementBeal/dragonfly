@@ -4,9 +4,9 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:dragonfly_js/dragonfly_js.dart';
-import 'package:dragonfly_navigation/dragonfly_navigation.dart';
-import 'package:dragonfly_navigation/src/css/css_browser_theme.dart';
-import 'package:dragonfly_navigation/src/html/dom.dart';
+import 'package:dragonfly_engine/dragonfly_engine.dart';
+import 'package:dragonfly_engine/src/css/css_browser_theme.dart';
+import 'package:dragonfly_engine/src/html/dom.dart';
 import 'package:html/dom.dart';
 
 import 'package:http/http.dart' as http;

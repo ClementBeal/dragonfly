@@ -13,7 +13,7 @@ import 'package:dragonfly/src/widgets/docking.dart';
 import 'package:dragonfly/utils/extensions/list.dart';
 import 'package:dragonfly/utils/responsiveness.dart';
 import 'package:dragonfly/utils/url_detection.dart';
-import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart' hide Tab;
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

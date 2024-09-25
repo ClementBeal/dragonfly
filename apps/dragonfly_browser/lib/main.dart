@@ -7,7 +7,7 @@ import 'package:dragonfly/src/screens/settings/cubit/settings_cubit.dart';
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 import 'package:window_manager/window_manager.dart';

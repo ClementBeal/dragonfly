@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
-import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
