@@ -228,9 +228,6 @@ class Tab {
 
     final imageResponse = await tracker.request(goodUrl, "GET", {});
 
-    print(imageResponse?.statusCode);
-    print(imageResponse?.headers);
-
     return imageResponse?.body;
   }
 

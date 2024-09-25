@@ -1,4 +1,5 @@
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
+import 'package:dragonfly/src/screens/browser/blocs/render_screen_cubit.dart';
 import 'package:dragonfly/src/screens/browser/browser_theme.dart';
 import 'package:dragonfly/src/screens/browser/helpers/color_utils.dart';
 import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
@@ -85,7 +86,8 @@ class RenderPageWidget extends StatelessWidget {
             HtmlPage page => CSSOMProvider(
                 cssom: page.cssom ?? cssomBuilder.browserStyle!,
                 child: (page.document!.documentElement != null)
-                    ? Builder(builder: (context) {
+                    ? BlocBuilder<RenderScreenCubit, RenderScreenState>(
+                        builder: (context, state) {
                         // TO DO
                         // dirty hack for testing purpose
                         // it has to be moded to a special package
@@ -97,7 +99,29 @@ class RenderPageWidget extends StatelessWidget {
                           initialRoute: page.uri.toString(),
                         ).parse();
 
-                        return TreeRenderer(renderTree.child);
+                        return Stack(
+                          children: [
+                            TreeRenderer(renderTree.child),
+                            if (state.hoveredLink != null)
+                              Align(
+                                alignment: Alignment.bottomLeft,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black87,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      state.hoveredLink!,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
                       })
                     : const SizedBox.shrink(),
               ),
@@ -320,57 +344,69 @@ class TreeRenderer extends StatelessWidget {
                 _ => FontWeight.normal,
               }),
         ),
-      RenderTreeLink r => GestureDetector(
-          onTap: () {
-            final uri =
-                context.read<BrowserCubit>().state.currentTab!.currentPage!.uri;
-            context
-                .read<BrowserCubit>()
-                .navigateToPage(uri.replace(path: r.link));
+      RenderTreeLink r => MouseRegion(
+          onEnter: (event) {
+            context.read<RenderScreenCubit>().setHoveredLink(r.link);
           },
-          child: Container(
-            padding: EdgeInsets.only(
-              bottom: r.paddingBottom ?? 0.0,
-              left: r.paddingLeft ?? 0.0,
-              top: r.paddingTop ?? 0.0,
-              right: r.paddingRight ?? 0.0,
-            ),
-            decoration: BoxDecoration(
-              borderRadius: (r.borderRadius != null)
-                  ? BorderRadius.circular(r.borderRadius!)
-                  : null,
-              color: (r.backgroundColor != null)
-                  ? HexColor.fromHex(r.backgroundColor!)
-                  : null,
-              border: Border(
-                bottom: (r.borderBottomColor != null)
-                    ? BorderSide(
-                        width: r.borderRightWidth ?? 0.0,
-                        color: HexColor.fromHex(r.borderBottomColor!),
-                      )
-                    : BorderSide.none,
-                left: (r.borderLeftColor != null)
-                    ? BorderSide(
-                        width: r.borderLeftWidth ?? 0.0,
-                        color: HexColor.fromHex(r.borderLeftColor!),
-                      )
-                    : BorderSide.none,
-                top: (r.borderTopColor != null)
-                    ? BorderSide(
-                        width: r.borderTopWidth ?? 0.0,
-                        color: HexColor.fromHex(r.borderTopColor!),
-                      )
-                    : BorderSide.none,
-                right: (r.borderRightColor != null)
-                    ? BorderSide(
-                        width: r.borderRightWidth ?? 0.0,
-                        color: HexColor.fromHex(r.borderRightColor!),
-                      )
-                    : BorderSide.none,
+          onExit: (event) {
+            context.read<RenderScreenCubit>().clearHoveredLink();
+          },
+          child: GestureDetector(
+            onTap: () {
+              final uri = context
+                  .read<BrowserCubit>()
+                  .state
+                  .currentTab!
+                  .currentPage!
+                  .uri;
+              context
+                  .read<BrowserCubit>()
+                  .navigateToPage(uri.replace(path: r.link));
+            },
+            child: Container(
+              padding: EdgeInsets.only(
+                bottom: r.paddingBottom ?? 0.0,
+                left: r.paddingLeft ?? 0.0,
+                top: r.paddingTop ?? 0.0,
+                right: r.paddingRight ?? 0.0,
               ),
-            ),
-            child: Column(
-              children: r.children.map((e) => TreeRenderer(e)).toList(),
+              decoration: BoxDecoration(
+                borderRadius: (r.borderRadius != null)
+                    ? BorderRadius.circular(r.borderRadius!)
+                    : null,
+                color: (r.backgroundColor != null)
+                    ? HexColor.fromHex(r.backgroundColor!)
+                    : null,
+                border: Border(
+                  bottom: (r.borderBottomColor != null)
+                      ? BorderSide(
+                          width: r.borderRightWidth ?? 0.0,
+                          color: HexColor.fromHex(r.borderBottomColor!),
+                        )
+                      : BorderSide.none,
+                  left: (r.borderLeftColor != null)
+                      ? BorderSide(
+                          width: r.borderLeftWidth ?? 0.0,
+                          color: HexColor.fromHex(r.borderLeftColor!),
+                        )
+                      : BorderSide.none,
+                  top: (r.borderTopColor != null)
+                      ? BorderSide(
+                          width: r.borderTopWidth ?? 0.0,
+                          color: HexColor.fromHex(r.borderTopColor!),
+                        )
+                      : BorderSide.none,
+                  right: (r.borderRightColor != null)
+                      ? BorderSide(
+                          width: r.borderRightWidth ?? 0.0,
+                          color: HexColor.fromHex(r.borderRightColor!),
+                        )
+                      : BorderSide.none,
+                ),
+              ),
+              child: Column(
+                children: r.children.map((e) => TreeRenderer(e)).toList(),
+              ),
             ),
           ),
         ),
