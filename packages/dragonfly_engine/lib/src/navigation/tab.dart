@@ -138,6 +138,9 @@ class Tab {
         uri: uri,
       );
     } else {
+      print("error here");
+      print(htmlRequest);
+      print(htmlRequest?.statusCode);
       _history.last = HtmlPage(
         document: null,
         cssom: null,
@@ -224,6 +227,7 @@ class Tab {
     }
 
     final baseUri = _history.last.uri;
+
     // Resolve the image URL to a full URI.
     Uri goodUrl;
 
