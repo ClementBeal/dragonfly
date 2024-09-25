@@ -20,7 +20,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final dbManager = DatabaseManager();
-  final db = dbManager.initializeInMemory();
+  final db = dbManager.initialize(".");
 
   navigationHistory = NavigationHistory(db);
 
