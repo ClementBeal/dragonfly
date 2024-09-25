@@ -5,7 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:dragonfly/src/constants/file_constants.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/browser/pages/cubit/file_explorer_cubit.dart';
-import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart' hide Tab;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -41,7 +41,7 @@ class FileExplorerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO : may not work on Windows
-    var parentDirectory = Directory(page.url).parent;
+    var parentDirectory = Directory.fromUri(page.uri).parent;
     final canGoToParent = parentDirectory.path != ".";
     final hasHiddenFile = page.result.firstWhereOrNull(
           (element) => element.name.startsWith("."),
@@ -58,7 +58,7 @@ class FileExplorerCard extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    "Index of ${Uri.parse(Directory(page.url).path).toFilePath()}",
+                    "Index of ${page.uri.toFilePath()}",
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   Row(
@@ -69,7 +69,7 @@ class FileExplorerCard extends StatelessWidget {
                           icon: const Icon(Icons.arrow_upward_rounded),
                           onPressed: () {
                             context.read<BrowserCubit>().navigateToPage(
-                                  parentDirectory.uri.toFilePath(),
+                                  parentDirectory.absolute.uri,
                                 );
                           },
                           label: const Text(
@@ -178,7 +178,7 @@ class ExplorerResultListView extends StatelessWidget {
                           launchUrl(e.path);
                         } else {
                           context.read<BrowserCubit>().navigateToPage(
-                                e.path.toFilePath(),
+                                e.path,
                               );
                         }
                       },

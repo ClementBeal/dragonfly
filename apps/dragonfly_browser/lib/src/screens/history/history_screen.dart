@@ -1,5 +1,7 @@
 import 'package:dragonfly/main.dart';
+import 'package:dragonfly/src/screens/scaffold/widgets/favicon_icon.dart';
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
+import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -98,8 +100,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           link.timestamp.isAfter(
                             DateTime(today.year, today.month),
                           ) &&
-                          link.timestamp
-                              .isBefore(today.subtract(const Duration(days: 7))),
+                          link.timestamp.isBefore(
+                              today.subtract(const Duration(days: 7))),
                     ),
                   HistorySort.month1 => history.where((link) =>
                       link.timestamp.year == today.year &&
@@ -134,8 +136,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   itemCount: sortedHistory
                       .length, // Replace with actual history length
                   itemBuilder: (context, i) {
+                    // final favicon =
+                    //     FileCache.getCacheFile(sortedHistory[i].link);
+
                     return ListTile(
-                      leading: const Icon(Icons.history),
+                      // leading: BrowserImageRender(
+                      //   favicon,
+                      //   onEmpty: () => const Icon(Icons.language),
+                      // ),
                       title: Text(sortedHistory[i].title),
                       subtitle: Text(sortedHistory[i].link.toString()),
                       trailing: IconButton(

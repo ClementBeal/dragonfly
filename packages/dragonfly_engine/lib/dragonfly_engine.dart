@@ -3,8 +3,8 @@
 /// More dartdocs go here.
 library;
 
-export 'src/dragonfly_navigation_base.dart'
-    show Browser, Tab, PageStatus, cssomBuilder;
+export 'src/navigation/browser.dart' show Browser;
+export 'src/navigation/tab.dart' show Tab, cssomBuilder, PageStatus;
 export 'src/pages/a_page.dart'
     show Page, FileExplorerPage, HtmlPage, JsonPage, MediaPage;
 export 'src/css/css_theme.dart' show FontSize, FontSizeType;

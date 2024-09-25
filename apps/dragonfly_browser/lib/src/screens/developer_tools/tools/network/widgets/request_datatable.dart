@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
-import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -78,6 +78,13 @@ class _NetworkRequestDataTableState extends State<NetworkRequestDataTable> {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
+                DataColumn2(
+                  size: ColumnSize.S,
+                  label: Text(
+                    "Is Cached",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
                 DataColumn(
                   label: Text(
                     "Method",
@@ -142,6 +149,9 @@ class _NetworkRequestDataTableState extends State<NetworkRequestDataTable> {
                             StatusCodeChip(
                                 statusCode: e.response?.statusCode ?? 0),
                           ),
+                          DataCell(TextWithTooltip((e.response != null)
+                              ? e.response!.isCached.toString()
+                              : "")),
                           DataCell(TextWithTooltip("GET")),
                           DataCell(TextWithTooltip(Uri.parse(e.url).host)),
                           DataCell(TextWithTooltip(Uri.parse(e.url).path)),

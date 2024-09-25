@@ -25,7 +25,7 @@ The following packages are used by the UI :
 
 `apps/dragonfly_browservault` : contains all the side-features of the browser that needs access to a local database (history, favorites...)
 
-`apps/dragonfly_navigation` : more or less a headless browser that can be controlled with code.
+`apps/dragonfly_engine` : more or less a headless browser that can be controlled with code.
 
 `apps/dragonfly_css_parser` : a CSS parser that create a `Stylesheet` object used by the navigator
 

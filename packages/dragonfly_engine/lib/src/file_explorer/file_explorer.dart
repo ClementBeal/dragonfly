@@ -38,7 +38,7 @@ Future<List<ExplorationResult>> exploreDirectory(Uri path) async {
 
     return ExplorationResult(
       name: p.basename(entity.path),
-      path: Uri.parse(entity.path),
+      path: entity.absolute.uri,
       size: stat.size,
       fileType: entity is File ? FileType.file : FileType.directory,
       lastModified: stat.changed,

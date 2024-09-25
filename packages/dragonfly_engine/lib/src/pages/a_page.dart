@@ -1,4 +1,4 @@
-import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:html/dom.dart';
 import 'package:uuid/uuid.dart';
 import 'package:path/path.dart' as p;
@@ -10,11 +10,11 @@ part 'media_page.dart';
 
 sealed class Page {
   late final String guid;
-  final String url;
+  final Uri uri;
   final PageStatus status;
 
   Page({
-    required this.url,
+    required this.uri,
     required this.status,
     String? guid,
   }) {

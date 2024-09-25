@@ -1,8 +1,9 @@
-import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly/main.dart';
+import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BrowserCubit extends Cubit<Browser> {
-  BrowserCubit() : super(Browser()) {
+  BrowserCubit(super.initialState) {
     state.onUpdate = _onUpdate;
   }
 
@@ -10,8 +11,8 @@ class BrowserCubit extends Cubit<Browser> {
     emit(state.copyWith());
   }
 
-  void openNewTab({String? initialUrl, bool switchTab = false}) {
-    state.openNewTab(initialUrl, switchTab: switchTab);
+  void openNewTab({Uri? initialUri, bool switchTab = false}) {
+    state.openNewTab(initialUri, switchTab: switchTab);
 
     emit(state.copyWith());
   }
@@ -25,7 +26,7 @@ class BrowserCubit extends Cubit<Browser> {
     emit(state.copyWith(currentTabGuid: guid));
   }
 
-  void navigateToPage(String url) {
+  void navigateToPage(Uri url) {
     if (state.currentTab != null) {
       final updatedTab = state.currentTab;
       updatedTab?.navigateTo(url, _onUpdate);

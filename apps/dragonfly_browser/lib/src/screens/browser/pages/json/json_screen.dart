@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart';
 
 class JsonScreen extends StatefulWidget {
@@ -25,7 +25,7 @@ class _JsonScreenState extends State<JsonScreen> {
   }
 
   Future<dynamic> loadJson() async {
-    final content = await File(widget.page.url).readAsString();
+    final content = await File.fromUri(widget.page.uri).readAsString();
     return jsonDecode(content);
   }
 

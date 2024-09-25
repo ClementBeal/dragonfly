@@ -83,9 +83,7 @@ class _FavoriteChipState extends State<FavoriteChip> {
     return GestureDetector(
       onTap: () {
         if (widget.favorite.link != null) {
-          context
-              .read<BrowserCubit>()
-              .navigateToPage(widget.favorite.link!.toString());
+          context.read<BrowserCubit>().navigateToPage(widget.favorite.link!);
         }
       },
       child: MouseRegion(
@@ -119,7 +117,7 @@ class _FavoriteChipState extends State<FavoriteChip> {
                                   if (!e.isFolder) {
                                     context
                                         .read<BrowserCubit>()
-                                        .navigateToPage(e.link!.toString());
+                                        .navigateToPage(e.link!);
                                   }
                                 },
                                 child: FavoriteChip(

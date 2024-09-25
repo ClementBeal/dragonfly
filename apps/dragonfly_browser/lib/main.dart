@@ -1,5 +1,6 @@
 import 'package:dragonfly/config/themes.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
+import 'package:dragonfly/src/screens/browser/blocs/render_screen_cubit.dart';
 import 'package:dragonfly/src/screens/browser/pages/cubit/file_explorer_cubit.dart';
 import 'package:dragonfly/src/screens/scaffold/browser_scaffold.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
@@ -7,7 +8,7 @@ import 'package:dragonfly/src/screens/settings/cubit/settings_cubit.dart';
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 import 'package:window_manager/window_manager.dart';
@@ -20,7 +21,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final dbManager = DatabaseManager();
-  dbManager.initializeInMemory();
+  final db = dbManager.initialize(".");
+
+  navigationHistory = NavigationHistory(db);
 
   await windowManager.ensureInitialized();
   Highlighter.initialize(['../../../assets/languages/html']);
@@ -64,10 +67,17 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => BrowserCubit()),
+        BlocProvider(
+          create: (context) => BrowserCubit(
+            Browser(
+              navigationHistory,
+            ),
+          ),
+        ),
         BlocProvider(create: (context) => FileExplorerCubit()),
         BlocProvider(create: (context) => SettingsCubit()),
         BlocProvider(create: (context) => BrowserInterfaceCubit()),
+        BlocProvider(create: (context) => RenderScreenCubit()),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         buildWhen: (previous, current) =>

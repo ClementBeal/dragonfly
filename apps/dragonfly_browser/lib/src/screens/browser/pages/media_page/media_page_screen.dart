@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:dragonfly/src/constants/file_constants.dart';
 import 'package:flutter/material.dart';
-import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_engine/dragonfly_engine.dart';
 
 class MediaPageScreen extends StatelessWidget {
   const MediaPageScreen({super.key, required this.page});
@@ -12,7 +12,7 @@ class MediaPageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fileExtension = page.url.split(".").last;
+    final fileExtension = page.uri.toFilePath().split(".").last;
 
     return DecoratedBox(
       decoration: const BoxDecoration(
@@ -97,13 +97,13 @@ class _ImageMediaPageState extends State<ImageMediaPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Image.file(
-                      File(widget.page.url),
+                      File.fromUri(widget.page.uri),
                     ),
                   ],
                 ),
               )
             : Image.file(
-                File(widget.page.url),
+                File.fromUri(widget.page.uri),
               ),
       ),
     );
@@ -137,7 +137,7 @@ class _AudioMediaPageState extends State<AudioMediaPage> {
     super.initState();
 
     audioPlayer = AudioPlayer()
-      ..setSourceDeviceFile(Uri.parse(widget.page.url).toFilePath())
+      ..setSourceDeviceFile(widget.page.uri.toFilePath())
       ..resume();
 
     _onPlayerStateChanged = audioPlayer.onPlayerStateChanged.listen(

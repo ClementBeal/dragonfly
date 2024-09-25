@@ -2,22 +2,23 @@ import 'dart:io';
 
 /// Guess the scheme of the input and return a correct URI
 /// Detect if is URL, file or search content
-String detectUrl(String input) {
+Uri detectUrl(String input) {
   input = input.trim();
 
   if (_isUrl(input)) {
     if (!input.startsWith(RegExp(r'https?://'))) {
-      return 'http://$input';
+      return Uri.parse('http://$input');
     }
-    return input;
+    return Uri.parse(input);
   }
 
   if (_isFilePath(input)) {
-    return 'file://$input';
+    return Uri.parse('file://$input');
   }
 
   // Treat as a search query
-  return 'https://www.google.com/search?q=${Uri.encodeComponent(input)}';
+  return Uri.parse(
+      'https://www.google.com/search?q=${Uri.encodeComponent(input)}');
 }
 
 /// Checks if the input is a URL

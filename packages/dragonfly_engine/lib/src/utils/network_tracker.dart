@@ -1,6 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
+import 'package:dragonfly_browservault/dragonfly_browservault.dart';
+import 'package:dragonfly_engine/src/files/cache_file.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as p;
 
 /// Tracks all network requests and responses.
 /// Each request and its updates are broadcast via a stream.
@@ -19,17 +23,17 @@ class NetworkTracker {
   /// Sends a request to the specified [url] using the given [method] and [headers].
   /// Any exceptions will be caught, and null will be returned in case of errors.
   Future<NetworkResponse?> request(
-    String url,
+    Uri uri,
     String method,
     Map<String, String> headers,
   ) async {
     try {
-      final request = http.Request(method, Uri.parse(url))
+      final request = http.Request(method, uri)
         ..headers.addAll(headers)
         ..headers["User-Agent"] = "DragonFly/1.0";
 
       final networkRequest = NetworkRequest(
-        url: url,
+        url: uri.toString(),
         headers: request.headers,
         method: method,
       );
@@ -37,22 +41,51 @@ class NetworkTracker {
       history.add(networkRequest);
       _requestStreamController.sink.add(networkRequest);
 
-      final response = await httpClient.send(request);
-      final responseBody = await response.stream.toBytes();
+      final cachedImage = FileCache.getCacheFile(uri);
 
-      final networkResponse = NetworkResponse(
-        statusCode: response.statusCode,
-        headers: response.headers,
-        body: responseBody,
-        contentLengthCompressed: responseBody.length,
-        contentLengthUncompressed: responseBody.length,
-      );
+      NetworkResponse networkResponse;
+
+      if (cachedImage != null) {
+        final body = await File.fromUri(cachedImage!.path).readAsBytes();
+
+        networkResponse = NetworkResponse(
+          statusCode: 200,
+          headers: {}, // TODO : should we save the headers?
+          body: body,
+          contentLengthCompressed: 0,
+          contentLengthUncompressed: body.length,
+          isCached: true,
+        );
+      } else {
+        final response = await httpClient.send(request);
+        final responseBody = await response.stream.toBytes();
+
+        if (response.statusCode >= 200 && response.statusCode < 300) {
+          if (response.headers["cache-control"] != null) {
+            final cachedUri = FileCache.cacheFile(uri, responseBody);
+            FileCacheRepo(db).addFileToCache(
+              p.basename(cachedUri.toString()),
+              uri.toString(),
+              response.headers["content-type"]!,
+            );
+          }
+        }
+
+        networkResponse = NetworkResponse(
+          statusCode: response.statusCode,
+          headers: response.headers,
+          body: responseBody,
+          contentLengthCompressed: responseBody.length,
+          contentLengthUncompressed: responseBody.length,
+        );
+      }
 
       networkRequest.response = networkResponse;
       _requestStreamController.sink.add(networkRequest);
 
       return networkResponse;
     } catch (e) {
+      print(e);
       return null;
     }
   }
@@ -102,6 +135,7 @@ class NetworkResponse {
   late final int headersLength;
   final int contentLengthUncompressed;
   final int contentLengthCompressed;
+  final bool isCached;
 
   NetworkResponse({
     required this.statusCode,
@@ -109,6 +143,7 @@ class NetworkResponse {
     required this.body,
     required this.contentLengthUncompressed,
     required this.contentLengthCompressed,
+    this.isCached = false,
   }) {
     timestamp = DateTime.now();
 

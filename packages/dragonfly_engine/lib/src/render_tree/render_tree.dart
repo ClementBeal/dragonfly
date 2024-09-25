@@ -1,4 +1,4 @@
-import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:html/dom.dart';
 
 class RenderTree {
@@ -52,7 +52,8 @@ class BrowserRenderTree {
   });
 
   RenderTree parse() {
-    final htmlStyle = cssom.find("html")!.style..convertUnits(16, 16);
+    final htmlStyle = (cssom.find("html")?.style ?? CssStyle(fontSize: "16px"))
+      ..convertUnits(16, 16);
 
     return RenderTree(
       child: RenderTreeView(
@@ -90,7 +91,7 @@ class BrowserRenderTree {
 
     if (element.localName! == "a") {
       return RenderTreeLink(
-        link: element.attributes["href"]!,
+        link: element.attributes["href"] ?? "",
         marginBottom: c.marginBottomConverted,
         marginLeft: c.marginLeftConverted,
         marginTop: c.marginTopConverted,
@@ -133,9 +134,7 @@ class BrowserRenderTree {
       );
     } else if (element.localName! == "img") {
       return RenderTreeImage(
-        link: Uri.parse(initialRoute)
-            .replace(path: element.attributes["src"]!)
-            .toString(),
+        link: element.attributes["src"]!,
         marginBottom: c.marginBottomConverted,
         marginLeft: c.marginLeftConverted,
         marginTop: c.marginTopConverted,

@@ -1,4 +1,4 @@
-import 'package:dragonfly_navigation/src/utils/network_tracker.dart';
+import 'package:dragonfly_engine/src/utils/network_tracker.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
 import 'package:http/http.dart' as http;
@@ -55,7 +55,7 @@ void main() {
           ),
         );
 
-        final response = await tracker.request("url", "GET", {});
+        final response = await tracker.request(Uri(), "GET", {});
 
         expect(tracker.history.length, 1);
 
@@ -81,7 +81,7 @@ void main() {
           ),
         );
 
-        final response = await tracker.request("url", "GET", {});
+        final response = await tracker.request(Uri(), "GET", {});
 
         expect(tracker.history.length, 1);
 
@@ -107,7 +107,7 @@ void main() {
           ),
         );
 
-        final response = await tracker.request("url", "GET", {});
+        final response = await tracker.request(Uri(), "GET", {});
 
         expect(tracker.history.length, 1);
         expect(tracker.history.first.response, response);
@@ -140,7 +140,7 @@ void main() {
           streamMessages.add(message);
         });
 
-        final response = await tracker.request("url", "GET", {});
+        final response = await tracker.request(Uri(), "GET", {});
 
         await Future.delayed(Duration(milliseconds: 100));
         subscription.cancel();

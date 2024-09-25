@@ -13,7 +13,7 @@ import 'package:dragonfly/src/widgets/docking.dart';
 import 'package:dragonfly/utils/extensions/list.dart';
 import 'package:dragonfly/utils/responsiveness.dart';
 import 'package:dragonfly/utils/url_detection.dart';
-import 'package:dragonfly_navigation/dragonfly_navigation.dart';
+import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart' hide Tab;
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -222,9 +222,16 @@ class BrowserActionBar extends StatelessWidget {
               ),
             ),
             IconButton(
-              onPressed: () {
-                context.read<BrowserCubit>().refresh();
-              },
+              onPressed: (context
+                          .watch<BrowserCubit>()
+                          .state
+                          .currentTab
+                          ?.canRefresh() ??
+                      false)
+                  ? () {
+                      context.read<BrowserCubit>().refresh();
+                    }
+                  : null,
               icon: const Icon(Icons.refresh),
             ),
           ],
@@ -263,7 +270,8 @@ class _BrowserSearchBarState extends State<BrowserSearchBar> {
       height: 50,
       child: BlocListener<BrowserCubit, Browser>(
         listener: (context, state) {
-          _searchController.text = state.currentTab?.currentPage?.url ?? "";
+          _searchController.text =
+              state.currentTab?.currentPage?.uri.toString() ?? "";
         },
         child: TextField(
           controller: _searchController,
@@ -272,9 +280,7 @@ class _BrowserSearchBarState extends State<BrowserSearchBar> {
           onEditingComplete: () {
             final formattedUri = detectUrl(_searchController.text);
 
-            context
-                .read<BrowserCubit>()
-                .navigateToPage(formattedUri.toString());
+            context.read<BrowserCubit>().navigateToPage(formattedUri);
           },
           decoration: InputDecoration(
             filled: true,
@@ -303,9 +309,7 @@ class _BrowserSearchBarState extends State<BrowserSearchBar> {
                         onPressed: () {
                           var uri = Uri.parse(_searchController.text);
 
-                          context
-                              .read<BrowserCubit>()
-                              .navigateToPage(uri.toString());
+                          context.read<BrowserCubit>().navigateToPage(uri);
                         },
                         icon: const Icon(Icons.arrow_forward),
                       ),

@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:dragonfly_css_parser/dragonfly_css_parser.dart';
-import 'package:dragonfly_navigation/src/css/css_style.dart';
+import 'package:dragonfly_engine/src/css/css_style.dart';
 
 abstract class CssomNode {}
 
