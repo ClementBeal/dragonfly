@@ -60,6 +60,8 @@ class Tab {
   /// [url] is the URL to navigate to.
   /// [onNavigationDone] is a callback function executed when navigation is complete.
   Future<void> navigateTo(String url, Function() onNavigationDone) async {
+    // remove the history after the current index
+    // it happends when the user has navigated backward
     if (_currentIndex < _history.length - 1) {
       _history.removeRange(_currentIndex + 1, _history.length);
     }
@@ -186,62 +188,8 @@ class Tab {
   ///
   /// [onNavigationDone] is a callback function executed when refresh is complete.
   Future<void> refresh(Function() onNavigationDone) async {
-    final url = _history.last.url;
-
-    // TO DO -> use correct function
-    final scheme = Uri.parse(url).scheme;
-
-    if (scheme == "http" || scheme == "https") {
-      _history.last = HtmlPage(
-        document: null,
-        cssom: null,
-        status: PageStatus.loading,
-        url: url,
-      );
-
-      final httpRequest = await tracker.request(url, "GET", {});
-      final document = (httpRequest != null)
-          ? DomBuilder.parse(String.fromCharCodes(httpRequest.body))
-          : null;
-      CssomTree? cssom;
-
-      if (document != null) {
-        final linkCssNode =
-            document.querySelectorAll('link[rel="stylesheet"]').firstOrNull;
-
-        if (linkCssNode != null) {
-          final href = linkCssNode.attributes["href"];
-          final a = await tracker.request(
-              Uri.parse(url).replace(path: href).toString(), "GET", {});
-          try {
-            cssom = cssomBuilder.parse(utf8.decode(a!.body));
-          } catch (e) {
-            cssom = null;
-          }
-        }
-      }
-
-      _history.last = HtmlPage(
-        document: document,
-        cssom: cssom,
-        status: (httpRequest != null) ? PageStatus.success : PageStatus.error,
-        url: url,
-      );
-    } else if (scheme == "file") {
-      _history.last = FileExplorerPage(
-        [],
-        status: PageStatus.loading,
-        url: url,
-      );
-
-      _history.last = FileExplorerPage(
-        await exploreDirectory(Uri.parse(url)),
-        status: PageStatus.success,
-        url: url,
-      );
-    }
-
-    onNavigationDone();
+    _currentIndex--;
+    navigateTo(_history.last.url, onNavigationDone);
   }
 
   /// Returns the currently displayed page, or null if no page is loaded.
