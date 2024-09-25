@@ -136,13 +136,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   itemCount: sortedHistory
                       .length, // Replace with actual history length
                   itemBuilder: (context, i) {
-                    final favicon =
-                        FileCache.getCacheFile(sortedHistory[i].link);
+                    // final favicon =
+                    //     FileCache.getCacheFile(sortedHistory[i].link);
 
                     return ListTile(
-                      leading: (favicon != null)
-                          ? BrowserImageRender(favicon)
-                          : const Icon(Icons.language),
+                      // leading: BrowserImageRender(
+                      //   favicon,
+                      //   onEmpty: () => const Icon(Icons.language),
+                      // ),
                       title: Text(sortedHistory[i].title),
                       subtitle: Text(sortedHistory[i].link.toString()),
                       trailing: IconButton(

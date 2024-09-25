@@ -151,8 +151,23 @@ class Tab {
     }
   }
 
-  Future<CssomTree?> _downloadCSSFile(Uri uri, String href) async {
-    final response = await tracker.request(uri.replace(path: href), "GET", {});
+  Future<CssomTree?> _downloadCSSFile(Uri baseUri, String href) async {
+    Uri goodUrl;
+
+    if (href.startsWith("/")) {
+      // Relative URL with leading slash, resolve against the base URI.
+      goodUrl = baseUri.replace(path: href);
+    } else if (href.startsWith("http") || href.startsWith("https")) {
+      // Absolute URL, use as-is.
+      goodUrl = Uri.parse(href);
+    } else {
+      // Relative URL without leading slash, resolve against the base URI.
+      final currentPath =
+          baseUri.path.endsWith("/") ? baseUri.path : "${baseUri.path}/";
+      goodUrl = baseUri.replace(path: currentPath + href);
+    }
+
+    final response = await tracker.request(goodUrl, "GET", {});
 
     try {
       if (response != null &&
