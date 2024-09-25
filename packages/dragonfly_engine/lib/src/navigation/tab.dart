@@ -200,8 +200,19 @@ class Tab {
     final href = linkFavicon.attributes["href"];
     if (href == null) return null;
 
-    final faviconUri =
-        href.startsWith("/") ? uri.replace(path: href) : Uri.parse(href);
+    Uri faviconUri;
+
+    if (href.startsWith("/")) {
+      // Relative URL with leading slash, resolve against the base URI.
+      faviconUri = uri.replace(path: href);
+    } else if (href.startsWith("http") || href.startsWith("https")) {
+      // Absolute URL, use as-is.
+      faviconUri = Uri.parse(href);
+    } else {
+      // Relative URL without leading slash, resolve against the base URI.
+      final currentPath = uri.path.endsWith("/") ? uri.path : "${uri.path}/";
+      faviconUri = uri.replace(path: currentPath + href);
+    }
 
     BrowserImage? cachedFavicon = FileCache.getCacheFile(faviconUri);
 
