@@ -25,7 +25,7 @@ class _JsonScreenState extends State<JsonScreen> {
   }
 
   Future<dynamic> loadJson() async {
-    final content = await File(widget.page.url).readAsString();
+    final content = await File.fromUri(widget.page.uri).readAsString();
     return jsonDecode(content);
   }
 

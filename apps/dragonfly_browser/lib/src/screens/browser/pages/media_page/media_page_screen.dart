@@ -12,7 +12,7 @@ class MediaPageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fileExtension = page.url.split(".").last;
+    final fileExtension = page.uri.toFilePath().split(".").last;
 
     return DecoratedBox(
       decoration: const BoxDecoration(
@@ -97,13 +97,13 @@ class _ImageMediaPageState extends State<ImageMediaPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Image.file(
-                      File(widget.page.url),
+                      File.fromUri(widget.page.uri),
                     ),
                   ],
                 ),
               )
             : Image.file(
-                File(widget.page.url),
+                File.fromUri(widget.page.uri),
               ),
       ),
     );
@@ -137,7 +137,7 @@ class _AudioMediaPageState extends State<AudioMediaPage> {
     super.initState();
 
     audioPlayer = AudioPlayer()
-      ..setSourceDeviceFile(Uri.parse(widget.page.url).toFilePath())
+      ..setSourceDeviceFile(widget.page.uri.toFilePath())
       ..resume();
 
     _onPlayerStateChanged = audioPlayer.onPlayerStateChanged.listen(

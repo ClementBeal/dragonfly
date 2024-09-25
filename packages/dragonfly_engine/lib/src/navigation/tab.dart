@@ -59,15 +59,14 @@ class Tab {
   ///
   /// [url] is the URL to navigate to.
   /// [onNavigationDone] is a callback function executed when navigation is complete.
-  Future<void> navigateTo(String url, Function() onNavigationDone) async {
+  Future<void> navigateTo(Uri uri, Function() onNavigationDone) async {
     // remove the history after the current index
     // it happends when the user has navigated backward
     if (_currentIndex < _history.length - 1) {
       _history.removeRange(_currentIndex + 1, _history.length);
     }
 
-    final uriRequest = Uri.parse(url);
-    final scheme = uriRequest.scheme;
+    final scheme = uri.scheme;
 
     if (scheme == "http" || scheme == "https") {
       _history.add(
@@ -75,12 +74,12 @@ class Tab {
           document: null,
           cssom: null,
           status: PageStatus.loading,
-          url: url,
+          uri: uri,
         ),
       );
       _currentIndex++;
 
-      final htmlRequest = await tracker.request(url, "GET", {});
+      final htmlRequest = await tracker.request(uri, "GET", {});
 
       Document? document;
       CssomTree? cssom;
@@ -91,7 +90,7 @@ class Tab {
         final titleTags = document.getElementsByTagName("title");
 
         if (titleTags.isNotEmpty) {
-          navigationHistory.addLink(uriRequest, titleTags.first.text.trim());
+          navigationHistory.addLink(uri, titleTags.first.text.trim());
         }
 
         final linkCssNode =
@@ -101,9 +100,8 @@ class Tab {
 
         if (linkFavicon != null) {
           final href = linkFavicon.attributes["href"];
-          final faviconUri = href!.startsWith("/")
-              ? uriRequest.replace(path: href)
-              : Uri.parse(href);
+          final faviconUri =
+              href!.startsWith("/") ? uri.replace(path: href) : Uri.parse(href);
 
           cachedFavicon = FileCache.getCacheFile(faviconUri);
 
@@ -129,8 +127,7 @@ class Tab {
 
         if (linkCssNode != null) {
           final href = linkCssNode.attributes["href"];
-          final a = await tracker.request(
-              Uri.parse(url).replace(path: href).toString(), "GET", {});
+          final a = await tracker.request(uri.replace(path: href), "GET", {});
 
           try {
             cssom = cssomBuilder.parse(utf8.decode(a!.body));
@@ -145,40 +142,10 @@ class Tab {
         cssom: cssom ?? CssomBuilder().parse(css),
         favicon: cachedFavicon,
         status: (document != null) ? PageStatus.success : PageStatus.error,
-        url: url,
+        uri: uri,
       );
-    } else {
-      _history.add(
-        FileExplorerPage(
-          [],
-          status: PageStatus.loading,
-          url: url,
-        ),
-      );
-      _currentIndex++;
-
-      if (!File(url).existsSync()) {
-        final result = await exploreDirectory(Uri.parse(url));
-
-        _history.last = FileExplorerPage(
-          result,
-          status: PageStatus.success,
-          url: url,
-        );
-      } else {
-        if (p.extension(Uri.parse(url).toFilePath()) == ".json") {
-          _history.last = JsonPage(
-            url: Uri.parse(url).toFilePath(),
-            status: PageStatus.success,
-          );
-        } else {
-          _history.last = MediaPage(
-            true,
-            url: Uri.parse(url).toFilePath(),
-            status: PageStatus.success,
-          );
-        }
-      }
+    } else if (scheme == "file") {
+      await _navigateFileScheme(uri);
     }
 
     onNavigationDone();
@@ -189,7 +156,47 @@ class Tab {
   /// [onNavigationDone] is a callback function executed when refresh is complete.
   Future<void> refresh(Function() onNavigationDone) async {
     _currentIndex--;
-    navigateTo(_history.last.url, onNavigationDone);
+    navigateTo(_history.last.uri, onNavigationDone);
+  }
+
+  /// Navigate to a page with the scheme "file://"
+  /// The navigation doesn't need internet connection
+  Future<void> _navigateFileScheme(Uri uri) async {
+    _history.add(
+      FileExplorerPage(
+        [],
+        status: PageStatus.loading,
+        uri: uri,
+      ),
+    );
+
+    _currentIndex++;
+
+    if (!File.fromUri(uri).existsSync()) {
+      final result = await exploreDirectory(uri);
+
+      _history.last = FileExplorerPage(
+        result,
+        status: PageStatus.success,
+        uri: uri,
+      );
+    } else {
+      final filePath = uri.toFilePath();
+      final fileExtension = p.extension(filePath).toLowerCase();
+
+      if (fileExtension == ".json") {
+        _history.last = JsonPage(
+          uri: uri,
+          status: PageStatus.success,
+        );
+      } else {
+        _history.last = MediaPage(
+          true,
+          uri: uri,
+          status: PageStatus.success,
+        );
+      }
+    }
   }
 
   /// Returns the currently displayed page, or null if no page is loaded.
@@ -198,7 +205,7 @@ class Tab {
   /// Toggles the pinned state of the tab.
   void togglePin() => isPinned = !isPinned;
 
-  /// Checks if the tab can navigate back in history.
+  /// Checks if the tab can be refreshed
   bool canRefresh() => _currentIndex >= 0;
 
   /// Checks if the tab can navigate back in history.

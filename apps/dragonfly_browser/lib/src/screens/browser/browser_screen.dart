@@ -22,7 +22,7 @@ class BrowserScreen extends StatelessWidget {
             final path = Uri.parse("file://${file.path}");
 
             context.read<BrowserCubit>().openNewTab(
-                  initialUrl: path.toFilePath(),
+                  initialUri: path,
                   switchTab: i == 0,
                 );
           }
@@ -93,7 +93,7 @@ class RenderPageWidget extends StatelessWidget {
                         final renderTree = BrowserRenderTree(
                           dom: page.document!,
                           cssom: page.cssom!,
-                          initialRoute: page.url,
+                          initialRoute: page.uri.toString(),
                         ).parse();
 
                         return TreeRenderer(renderTree.child);
@@ -319,15 +319,11 @@ class TreeRenderer extends StatelessWidget {
         ),
       RenderTreeLink r => GestureDetector(
           onTap: () {
-            final a = Uri.parse(context
-                .read<BrowserCubit>()
-                .state
-                .currentTab!
-                .currentPage!
-                .url);
+            final uri =
+                context.read<BrowserCubit>().state.currentTab!.currentPage!.uri;
             context
                 .read<BrowserCubit>()
-                .navigateToPage(a.replace(path: r.link).toString());
+                .navigateToPage(uri.replace(path: r.link));
           },
           child: Container(
             padding: EdgeInsets.only(

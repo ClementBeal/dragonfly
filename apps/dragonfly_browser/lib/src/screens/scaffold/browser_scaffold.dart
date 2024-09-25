@@ -270,7 +270,8 @@ class _BrowserSearchBarState extends State<BrowserSearchBar> {
       height: 50,
       child: BlocListener<BrowserCubit, Browser>(
         listener: (context, state) {
-          _searchController.text = state.currentTab?.currentPage?.url ?? "";
+          _searchController.text =
+              state.currentTab?.currentPage?.uri.toString() ?? "";
         },
         child: TextField(
           controller: _searchController,
@@ -279,9 +280,7 @@ class _BrowserSearchBarState extends State<BrowserSearchBar> {
           onEditingComplete: () {
             final formattedUri = detectUrl(_searchController.text);
 
-            context
-                .read<BrowserCubit>()
-                .navigateToPage(formattedUri.toString());
+            context.read<BrowserCubit>().navigateToPage(formattedUri);
           },
           decoration: InputDecoration(
             filled: true,
@@ -310,9 +309,7 @@ class _BrowserSearchBarState extends State<BrowserSearchBar> {
                         onPressed: () {
                           var uri = Uri.parse(_searchController.text);
 
-                          context
-                              .read<BrowserCubit>()
-                              .navigateToPage(uri.toString());
+                          context.read<BrowserCubit>().navigateToPage(uri);
                         },
                         icon: const Icon(Icons.arrow_forward),
                       ),

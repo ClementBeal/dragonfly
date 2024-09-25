@@ -6,7 +6,7 @@ class HtmlPage extends Page {
   final BrowserImage? favicon;
 
   HtmlPage(
-      {required super.url,
+      {required super.uri,
       required super.status,
       super.guid,
       this.favicon,
@@ -19,7 +19,7 @@ class HtmlPage extends Page {
     CssomTree? cssom,
   }) {
     return HtmlPage(
-      url: url,
+      uri: uri,
       guid: guid,
       document: document ?? this.document,
       cssom: cssom ?? this.cssom,

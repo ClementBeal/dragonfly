@@ -55,7 +55,7 @@ void main() {
           ),
         );
 
-        final response = await tracker.request("url", "GET", {});
+        final response = await tracker.request(Uri(), "GET", {});
 
         expect(tracker.history.length, 1);
 
@@ -81,7 +81,7 @@ void main() {
           ),
         );
 
-        final response = await tracker.request("url", "GET", {});
+        final response = await tracker.request(Uri(), "GET", {});
 
         expect(tracker.history.length, 1);
 
@@ -107,7 +107,7 @@ void main() {
           ),
         );
 
-        final response = await tracker.request("url", "GET", {});
+        final response = await tracker.request(Uri(), "GET", {});
 
         expect(tracker.history.length, 1);
         expect(tracker.history.first.response, response);
@@ -140,7 +140,7 @@ void main() {
           streamMessages.add(message);
         });
 
-        final response = await tracker.request("url", "GET", {});
+        final response = await tracker.request(Uri(), "GET", {});
 
         await Future.delayed(Duration(milliseconds: 100));
         subscription.cancel();

@@ -10,11 +10,11 @@ part 'media_page.dart';
 
 sealed class Page {
   late final String guid;
-  final String url;
+  final Uri uri;
   final PageStatus status;
 
   Page({
-    required this.url,
+    required this.uri,
     required this.status,
     String? guid,
   }) {

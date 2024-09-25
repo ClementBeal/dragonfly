@@ -19,17 +19,17 @@ class NetworkTracker {
   /// Sends a request to the specified [url] using the given [method] and [headers].
   /// Any exceptions will be caught, and null will be returned in case of errors.
   Future<NetworkResponse?> request(
-    String url,
+    Uri uri,
     String method,
     Map<String, String> headers,
   ) async {
     try {
-      final request = http.Request(method, Uri.parse(url))
+      final request = http.Request(method, uri)
         ..headers.addAll(headers)
         ..headers["User-Agent"] = "DragonFly/1.0";
 
       final networkRequest = NetworkRequest(
-        url: url,
+        url: uri.toString(),
         headers: request.headers,
         method: method,
       );

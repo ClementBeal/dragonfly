@@ -11,8 +11,8 @@ class BrowserCubit extends Cubit<Browser> {
     emit(state.copyWith());
   }
 
-  void openNewTab({String? initialUrl, bool switchTab = false}) {
-    state.openNewTab(initialUrl, switchTab: switchTab);
+  void openNewTab({Uri? initialUri, bool switchTab = false}) {
+    state.openNewTab(initialUri, switchTab: switchTab);
 
     emit(state.copyWith());
   }
@@ -26,7 +26,7 @@ class BrowserCubit extends Cubit<Browser> {
     emit(state.copyWith(currentTabGuid: guid));
   }
 
-  void navigateToPage(String url) {
+  void navigateToPage(Uri url) {
     if (state.currentTab != null) {
       final updatedTab = state.currentTab;
       updatedTab?.navigateTo(url, _onUpdate);

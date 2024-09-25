@@ -52,7 +52,7 @@ class Browser {
   ///
   /// [initialUrl] (optional) sets the initial URL for the new tab.
   /// [switchTab] (optional) determines whether to switch to the new tab after creation (default: true).
-  void openNewTab(String? initialUrl, {bool switchTab = true}) {
+  void openNewTab(Uri? initialUrl, {bool switchTab = true}) {
     final lastOrder =
         tabs.where((e) => !e.isPinned).map((e) => e.order).maxOrNull;
     final newTab = Tab(
