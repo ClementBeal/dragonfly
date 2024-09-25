@@ -19,30 +19,46 @@ import 'package:http/http.dart' as http;
 
 enum PageStatus { loading, error, success }
 
+/// Represents a browser tab.
 class Tab {
+  /// Unique identifier for the tab.
   late final String guid;
+
+  /// Javascript interpreter associated with the tab.
   late final JavascriptInterpreter interpreter;
+
+  /// Browsing history of the tab.
   final List<Page> _history = [];
-  int _currentIndex = -1;
-  bool isPinned = false;
-  int order;
+
+  /// Network tracker for monitoring network requests.
   final NetworkTracker tracker = NetworkTracker();
+
+  /// Global navigation history across all tabs.
   final NavigationHistory navigationHistory;
 
+  /// Index of the current page in the history.
+  int _currentIndex = -1;
+
+  /// Whether the tab is pinned.
+  bool isPinned = false;
+
+  /// Order of the tab in the tab bar.
+  int order;
+
+  /// Creates a new Tab instance.
+  ///
+  /// [order] specifies the order of the tab.
+  /// [navigationHistory] provides access to the global navigation history.
   Tab({
     required this.order,
     required this.navigationHistory,
-  }) {
-    guid = Uuid().v4();
-    interpreter = JavascriptInterpreter();
-  }
+  })  : guid = Uuid().v4(),
+        interpreter = JavascriptInterpreter();
 
-  Page? get currentPage => _currentIndex >= 0 ? _history[_currentIndex] : null;
-
-  void togglePin() {
-    isPinned = !isPinned;
-  }
-
+  /// Navigates the tab to the specified URL.
+  ///
+  /// [url] is the URL to navigate to.
+  /// [onNavigationDone] is a callback function executed when navigation is complete.
   Future<void> navigateTo(String url, Function() onNavigationDone) async {
     if (_currentIndex < _history.length - 1) {
       _history.removeRange(_currentIndex + 1, _history.length);
@@ -166,6 +182,9 @@ class Tab {
     onNavigationDone();
   }
 
+  /// Refreshes the current page.
+  ///
+  /// [onNavigationDone] is a callback function executed when refresh is complete.
   Future<void> refresh(Function() onNavigationDone) async {
     final url = _history.last.url;
 
@@ -225,15 +244,26 @@ class Tab {
     onNavigationDone();
   }
 
+  /// Returns the currently displayed page, or null if no page is loaded.
+  Page? get currentPage => _currentIndex >= 0 ? _history[_currentIndex] : null;
+
+  /// Toggles the pinned state of the tab.
+  void togglePin() => isPinned = !isPinned;
+
+  /// Checks if the tab can navigate back in history.
   bool canGoBack() => _currentIndex > 0;
+
+  /// Checks if the tab can navigate forward in history.
   bool canGoForward() => _currentIndex < _history.length - 1;
 
+  /// Navigates back in the tab's history.
   void goBack() {
     if (canGoBack()) {
       _currentIndex--;
     }
   }
 
+  /// Navigates forward in the tab's history.
   void goForward() {
     if (canGoForward()) {
       _currentIndex++;
