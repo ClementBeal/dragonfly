@@ -329,6 +329,11 @@ class TreeRenderer extends StatelessWidget {
               fontFamily: r.fontFamily,
               letterSpacing: r.letterSpacing,
               wordSpacing: r.wordSpacing,
+              decoration: TextDecoration.combine(
+                [
+                  if (r.textDecoration == "underline") TextDecoration.underline,
+                ],
+              ),
               fontWeight: switch (r.fontWeight) {
                 "normal" => FontWeight.normal,
                 "bold" => FontWeight.bold,

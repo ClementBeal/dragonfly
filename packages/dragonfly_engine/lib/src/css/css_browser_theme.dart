@@ -460,4 +460,9 @@ ul {
 var {
   font-style: italic;
 }
+
+a {
+  color: #00f;
+  text-decoration: underline;
+}
 """;
