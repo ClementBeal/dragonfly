@@ -69,81 +69,7 @@ class Tab {
     final scheme = uri.scheme;
 
     if (scheme == "http" || scheme == "https") {
-      _history.add(
-        HtmlPage(
-          document: null,
-          cssom: null,
-          status: PageStatus.loading,
-          uri: uri,
-        ),
-      );
-      _currentIndex++;
-
-      final htmlRequest = await tracker.request(uri, "GET", {});
-
-      Document? document;
-      CssomTree? cssom;
-      BrowserImage? cachedFavicon;
-
-      if (htmlRequest != null) {
-        document = DomBuilder.parse(utf8.decode(htmlRequest.body));
-        final titleTags = document.getElementsByTagName("title");
-
-        if (titleTags.isNotEmpty) {
-          navigationHistory.addLink(uri, titleTags.first.text.trim());
-        }
-
-        final linkCssNode =
-            document.querySelectorAll('link[rel="stylesheet"]').firstOrNull;
-
-        final linkFavicon = document.querySelector('link[rel="icon"]');
-
-        if (linkFavicon != null) {
-          final href = linkFavicon.attributes["href"];
-          final faviconUri =
-              href!.startsWith("/") ? uri.replace(path: href) : Uri.parse(href);
-
-          cachedFavicon = FileCache.getCacheFile(faviconUri);
-
-          if (cachedFavicon == null) {
-            final faviconData = await http.get(faviconUri);
-            final cachedFaviconUri =
-                FileCache.cacheFile(faviconUri, faviconData.bodyBytes);
-
-            cachedFavicon = BrowserImage(
-              path: cachedFaviconUri,
-              mimetype: lookupMimeType(
-                cachedFaviconUri.toFilePath(),
-              )!,
-            );
-
-            FileCacheRepo(db).addFileToCache(
-              p.basename(cachedFaviconUri.toString()),
-              faviconUri.toString(),
-              faviconData.headers["content-type"]!,
-            );
-          }
-        }
-
-        if (linkCssNode != null) {
-          final href = linkCssNode.attributes["href"];
-          final a = await tracker.request(uri.replace(path: href), "GET", {});
-
-          try {
-            cssom = cssomBuilder.parse(utf8.decode(a!.body));
-          } catch (e) {
-            cssom = null;
-          }
-        }
-      }
-
-      _history.last = HtmlPage(
-        document: document,
-        cssom: cssom ?? CssomBuilder().parse(css),
-        favicon: cachedFavicon,
-        status: (document != null) ? PageStatus.success : PageStatus.error,
-        uri: uri,
-      );
+      await _navigateHttpScheme(uri);
     } else if (scheme == "file") {
       await _navigateFileScheme(uri);
     }
@@ -157,6 +83,123 @@ class Tab {
   Future<void> refresh(Function() onNavigationDone) async {
     _currentIndex--;
     navigateTo(_history.last.uri, onNavigationDone);
+  }
+
+  Future<void> _navigateHttpScheme(Uri uri) async {
+    _history.add(
+      HtmlPage(
+        document: null,
+        cssom: null,
+        status: PageStatus.loading,
+        uri: uri,
+      ),
+    );
+    _currentIndex++;
+
+    final htmlRequest = await tracker.request(uri, "GET", {});
+
+    if (htmlRequest != null) {
+      Document? document;
+      CssomTree? cssom;
+      BrowserImage? cachedFavicon;
+
+      document = DomBuilder.parse(utf8.decode(htmlRequest.body));
+
+      _updateNavigationHistory(uri, document);
+
+      final faviconFuture = _fetchFavicon(document, uri);
+
+      final linkCssNode = document.querySelectorAll('link[rel="stylesheet"]');
+
+      final result = await Future.wait(
+        [
+          faviconFuture,
+          ...linkCssNode.map(
+            (e) => _downloadCSSFile(uri, e.attributes["href"]!),
+          )
+        ],
+      );
+
+      final cssomPage =
+          (result.length > 1) ? result.skip(1).first as CssomTree? : null;
+
+      _history.last = HtmlPage(
+        document: document,
+        cssom: cssomPage ?? CssomBuilder().parse(css),
+        favicon: result.first as BrowserImage?,
+        status: PageStatus.success,
+        uri: uri,
+      );
+    } else {
+      _history.last = HtmlPage(
+        document: null,
+        cssom: null,
+        favicon: null,
+        status: PageStatus.error,
+        uri: uri,
+      );
+    }
+  }
+
+  Future<CssomTree?> _downloadCSSFile(Uri uri, String href) async {
+    final response = await tracker.request(uri.replace(path: href), "GET", {});
+
+    try {
+      if (response != null &&
+          response.statusCode >= 200 &&
+          response.statusCode < 300) {
+        return CssomBuilder().parse(
+          utf8.decode(response.body),
+        );
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Updates the navigation history with the current URI and document title.
+  void _updateNavigationHistory(Uri uri, Document document) {
+    final titleTags = document.getElementsByTagName("title");
+    if (titleTags.isNotEmpty) {
+      navigationHistory.addLink(uri, titleTags.first.text.trim());
+    }
+  }
+
+  /// Fetches the favicon, if present in the document.
+  Future<BrowserImage?> _fetchFavicon(Document document, Uri uri) async {
+    final linkFavicon = document.querySelector('link[rel="icon"]');
+    if (linkFavicon == null) return null;
+
+    final href = linkFavicon.attributes["href"];
+    if (href == null) return null;
+
+    final faviconUri =
+        href.startsWith("/") ? uri.replace(path: href) : Uri.parse(href);
+
+    BrowserImage? cachedFavicon = FileCache.getCacheFile(faviconUri);
+
+    if (cachedFavicon == null) {
+      final faviconData = await http.get(faviconUri);
+      final cachedFaviconUri =
+          FileCache.cacheFile(faviconUri, faviconData.bodyBytes);
+
+      cachedFavicon = BrowserImage(
+        path: cachedFaviconUri,
+        mimetype: lookupMimeType(
+          cachedFaviconUri.toFilePath(),
+        )!,
+      );
+
+      FileCacheRepo(db).addFileToCache(
+        p.basename(cachedFaviconUri.toString()),
+        faviconUri.toString(),
+        faviconData.headers["content-type"]!,
+      );
+    }
+
+    return cachedFavicon;
   }
 
   /// Navigate to a page with the scheme "file://"
