@@ -133,9 +133,7 @@ class BrowserRenderTree {
       );
     } else if (element.localName! == "img") {
       return RenderTreeImage(
-        link: Uri.parse(initialRoute)
-            .replace(path: element.attributes["src"]!)
-            .toString(),
+        link: element.attributes["src"]!,
         marginBottom: c.marginBottomConverted,
         marginLeft: c.marginLeftConverted,
         marginTop: c.marginTopConverted,

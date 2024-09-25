@@ -4,6 +4,7 @@ import 'package:dragonfly/src/screens/browser/helpers/color_utils.dart';
 import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
 import 'package:dragonfly/src/screens/browser/pages/json/json_screen.dart';
 import 'package:dragonfly/src/screens/browser/pages/media_page/media_page_screen.dart';
+import 'package:dragonfly/src/screens/browser/render_node_widget/render_image.dart';
 import 'package:dragonfly/src/screens/lobby/lobby_screen.dart';
 import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart' hide Element, Page, Tab;
@@ -267,7 +268,9 @@ class TreeRenderer extends StatelessWidget {
           mainAxisSize: MainAxisSize.max,
           children: r.children.map((a) => TreeRenderer(a)).toList(),
         ),
-      RenderTreeImage r => Image.network(r.link),
+      RenderTreeImage r => RenderImage(
+          node: r,
+        ),
       RenderTreeView r => DecoratedBox(
           decoration: BoxDecoration(
             color: HexColor.fromHex(r.backgroundColor),

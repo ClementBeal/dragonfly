@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:dragonfly_engine/src/css/css_browser_theme.dart';
@@ -98,12 +99,14 @@ class Tab {
 
     final htmlRequest = await tracker.request(uri, "GET", {});
 
-    if (htmlRequest != null) {
-      Document? document;
-      CssomTree? cssom;
-      BrowserImage? cachedFavicon;
-
-      document = DomBuilder.parse(utf8.decode(htmlRequest.body));
+    if (htmlRequest != null &&
+        htmlRequest.statusCode >= 200 &&
+        htmlRequest.statusCode < 300) {
+      // the request is not empty and has a correct status code
+      // we can create the dom
+      // add the current uri to the history
+      // load the favicon and the CSS if they exist
+      final document = DomBuilder.parse(utf8.decode(htmlRequest.body));
 
       _updateNavigationHistory(uri, document);
 
@@ -120,6 +123,7 @@ class Tab {
         ],
       );
 
+      // we should merge the the CSSom trees
       final cssomPage =
           (result.length > 1) ? result.skip(1).first as CssomTree? : null;
 
@@ -200,6 +204,34 @@ class Tab {
     }
 
     return cachedFavicon;
+  }
+
+  Future<Uint8List?> downloadImage(
+    String imageUrl,
+  ) async {
+    final baseUri = _history.last.uri;
+    // Resolve the image URL to a full URI.
+    Uri goodUrl;
+
+    if (imageUrl.startsWith("/")) {
+      // Relative URL with leading slash, resolve against the base URI.
+      goodUrl = baseUri.replace(path: imageUrl);
+    } else if (imageUrl.startsWith("http") || imageUrl.startsWith("https")) {
+      // Absolute URL, use as-is.
+      goodUrl = Uri.parse(imageUrl);
+    } else {
+      // Relative URL without leading slash, resolve against the base URI.
+      final currentPath =
+          baseUri.path.endsWith("/") ? baseUri.path : "${baseUri.path}/";
+      goodUrl = baseUri.replace(path: currentPath + imageUrl);
+    }
+
+    final imageResponse = await tracker.request(goodUrl, "GET", {});
+
+    print(imageResponse?.statusCode);
+    print(imageResponse?.headers);
+
+    return imageResponse?.body;
   }
 
   /// Navigate to a page with the scheme "file://"
