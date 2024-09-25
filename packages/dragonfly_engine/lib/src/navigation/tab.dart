@@ -106,7 +106,8 @@ class Tab {
       // we can create the dom
       // add the current uri to the history
       // load the favicon and the CSS if they exist
-      final document = DomBuilder.parse(utf8.decode(htmlRequest.body));
+      final document =
+          DomBuilder.parse(utf8.decode(htmlRequest.body, allowMalformed: true));
 
       _updateNavigationHistory(uri, document);
 
@@ -124,12 +125,14 @@ class Tab {
       );
 
       // we should merge the the CSSom trees
-      final cssomPage =
+      final currentCSSOM =
           (result.length > 1) ? result.skip(1).first as CssomTree? : null;
+
+      print("cssom -> $currentCSSOM");
 
       _history.last = HtmlPage(
         document: document,
-        cssom: cssomPage ?? CssomBuilder().parse(css),
+        cssom: currentCSSOM ?? CssomBuilder().parse(css),
         favicon: result.first as BrowserImage?,
         status: PageStatus.success,
         uri: uri,

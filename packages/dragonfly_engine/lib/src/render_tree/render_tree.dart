@@ -52,7 +52,8 @@ class BrowserRenderTree {
   });
 
   RenderTree parse() {
-    final htmlStyle = cssom.find("html")!.style..convertUnits(16, 16);
+    final htmlStyle = (cssom.find("html")?.style ?? CssStyle(fontSize: "16px"))
+      ..convertUnits(16, 16);
 
     return RenderTree(
       child: RenderTreeView(
