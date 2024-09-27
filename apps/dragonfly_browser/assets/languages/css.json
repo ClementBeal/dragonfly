@@ -5,8 +5,8 @@
 		"css"
 	],
 	"scopeName": "source.css",
-	"foldingStartMarker": "\\{",
-	"foldingStopMarker": "\\}",
+	"foldingStartMarker": "{",
+	"foldingStopMarker": "}",
 	"patterns": [
 		{
 			"name": "meta.selector.css",
@@ -28,7 +28,7 @@
 		},
 		{
 			"name": "meta.value.css",
-			"match": "(?<=:).*$",
+			"match": "(?<=\\:).*$",
 			"patterns": [
 				{
 					"name": "constant.numeric.css",
@@ -58,9 +58,12 @@
 				},
 				{
 					"name": "support.constant.color.css",
-					"match": "#[a-fA-F0-9]{3,6}"
+					"match": "\\#[a-fA-F0-9]{3,6}"
 				},
-
+				{
+					"name": "support.constant.color.css",
+					"match": "\\b(black|white|red|green|blue|yellow|cyan|magenta|orange|purple|pink|brown|gray|grey)\\b"
+				}
 			]
 		},
 		{

@@ -152,6 +152,7 @@ class TreeRenderer extends StatelessWidget {
       RenderTreeList r => CommonStyleBlock(
           r.commonStyle,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               for (final c in r.children)
                 Row(

@@ -203,9 +203,11 @@ class Tab {
           name: baseUri.path,
         );
       } else {
+        print(response?.statusCode);
         return null;
       }
     } catch (e) {
+      print(e);
       return null;
     }
   }
