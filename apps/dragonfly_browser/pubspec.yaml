@@ -27,6 +27,7 @@ dependencies:
   data_table_2: ^2.5.15
   desktop_drop: ^0.4.4
   file_picker: ^8.1.2
+  csslib: ^1.0.0 # format the CSS
 
 dev_dependencies:
   flutter_test:

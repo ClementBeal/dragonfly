@@ -1,13 +1,11 @@
 import 'package:collection/collection.dart';
+import 'package:csslib/parser.dart';
+import 'package:csslib/visitor.dart';
 import 'package:dragonfly/main.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
-import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
 import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:path/path.dart';
-import 'package:syntax_highlight/syntax_highlight.dart';
 
 class StylesheetsScreen extends StatefulWidget {
   const StylesheetsScreen({super.key});
@@ -71,17 +69,56 @@ class _StylesheetsScreenState extends State<StylesheetsScreen> {
   }
 }
 
-class _CSSVisualizer extends StatelessWidget {
+class _CSSVisualizer extends StatefulWidget {
   const _CSSVisualizer({required this.stylesheet});
 
   final CSSStylesheet stylesheet;
 
   @override
-  Widget build(BuildContext context) {
-    var highlightedCode = cssHightlighter.highlight(stylesheet.content);
+  State<_CSSVisualizer> createState() => _CSSVisualizerState();
+}
 
+class _CSSVisualizerState extends State<_CSSVisualizer> {
+  late final String formattedCode;
+
+  @override
+  void initState() {
+    super.initState();
+
+    formattedCode = (CssPrinter()
+          ..visitTree(parse(widget.stylesheet.content), pretty: true))
+        .toString();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var highlightedCode = cssHightlighter.highlight(formattedCode);
+    final lines = formattedCode.codeUnits.fold(
+      1,
+      (ini, element) => ini + ((element == "\n".codeUnitAt(0)) ? 1 : 0),
+    );
+
+    // TO DO : I really think it's bad to nest 2 SingleChildScrollView
+    // not important yet but It has to be changed
     return SingleChildScrollView(
-      child: Text.rich(highlightedCode),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 50,
+              child: ListView.builder(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                itemCount: lines,
+                shrinkWrap: true,
+                itemBuilder: (context, index) => Text("${index + 1}"),
+              ),
+            ),
+            Text.rich(highlightedCode),
+          ],
+        ),
+      ),
     );
   }
 }
