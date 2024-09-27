@@ -38,6 +38,7 @@ class CssStyle {
     this.borderRightWidth,
     this.borderTopWidth,
     this.borderBottomWidth,
+    this.cursor,
   });
 
   double? lineHeight;
@@ -82,6 +83,8 @@ class CssStyle {
   // grid
   String? rowGap;
   String? columnGap;
+
+  String? cursor;
 
   double? rowGapConverted;
   double? columnGapConverted;
@@ -294,6 +297,7 @@ class CssStyle {
       alignItems: alignItems,
       minHeight: minHeight,
       fontFamily: fontFamily,
+      cursor: cursor,
     );
   }
 }

@@ -29,32 +29,35 @@ class CommonStyle {
   final double? minWidth;
   final double? minHeight;
   final bool? isCentered;
+  final String? cursor;
 
-  CommonStyle(
-      {required this.backgroundColor,
-      required this.paddingTop,
-      required this.paddingRight,
-      required this.paddingBottom,
-      required this.paddingLeft,
-      required this.marginTop,
-      required this.marginRight,
-      required this.marginBottom,
-      required this.marginLeft,
-      required this.borderWidth,
-      required this.borderLeftColor,
-      required this.borderRightColor,
-      required this.borderTopColor,
-      required this.borderBottomColor,
-      required this.borderLeftWidth,
-      required this.borderRightWidth,
-      required this.borderTopWidth,
-      required this.borderBottomWidth,
-      required this.borderRadius,
-      required this.maxWidth,
-      required this.maxHeight,
-      required this.minWidth,
-      required this.minHeight,
-      required this.isCentered});
+  CommonStyle({
+    required this.backgroundColor,
+    required this.paddingTop,
+    required this.paddingRight,
+    required this.paddingBottom,
+    required this.paddingLeft,
+    required this.marginTop,
+    required this.marginRight,
+    required this.marginBottom,
+    required this.marginLeft,
+    required this.borderWidth,
+    required this.borderLeftColor,
+    required this.borderRightColor,
+    required this.borderTopColor,
+    required this.borderBottomColor,
+    required this.borderLeftWidth,
+    required this.borderRightWidth,
+    required this.borderTopWidth,
+    required this.borderBottomWidth,
+    required this.borderRadius,
+    required this.maxWidth,
+    required this.maxHeight,
+    required this.minWidth,
+    required this.minHeight,
+    required this.isCentered,
+    required this.cursor,
+  });
 
   factory CommonStyle.fromCSSStyle(CssStyle c) {
     return CommonStyle(
@@ -82,6 +85,7 @@ class CommonStyle {
       isCentered: c.isCentered,
       backgroundColor: c.backgroundColor,
       borderWidth: null,
+      cursor: c.cursor,
     );
   }
 }

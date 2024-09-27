@@ -105,6 +105,7 @@ class CssomBuilder {
       "font-size": (String value) => style.fontSize = value,
       "font-weight": (String value) => style.fontWeight = value,
       "display": (String value) => style.display = value,
+      "cursor": (String value) => style.display = value,
       "border-radius": (String value) => style.borderRadius = value,
       "border-left": (String value) {
         final tokens = value.split(" ");

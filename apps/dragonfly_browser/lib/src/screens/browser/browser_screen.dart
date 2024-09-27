@@ -342,63 +342,68 @@ class CommonStyleBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: AlignmentDirectional.center,
-      // alignment:
-      //     (r.isCentered != null && r.isCentered!) ? Alignment.center : null,
-      constraints: BoxConstraints(
-        maxWidth: commonStyle.maxWidth ?? double.infinity,
-        maxHeight: commonStyle.maxHeight ?? double.infinity,
-        minHeight: commonStyle.minHeight ?? 0.0,
-        minWidth: commonStyle.minWidth ?? 0.0,
-      ),
-      decoration: BoxDecoration(
-        color: (commonStyle.backgroundColor != null)
-            ? HexColor.fromHex(commonStyle.backgroundColor!)
-            : null,
-        border: Border(
-          bottom: (commonStyle.borderBottomColor != null)
-              ? BorderSide(
-                  width: commonStyle.borderRightWidth ?? 0.0,
-                  color: HexColor.fromHex(commonStyle.borderBottomColor!),
-                )
-              : BorderSide.none,
-          left: (commonStyle.borderLeftColor != null)
-              ? BorderSide(
-                  width: commonStyle.borderLeftWidth ?? 0.0,
-                  color: HexColor.fromHex(commonStyle.borderLeftColor!),
-                )
-              : BorderSide.none,
-          top: (commonStyle.borderTopColor != null)
-              ? BorderSide(
-                  width: commonStyle.borderTopWidth ?? 0.0,
-                  color: HexColor.fromHex(commonStyle.borderTopColor!),
-                )
-              : BorderSide.none,
-          right: (commonStyle.borderRightColor != null)
-              ? BorderSide(
-                  width: commonStyle.borderRightWidth ?? 0.0,
-                  color: HexColor.fromHex(commonStyle.borderRightColor!),
-                )
-              : BorderSide.none,
+    return MouseRegion(
+      cursor: (commonStyle.cursor == "pointer")
+          ? SystemMouseCursors.click
+          : MouseCursor.defer,
+      child: Container(
+        alignment: AlignmentDirectional.center,
+        // alignment:
+        //     (r.isCentered != null && r.isCentered!) ? Alignment.center : null,
+        constraints: BoxConstraints(
+          maxWidth: commonStyle.maxWidth ?? double.infinity,
+          maxHeight: commonStyle.maxHeight ?? double.infinity,
+          minHeight: commonStyle.minHeight ?? 0.0,
+          minWidth: commonStyle.minWidth ?? 0.0,
         ),
-        borderRadius: (commonStyle.borderRadius != null)
-            ? BorderRadius.circular(commonStyle.borderRadius!)
-            : null,
+        decoration: BoxDecoration(
+          color: (commonStyle.backgroundColor != null)
+              ? HexColor.fromHex(commonStyle.backgroundColor!)
+              : null,
+          border: Border(
+            bottom: (commonStyle.borderBottomColor != null)
+                ? BorderSide(
+                    width: commonStyle.borderRightWidth ?? 0.0,
+                    color: HexColor.fromHex(commonStyle.borderBottomColor!),
+                  )
+                : BorderSide.none,
+            left: (commonStyle.borderLeftColor != null)
+                ? BorderSide(
+                    width: commonStyle.borderLeftWidth ?? 0.0,
+                    color: HexColor.fromHex(commonStyle.borderLeftColor!),
+                  )
+                : BorderSide.none,
+            top: (commonStyle.borderTopColor != null)
+                ? BorderSide(
+                    width: commonStyle.borderTopWidth ?? 0.0,
+                    color: HexColor.fromHex(commonStyle.borderTopColor!),
+                  )
+                : BorderSide.none,
+            right: (commonStyle.borderRightColor != null)
+                ? BorderSide(
+                    width: commonStyle.borderRightWidth ?? 0.0,
+                    color: HexColor.fromHex(commonStyle.borderRightColor!),
+                  )
+                : BorderSide.none,
+          ),
+          borderRadius: (commonStyle.borderRadius != null)
+              ? BorderRadius.circular(commonStyle.borderRadius!)
+              : null,
+        ),
+        padding: EdgeInsets.only(
+          bottom: commonStyle.paddingBottom ?? 0.0,
+          left: commonStyle.paddingLeft ?? 0.0,
+          top: commonStyle.paddingTop ?? 0.0,
+          right: commonStyle.paddingRight ?? 0.0,
+        ),
+        margin: EdgeInsets.only(
+          bottom: commonStyle.marginBottom ?? 0.0,
+          left: commonStyle.marginLeft ?? 0.0,
+          top: commonStyle.marginTop ?? 0.0,
+          right: commonStyle.marginRight ?? 0.0,
+        ),
+        child: child,
       ),
-      padding: EdgeInsets.only(
-        bottom: commonStyle.paddingBottom ?? 0.0,
-        left: commonStyle.paddingLeft ?? 0.0,
-        top: commonStyle.paddingTop ?? 0.0,
-        right: commonStyle.paddingRight ?? 0.0,
-      ),
-      margin: EdgeInsets.only(
-        bottom: commonStyle.marginBottom ?? 0.0,
-        left: commonStyle.marginLeft ?? 0.0,
-        top: commonStyle.marginTop ?? 0.0,
-        right: commonStyle.marginRight ?? 0.0,
-      ),
-      child: child,
     );
   }
 }
