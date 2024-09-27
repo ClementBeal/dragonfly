@@ -48,3 +48,69 @@ class BrowserInputTextField extends StatelessWidget {
     );
   }
 }
+
+class BrowserInputSubmit extends StatelessWidget {
+  const BrowserInputSubmit({
+    super.key,
+    required this.r,
+  });
+
+  final RenderTreeInputSubmit r;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {},
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            width: 1,
+            color: Colors.black,
+          ),
+          color: const Color(0xffe9e9ed),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 4,
+            vertical: 2,
+          ),
+          child: Text(r.value ?? ""),
+        ),
+      ),
+    );
+  }
+}
+
+class BrowserInputReset extends StatelessWidget {
+  const BrowserInputReset({
+    super.key,
+    required this.r,
+  });
+
+  final RenderTreeInputReset r;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {},
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            width: 1,
+            color: Colors.black,
+          ),
+          color: const Color(0xffe9e9ed),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 4,
+            vertical: 2,
+          ),
+          child: Text(r.value ?? ""),
+        ),
+      ),
+    );
+  }
+}

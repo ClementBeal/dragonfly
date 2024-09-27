@@ -554,6 +554,12 @@ class TreeRenderer extends StatelessWidget {
       RenderTreeInputText r => BrowserInputTextField(
           r: r,
         ),
+      RenderTreeInputSubmit r => BrowserInputSubmit(
+          r: r,
+        ),
+      RenderTreeInputReset r => BrowserInputReset(
+          r: r,
+        ),
       RenderTreeBox r => Container(
           alignment: AlignmentDirectional.center,
           // alignment:
