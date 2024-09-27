@@ -94,28 +94,7 @@ class BrowserRenderTree {
     if (element.localName! == "a") {
       return RenderTreeLink(
         link: element.attributes["href"] ?? "",
-        marginBottom: c.marginBottomConverted,
-        marginLeft: c.marginLeftConverted,
-        marginTop: c.marginTopConverted,
-        marginRight: c.marginRightConverted,
-        paddingBottom: c.paddingBottomConverted,
-        paddingLeft: c.paddingLeftConverted,
-        paddingTop: c.paddingTopConverted,
-        paddingRight: c.paddingRightConverted,
-        borderBottomColor: c.borderBottomColor,
-        borderLeftColor: c.borderLeftColor,
-        borderRightColor: c.borderRightColor,
-        borderTopColor: c.borderTopColor,
-        borderLeftWidth: c.borderLeftWidthConverted,
-        borderRightWidth: c.borderRightWidthConverted,
-        borderTopWidth: c.borderTopWidthConverted,
-        borderBottomWidth: c.borderBottomWidthConverted,
-        maxHeight: c.maxHeightConverted,
-        maxWidth: c.maxWidthConverted,
-        borderRadius: c.borderRadiusConverted,
-        minHeight: c.minHeightConverted,
-        minWidth: c.minWidthtConverted,
-        isCentered: c.isCentered,
+        commonStyle: CommonStyle.fromCSSStyle(c),
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -131,34 +110,11 @@ class BrowserRenderTree {
             ),
           ...element.children.map((e) => _parse(e, c)),
         ],
-        backgroundColor: c.backgroundColor,
-        borderWidth: null,
       );
     } else if (element.localName! == "img") {
       return RenderTreeImage(
         link: element.attributes["src"]!,
-        marginBottom: c.marginBottomConverted,
-        marginLeft: c.marginLeftConverted,
-        marginTop: c.marginTopConverted,
-        marginRight: c.marginRightConverted,
-        paddingBottom: c.paddingBottomConverted,
-        paddingLeft: c.paddingLeftConverted,
-        paddingTop: c.paddingTopConverted,
-        paddingRight: c.paddingRightConverted,
-        borderBottomColor: c.borderBottomColor,
-        borderLeftColor: c.borderLeftColor,
-        borderRightColor: c.borderRightColor,
-        borderTopColor: c.borderTopColor,
-        borderLeftWidth: c.borderLeftWidthConverted,
-        borderRightWidth: c.borderRightWidthConverted,
-        borderTopWidth: c.borderTopWidthConverted,
-        borderBottomWidth: c.borderBottomWidthConverted,
-        maxHeight: c.maxHeightConverted,
-        maxWidth: c.maxWidthConverted,
-        borderRadius: c.borderRadiusConverted,
-        minHeight: c.minHeightConverted,
-        minWidth: c.minWidthtConverted,
-        isCentered: c.isCentered,
+        commonStyle: CommonStyle.fromCSSStyle(c),
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -174,35 +130,12 @@ class BrowserRenderTree {
             ),
           ...element.children.map((e) => _parse(e, c)),
         ],
-        backgroundColor: c.backgroundColor,
-        borderWidth: null,
       );
     } else if (element.localName! == "form") {
       return RenderTreeForm(
         action: element.attributes["action"],
         method: element.attributes["method"],
-        marginBottom: c.marginBottomConverted,
-        marginLeft: c.marginLeftConverted,
-        marginTop: c.marginTopConverted,
-        marginRight: c.marginRightConverted,
-        paddingBottom: c.paddingBottomConverted,
-        paddingLeft: c.paddingLeftConverted,
-        paddingTop: c.paddingTopConverted,
-        paddingRight: c.paddingRightConverted,
-        borderBottomColor: c.borderBottomColor,
-        borderLeftColor: c.borderLeftColor,
-        borderRightColor: c.borderRightColor,
-        borderTopColor: c.borderTopColor,
-        borderLeftWidth: c.borderLeftWidthConverted,
-        borderRightWidth: c.borderRightWidthConverted,
-        borderTopWidth: c.borderTopWidthConverted,
-        borderBottomWidth: c.borderBottomWidthConverted,
-        maxHeight: c.maxHeightConverted,
-        maxWidth: c.maxWidthConverted,
-        borderRadius: c.borderRadiusConverted,
-        minHeight: c.minHeightConverted,
-        minWidth: c.minWidthtConverted,
-        isCentered: c.isCentered,
+        commonStyle: CommonStyle.fromCSSStyle(c),
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -218,8 +151,6 @@ class BrowserRenderTree {
             ),
           ...element.children.map((e) => _parse(e, c)),
         ],
-        backgroundColor: c.backgroundColor,
-        borderWidth: null,
       );
     } else if (element.localName! == "input") {
       final inputType = element.attributes["type"];
@@ -232,28 +163,7 @@ class BrowserRenderTree {
           size: element.attributes["size"]?.apply(int.parse) ?? 20,
           name: element.attributes["name"],
           placeholder: element.attributes["placeholder"],
-          marginBottom: c.marginBottomConverted,
-          marginLeft: c.marginLeftConverted,
-          marginTop: c.marginTopConverted,
-          marginRight: c.marginRightConverted,
-          paddingBottom: c.paddingBottomConverted,
-          paddingLeft: c.paddingLeftConverted,
-          paddingTop: c.paddingTopConverted,
-          paddingRight: c.paddingRightConverted,
-          borderBottomColor: c.borderBottomColor,
-          borderLeftColor: c.borderLeftColor,
-          borderRightColor: c.borderRightColor,
-          borderTopColor: c.borderTopColor,
-          borderLeftWidth: c.borderLeftWidthConverted,
-          borderRightWidth: c.borderRightWidthConverted,
-          borderTopWidth: c.borderTopWidthConverted,
-          borderBottomWidth: c.borderBottomWidthConverted,
-          maxHeight: c.maxHeightConverted,
-          maxWidth: c.maxWidthConverted,
-          borderRadius: c.borderRadiusConverted,
-          minHeight: c.minHeightConverted,
-          minWidth: c.minWidthtConverted,
-          isCentered: c.isCentered,
+          commonStyle: CommonStyle.fromCSSStyle(c),
           children: [
             if (element.text != "")
               RenderTreeText(
@@ -269,35 +179,12 @@ class BrowserRenderTree {
               ),
             ...element.children.map((e) => _parse(e, c)),
           ],
-          backgroundColor: c.backgroundColor,
-          borderWidth: null,
         );
       } else if (element.attributes["type"] == "submit") {
         return RenderTreeInputSubmit(
           isDisabled: element.attributes["disabled"]?.apply(bool.parse),
           value: element.attributes["value"],
-          marginBottom: c.marginBottomConverted,
-          marginLeft: c.marginLeftConverted,
-          marginTop: c.marginTopConverted,
-          marginRight: c.marginRightConverted,
-          paddingBottom: c.paddingBottomConverted,
-          paddingLeft: c.paddingLeftConverted,
-          paddingTop: c.paddingTopConverted,
-          paddingRight: c.paddingRightConverted,
-          borderBottomColor: c.borderBottomColor,
-          borderLeftColor: c.borderLeftColor,
-          borderRightColor: c.borderRightColor,
-          borderTopColor: c.borderTopColor,
-          borderLeftWidth: c.borderLeftWidthConverted,
-          borderRightWidth: c.borderRightWidthConverted,
-          borderTopWidth: c.borderTopWidthConverted,
-          borderBottomWidth: c.borderBottomWidthConverted,
-          maxHeight: c.maxHeightConverted,
-          maxWidth: c.maxWidthConverted,
-          borderRadius: c.borderRadiusConverted,
-          minHeight: c.minHeightConverted,
-          minWidth: c.minWidthtConverted,
-          isCentered: c.isCentered,
+          commonStyle: CommonStyle.fromCSSStyle(c),
           children: [
             if (element.text != "")
               RenderTreeText(
@@ -313,35 +200,12 @@ class BrowserRenderTree {
               ),
             ...element.children.map((e) => _parse(e, c)),
           ],
-          backgroundColor: c.backgroundColor,
-          borderWidth: null,
         );
       } else if (element.attributes["type"] == "reset") {
         return RenderTreeInputReset(
           isDisabled: element.attributes["disabled"]?.apply(bool.parse),
           value: element.attributes["value"],
-          marginBottom: c.marginBottomConverted,
-          marginLeft: c.marginLeftConverted,
-          marginTop: c.marginTopConverted,
-          marginRight: c.marginRightConverted,
-          paddingBottom: c.paddingBottomConverted,
-          paddingLeft: c.paddingLeftConverted,
-          paddingTop: c.paddingTopConverted,
-          paddingRight: c.paddingRightConverted,
-          borderBottomColor: c.borderBottomColor,
-          borderLeftColor: c.borderLeftColor,
-          borderRightColor: c.borderRightColor,
-          borderTopColor: c.borderTopColor,
-          borderLeftWidth: c.borderLeftWidthConverted,
-          borderRightWidth: c.borderRightWidthConverted,
-          borderTopWidth: c.borderTopWidthConverted,
-          borderBottomWidth: c.borderBottomWidthConverted,
-          maxHeight: c.maxHeightConverted,
-          maxWidth: c.maxWidthConverted,
-          borderRadius: c.borderRadiusConverted,
-          minHeight: c.minHeightConverted,
-          minWidth: c.minWidthtConverted,
-          isCentered: c.isCentered,
+          commonStyle: CommonStyle.fromCSSStyle(c),
           children: [
             if (element.text != "")
               RenderTreeText(
@@ -357,8 +221,6 @@ class BrowserRenderTree {
               ),
             ...element.children.map((e) => _parse(e, c)),
           ],
-          backgroundColor: c.backgroundColor,
-          borderWidth: null,
         );
       }
     } else if (displayProperty == "inline") {
@@ -366,93 +228,22 @@ class BrowserRenderTree {
         children: element.children.map((e) => _parse(e, c)).toList(),
       );
     } else if (displayProperty == "grid") {
-      print(c.rowGap);
-      print(c.columnGap);
-      print(c.rowGapConverted);
-      print(c.columnGapConverted);
       return RenderTreeGrid(
         columnGap: c.columnGapConverted,
         rowGap: c.rowGapConverted,
-        marginBottom: c.marginBottomConverted,
-        marginLeft: c.marginLeftConverted,
-        marginTop: c.marginTopConverted,
-        marginRight: c.marginRightConverted,
-        paddingBottom: c.paddingBottomConverted,
-        paddingLeft: c.paddingLeftConverted,
-        paddingTop: c.paddingTopConverted,
-        paddingRight: c.paddingRightConverted,
-        borderBottomColor: c.borderBottomColor,
-        borderLeftColor: c.borderLeftColor,
-        borderRightColor: c.borderRightColor,
-        borderTopColor: c.borderTopColor,
-        borderLeftWidth: c.borderLeftWidthConverted,
-        borderRightWidth: c.borderRightWidthConverted,
-        borderTopWidth: c.borderTopWidthConverted,
-        borderBottomWidth: c.borderBottomWidthConverted,
-        backgroundColor: c.backgroundColor,
-        borderWidth: null,
-        maxHeight: c.maxHeightConverted,
-        maxWidth: c.maxWidthConverted,
-        borderRadius: c.borderRadiusConverted,
-        minHeight: c.minHeightConverted,
-        minWidth: c.minWidthtConverted,
-        isCentered: c.isCentered,
+        commonStyle: CommonStyle.fromCSSStyle(c),
         children: element.children.map((e) => _parse(e, c)).toList(),
       );
     } else if (displayProperty == "flex") {
       return RenderTreeFlex(
         direction: "row",
         justifyContent: c.justifyContent,
-        marginBottom: c.marginBottomConverted,
-        marginLeft: c.marginLeftConverted,
-        marginTop: c.marginTopConverted,
-        marginRight: c.marginRightConverted,
-        paddingBottom: c.paddingBottomConverted,
-        paddingLeft: c.paddingLeftConverted,
-        paddingTop: c.paddingTopConverted,
-        paddingRight: c.paddingRightConverted,
-        borderBottomColor: c.borderBottomColor,
-        borderLeftColor: c.borderLeftColor,
-        borderRightColor: c.borderRightColor,
-        borderTopColor: c.borderTopColor,
-        borderLeftWidth: c.borderLeftWidthConverted,
-        borderRightWidth: c.borderRightWidthConverted,
-        borderTopWidth: c.borderTopWidthConverted,
-        borderBottomWidth: c.borderBottomWidthConverted,
-        backgroundColor: c.backgroundColor,
-        borderWidth: null,
-        maxHeight: c.maxHeightConverted,
-        maxWidth: c.maxWidthConverted,
-        borderRadius: c.borderRadiusConverted,
-        minHeight: c.minHeightConverted,
-        minWidth: c.minWidthtConverted,
-        isCentered: c.isCentered,
+        commonStyle: CommonStyle.fromCSSStyle(c),
         children: element.children.map((e) => _parse(e, c)).toList(),
       );
     } else if (displayProperty == "list-item") {
       return RenderTreeListItem(
-        marginBottom: c.marginBottomConverted,
-        marginLeft: c.marginLeftConverted,
-        marginTop: c.marginTopConverted,
-        marginRight: c.marginRightConverted,
-        paddingBottom: c.paddingBottomConverted,
-        paddingLeft: c.paddingLeftConverted,
-        paddingTop: c.paddingTopConverted,
-        paddingRight: c.paddingRightConverted,
-        borderBottomColor: c.borderBottomColor,
-        borderLeftColor: c.borderLeftColor,
-        borderRightColor: c.borderRightColor,
-        borderTopColor: c.borderTopColor,
-        borderLeftWidth: c.borderLeftWidthConverted,
-        borderRightWidth: c.borderRightWidthConverted,
-        borderTopWidth: c.borderTopWidthConverted,
-        borderBottomWidth: c.borderBottomWidthConverted,
-        maxHeight: c.maxHeightConverted,
-        maxWidth: c.maxWidthConverted,
-        borderRadius: c.borderRadiusConverted,
-        minHeight: c.minHeightConverted,
-        minWidth: c.minWidthtConverted,
-        isCentered: c.isCentered,
+        commonStyle: CommonStyle.fromCSSStyle(c),
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -474,35 +265,12 @@ class BrowserRenderTree {
             ),
           ...element.children.map((e) => _parse(e, c)),
         ],
-        backgroundColor: c.backgroundColor,
-        borderWidth: null,
       );
     } else if (displayProperty == "block") {
       if (c.listStyleType != null) {
         return RenderTreeList(
           listType: c.listStyleType!,
-          marginBottom: c.marginBottomConverted,
-          marginLeft: c.marginLeftConverted,
-          marginTop: c.marginTopConverted,
-          marginRight: c.marginRightConverted,
-          paddingBottom: c.paddingBottomConverted,
-          paddingLeft: c.paddingLeftConverted,
-          paddingTop: c.paddingTopConverted,
-          paddingRight: c.paddingRightConverted,
-          borderBottomColor: c.borderBottomColor,
-          borderLeftColor: c.borderLeftColor,
-          borderRightColor: c.borderRightColor,
-          borderTopColor: c.borderTopColor,
-          borderLeftWidth: c.borderLeftWidthConverted,
-          borderRightWidth: c.borderRightWidthConverted,
-          borderTopWidth: c.borderTopWidthConverted,
-          borderBottomWidth: c.borderBottomWidthConverted,
-          maxHeight: c.maxHeightConverted,
-          maxWidth: c.maxWidthConverted,
-          borderRadius: c.borderRadiusConverted,
-          minHeight: c.minHeightConverted,
-          minWidth: c.minWidthtConverted,
-          isCentered: c.isCentered,
+          commonStyle: CommonStyle.fromCSSStyle(c),
           children: [
             if (text != "")
               RenderTreeText(
@@ -518,34 +286,11 @@ class BrowserRenderTree {
               ),
             ...element.children.map((e) => _parse(e, c)),
           ],
-          backgroundColor: c.backgroundColor,
-          borderWidth: null,
         );
       }
 
       return RenderTreeBox(
-        marginBottom: c.marginBottomConverted,
-        marginLeft: c.marginLeftConverted,
-        marginTop: c.marginTopConverted,
-        marginRight: c.marginRightConverted,
-        paddingBottom: c.paddingBottomConverted,
-        paddingLeft: c.paddingLeftConverted,
-        paddingTop: c.paddingTopConverted,
-        paddingRight: c.paddingRightConverted,
-        borderBottomColor: c.borderBottomColor,
-        borderLeftColor: c.borderLeftColor,
-        borderRightColor: c.borderRightColor,
-        borderTopColor: c.borderTopColor,
-        borderLeftWidth: c.borderLeftWidthConverted,
-        borderRightWidth: c.borderRightWidthConverted,
-        borderTopWidth: c.borderTopWidthConverted,
-        borderBottomWidth: c.borderBottomWidthConverted,
-        maxWidth: c.maxWidthConverted,
-        maxHeight: c.maxHeightConverted,
-        borderRadius: c.borderRadiusConverted,
-        minHeight: c.minHeightConverted,
-        minWidth: c.minWidthtConverted,
-        isCentered: c.isCentered,
+        commonStyle: CommonStyle.fromCSSStyle(c),
         children: [
           if (text != "")
             RenderTreeText(
@@ -561,8 +306,6 @@ class BrowserRenderTree {
             ),
           ...element.children.map((e) => _parse(e, c)),
         ],
-        backgroundColor: c.backgroundColor,
-        borderWidth: null,
       );
     }
 
