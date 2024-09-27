@@ -115,7 +115,7 @@ class _CSSVisualizerState extends State<_CSSVisualizer> {
                 itemBuilder: (context, index) => Text("${index + 1}"),
               ),
             ),
-            Text.rich(highlightedCode),
+            SelectableText.rich(highlightedCode),
           ],
         ),
       ),
