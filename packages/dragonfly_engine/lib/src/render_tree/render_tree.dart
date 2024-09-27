@@ -179,8 +179,8 @@ class BrowserRenderTree {
       );
     } else if (element.localName! == "form") {
       return RenderTreeForm(
-        action: element.attributes["action"]!,
-        method: element.attributes["method"]!,
+        action: element.attributes["action"],
+        method: element.attributes["method"],
         marginBottom: c.marginBottomConverted,
         marginLeft: c.marginLeftConverted,
         marginTop: c.marginTopConverted,

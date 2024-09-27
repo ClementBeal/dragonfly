@@ -93,7 +93,9 @@ class BrowserInputReset extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Form.maybeOf(context)?.reset();
+      },
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),

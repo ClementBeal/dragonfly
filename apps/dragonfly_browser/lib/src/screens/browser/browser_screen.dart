@@ -226,6 +226,73 @@ class TreeRenderer extends StatelessWidget {
             ),
           ),
         ),
+      RenderTreeForm r => Form(
+          child: Container(
+            alignment: AlignmentDirectional.center,
+            // alignment:
+            //     (r.isCentered != null && r.isCentered!) ? Alignment.center : null,
+            constraints: BoxConstraints(
+              maxWidth: r.maxWidth ?? double.infinity,
+              maxHeight: r.maxHeight ?? double.infinity,
+              minHeight: r.minHeight ?? 0.0,
+              minWidth: r.minWidth ?? 0.0,
+            ),
+            decoration: BoxDecoration(
+              color: (r.backgroundColor != null)
+                  ? HexColor.fromHex(r.backgroundColor!)
+                  : null,
+              border: Border(
+                bottom: (r.borderBottomColor != null)
+                    ? BorderSide(
+                        width: r.borderRightWidth ?? 0.0,
+                        color: HexColor.fromHex(r.borderBottomColor!),
+                      )
+                    : BorderSide.none,
+                left: (r.borderLeftColor != null)
+                    ? BorderSide(
+                        width: r.borderLeftWidth ?? 0.0,
+                        color: HexColor.fromHex(r.borderLeftColor!),
+                      )
+                    : BorderSide.none,
+                top: (r.borderTopColor != null)
+                    ? BorderSide(
+                        width: r.borderTopWidth ?? 0.0,
+                        color: HexColor.fromHex(r.borderTopColor!),
+                      )
+                    : BorderSide.none,
+                right: (r.borderRightColor != null)
+                    ? BorderSide(
+                        width: r.borderRightWidth ?? 0.0,
+                        color: HexColor.fromHex(r.borderRightColor!),
+                      )
+                    : BorderSide.none,
+              ),
+              borderRadius: (r.borderRadius != null)
+                  ? BorderRadius.circular(r.borderRadius!)
+                  : null,
+            ),
+            padding: EdgeInsets.only(
+              bottom: r.paddingBottom ?? 0.0,
+              left: r.paddingLeft ?? 0.0,
+              top: r.paddingTop ?? 0.0,
+              right: r.paddingRight ?? 0.0,
+            ),
+            margin: EdgeInsets.only(
+              bottom: r.marginBottom ?? 0.0,
+              left: r.marginLeft ?? 0.0,
+              top: r.marginTop ?? 0.0,
+              right: r.marginRight ?? 0.0,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              // crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (final c in r.children) TreeRenderer(c),
+              ],
+            ),
+          ),
+        ),
       RenderTreeListItem r => Container(
           constraints: BoxConstraints(
             maxWidth: r.maxWidth ?? double.infinity,
