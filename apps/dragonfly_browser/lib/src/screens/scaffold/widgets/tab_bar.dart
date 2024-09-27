@@ -191,7 +191,7 @@ class FlatTab extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: (isActive) ? Colors.white : null,
                         fontWeight:
                             isActive ? FontWeight.bold : FontWeight.normal,
                       ),
