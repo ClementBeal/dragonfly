@@ -30,6 +30,7 @@ class BrowserInputTextField extends StatelessWidget {
       width: size.width,
       child: TextFormField(
         cursorHeight: size.height,
+        obscureText: r.isPassord,
         decoration: InputDecoration(
           isDense: true,
           border: OutlineInputBorder(

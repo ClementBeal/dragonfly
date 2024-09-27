@@ -222,8 +222,11 @@ class BrowserRenderTree {
         borderWidth: null,
       );
     } else if (element.localName! == "input") {
-      if (element.attributes["type"] == "text") {
+      final inputType = element.attributes["type"];
+
+      if (inputType == "text" || inputType == "password") {
         return RenderTreeInputText(
+          isPassord: inputType == "password",
           isReadOnly: element.attributes["readonly"]?.apply(bool.parse),
           maxLength: element.attributes["maxlength"]?.apply(int.parse),
           size: element.attributes["size"]?.apply(int.parse) ?? 20,

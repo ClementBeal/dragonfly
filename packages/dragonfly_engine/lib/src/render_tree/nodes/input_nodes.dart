@@ -15,12 +15,16 @@ class RenderTreeInputText extends RenderTreeBox {
   /// The number of characters to display
   final int size;
 
+  /// Is a "password" field
+  final bool isPassord;
+
   RenderTreeInputText({
     this.name,
     this.maxLength,
     this.isReadOnly,
     this.placeholder,
     this.size = 20,
+    this.isPassord = false,
     required super.children,
     required super.backgroundColor,
     required super.paddingTop,
