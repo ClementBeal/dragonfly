@@ -2,7 +2,7 @@ part of 'a_page.dart';
 
 class HtmlPage extends Page {
   final Document? document;
-  final List<String?> stylesheets;
+  final List<CSSStylesheet?> stylesheets;
   final BrowserImage? favicon;
 
   HtmlPage({
@@ -17,7 +17,7 @@ class HtmlPage extends Page {
   HtmlPage copyWith({
     Document? document,
     PageStatus? status,
-    List<String>? stylesheets,
+    List<CSSStylesheet>? stylesheets,
   }) {
     return HtmlPage(
       uri: uri,

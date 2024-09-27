@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
+import 'package:dragonfly_css_parser/dragonfly_css_parser.dart';
 import 'package:dragonfly_engine/src/css/css_browser_theme.dart';
 import 'package:dragonfly_engine/src/css/cssom_builder.dart';
 import 'package:dragonfly_engine/src/file_explorer/file_explorer.dart';
@@ -19,6 +20,20 @@ import 'package:path/path.dart' as p;
 import 'package:http/http.dart' as http;
 
 enum PageStatus { loading, error, success }
+
+class CSSStylesheet {
+  final String name;
+  final String content;
+  final bool isVisible;
+  final bool isBrowserStyle;
+
+  CSSStylesheet({
+    required this.name,
+    required this.content,
+    required this.isVisible,
+    this.isBrowserStyle = false,
+  });
+}
 
 /// Represents a browser tab.
 class Tab {
@@ -124,11 +139,19 @@ class Tab {
         ],
       );
 
-      final allStylesheets = result.skip(1).cast<String?>().toList();
+      final allStylesheets = result.skip(1).cast<CSSStylesheet?>().toList();
 
       _history.last = HtmlPage(
         document: document,
-        stylesheets: [css, ...allStylesheets],
+        stylesheets: [
+          CSSStylesheet(
+            name: "",
+            isVisible: true,
+            content: css,
+            isBrowserStyle: true,
+          ),
+          ...allStylesheets
+        ],
         favicon: result.first as BrowserImage?,
         status: PageStatus.success,
         uri: uri,
@@ -148,7 +171,7 @@ class Tab {
   }
 
   /// Return the CSS string
-  Future<String?> _downloadCSSFile(Uri baseUri, String href) async {
+  Future<CSSStylesheet?> _downloadCSSFile(Uri baseUri, String href) async {
     Uri goodUrl;
 
     if (href.startsWith("/")) {
@@ -170,7 +193,11 @@ class Tab {
       if (response != null &&
           response.statusCode >= 200 &&
           response.statusCode < 300) {
-        return utf8.decode(response.body);
+        return CSSStylesheet(
+          content: utf8.decode(response.body),
+          isVisible: true,
+          name: baseUri.path,
+        );
       } else {
         return null;
       }

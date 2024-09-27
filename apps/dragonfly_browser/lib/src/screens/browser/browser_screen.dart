@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/browser/blocs/render_screen_cubit.dart';
 import 'package:dragonfly/src/screens/browser/helpers/color_utils.dart';
@@ -94,8 +93,10 @@ class RenderPageWidget extends StatelessWidget {
 
                     final renderTree = BrowserRenderTree(
                       dom: page.document!,
-                      cssom: CssomBuilder().parse(
-                          page.stylesheets.whereType<String>().join("\n")),
+                      cssom: CssomBuilder().parse(page.stylesheets
+                          .whereType<CSSStylesheet>()
+                          .map((e) => e.content)
+                          .join("\n")),
                       initialRoute: page.uri.toString(),
                     ).parse();
 
