@@ -1,4 +1,6 @@
 import 'package:dragonfly_engine/dragonfly_engine.dart';
+import 'package:dragonfly_engine/src/render_tree/nodes/render_tree_node.dart';
+import 'package:dragonfly_engine/src/utils/extension.dart';
 import 'package:html/dom.dart';
 
 class RenderTree {
@@ -175,6 +177,99 @@ class BrowserRenderTree {
         backgroundColor: c.backgroundColor,
         borderWidth: null,
       );
+    } else if (element.localName! == "form") {
+      return RenderTreeForm(
+        action: element.attributes["action"]!,
+        method: element.attributes["method"]!,
+        marginBottom: c.marginBottomConverted,
+        marginLeft: c.marginLeftConverted,
+        marginTop: c.marginTopConverted,
+        marginRight: c.marginRightConverted,
+        paddingBottom: c.paddingBottomConverted,
+        paddingLeft: c.paddingLeftConverted,
+        paddingTop: c.paddingTopConverted,
+        paddingRight: c.paddingRightConverted,
+        borderBottomColor: c.borderBottomColor,
+        borderLeftColor: c.borderLeftColor,
+        borderRightColor: c.borderRightColor,
+        borderTopColor: c.borderTopColor,
+        borderLeftWidth: c.borderLeftWidthConverted,
+        borderRightWidth: c.borderRightWidthConverted,
+        borderTopWidth: c.borderTopWidthConverted,
+        borderBottomWidth: c.borderBottomWidthConverted,
+        maxHeight: c.maxHeightConverted,
+        maxWidth: c.maxWidthConverted,
+        borderRadius: c.borderRadiusConverted,
+        minHeight: c.minHeightConverted,
+        minWidth: c.minWidthtConverted,
+        isCentered: c.isCentered,
+        children: [
+          if (element.text != "")
+            RenderTreeText(
+              text: element.text,
+              color: c.textColor,
+              fontFamily: c.fontFamily,
+              fontSize: c.fontSizeConverted,
+              textAlign: c.textAlign,
+              fontWeight: c.fontWeight,
+              textDecoration: null,
+              letterSpacing: null,
+              wordSpacing: null,
+            ),
+          ...element.children.map((e) => _parse(e, c)),
+        ],
+        backgroundColor: c.backgroundColor,
+        borderWidth: null,
+      );
+    } else if (element.localName! == "input") {
+      if (element.attributes["type"] == "text") {
+        return RenderTreeInputText(
+          isReadOnly: element.attributes["readonly"]?.apply(bool.parse),
+          maxLength: element.attributes["maxlength"]?.apply(int.parse),
+          size: element.attributes["size"]?.apply(int.parse) ?? 20,
+          name: element.attributes["name"],
+          placeholder: element.attributes["placeholder"],
+          marginBottom: c.marginBottomConverted,
+          marginLeft: c.marginLeftConverted,
+          marginTop: c.marginTopConverted,
+          marginRight: c.marginRightConverted,
+          paddingBottom: c.paddingBottomConverted,
+          paddingLeft: c.paddingLeftConverted,
+          paddingTop: c.paddingTopConverted,
+          paddingRight: c.paddingRightConverted,
+          borderBottomColor: c.borderBottomColor,
+          borderLeftColor: c.borderLeftColor,
+          borderRightColor: c.borderRightColor,
+          borderTopColor: c.borderTopColor,
+          borderLeftWidth: c.borderLeftWidthConverted,
+          borderRightWidth: c.borderRightWidthConverted,
+          borderTopWidth: c.borderTopWidthConverted,
+          borderBottomWidth: c.borderBottomWidthConverted,
+          maxHeight: c.maxHeightConverted,
+          maxWidth: c.maxWidthConverted,
+          borderRadius: c.borderRadiusConverted,
+          minHeight: c.minHeightConverted,
+          minWidth: c.minWidthtConverted,
+          isCentered: c.isCentered,
+          children: [
+            if (element.text != "")
+              RenderTreeText(
+                text: element.text,
+                color: c.textColor,
+                fontFamily: c.fontFamily,
+                fontSize: c.fontSizeConverted,
+                textAlign: c.textAlign,
+                fontWeight: c.fontWeight,
+                textDecoration: null,
+                letterSpacing: null,
+                wordSpacing: null,
+              ),
+            ...element.children.map((e) => _parse(e, c)),
+          ],
+          backgroundColor: c.backgroundColor,
+          borderWidth: null,
+        );
+      }
     } else if (displayProperty == "inline") {
       return RenderTreeInline(
         children: element.children.map((e) => _parse(e, c)).toList(),

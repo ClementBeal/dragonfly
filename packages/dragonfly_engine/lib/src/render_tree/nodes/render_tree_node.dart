@@ -1,3 +1,5 @@
+part 'input_nodes.dart';
+
 sealed class RenderTreeObject {}
 
 class RenderTreeView extends RenderTreeObject {
@@ -287,6 +289,44 @@ class RenderTreeGrid extends RenderTreeBox {
   RenderTreeGrid({
     required this.rowGap,
     required this.columnGap,
+    required super.children,
+    required super.backgroundColor,
+    required super.paddingTop,
+    required super.paddingRight,
+    required super.paddingBottom,
+    required super.paddingLeft,
+    required super.marginTop,
+    required super.marginRight,
+    required super.marginBottom,
+    required super.marginLeft,
+    required super.borderWidth,
+    required super.borderLeftColor,
+    required super.borderRightColor,
+    required super.borderTopColor,
+    required super.borderBottomColor,
+    required super.borderLeftWidth,
+    required super.borderRightWidth,
+    required super.borderTopWidth,
+    required super.borderBottomWidth,
+    required super.maxHeight,
+    required super.maxWidth,
+    required super.borderRadius,
+    required super.minHeight,
+    required super.minWidth,
+    required super.isCentered,
+  });
+}
+
+class RenderTreeForm extends RenderTreeBox {
+  /// The destination of the form
+  final String? action;
+
+  /// The HTTP request method : GET, POST, DELETE etc
+  final String? method;
+
+  RenderTreeForm({
+    required this.method,
+    required this.action,
     required super.children,
     required super.backgroundColor,
     required super.paddingTop,
