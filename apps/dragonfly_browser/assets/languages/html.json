@@ -6,10 +6,8 @@
 		"htm"
 	],
 	"scopeName": "text.html.basic",
-
 	"foldingStartMarker": "<(?!\\/|!DOCTYPE)[^>]*?>",
 	"foldingStopMarker": "<\\/[^>]*?>",
-
 	"patterns": [
 		{
 			"name": "meta.doctype.html",

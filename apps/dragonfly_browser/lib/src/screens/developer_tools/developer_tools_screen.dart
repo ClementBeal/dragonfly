@@ -1,10 +1,11 @@
 import 'package:dragonfly/src/screens/developer_tools/tools/console/console_screen.dart';
 import 'package:dragonfly/src/screens/developer_tools/tools/network/network_tool_screen.dart';
+import 'package:dragonfly/src/screens/developer_tools/tools/stylesheets/stylesheets_tool_screen.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-enum DeveloperTool { network, console }
+enum DeveloperTool { network, console, stylesheet }
 
 class DeveloperToolsScreen extends StatefulWidget {
   const DeveloperToolsScreen({super.key, required this.isInsideColumn});
@@ -79,6 +80,18 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
                           isSelected: selectedTool == DeveloperTool.network,
                         ),
                       ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedTool = DeveloperTool.stylesheet;
+                          });
+                        },
+                        child: IconWithTool(
+                          icon: Icons.palette_outlined,
+                          label: "Stylesheets",
+                          isSelected: selectedTool == DeveloperTool.stylesheet,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -86,6 +99,7 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
                     child: switch (selectedTool) {
                   DeveloperTool.network => const NetworkToolScreen(),
                   DeveloperTool.console => const ConsoleScreen(),
+                  DeveloperTool.stylesheet => const StylesheetsScreen(),
                 }),
               ],
             ),
@@ -97,11 +111,12 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
 }
 
 class IconWithTool extends StatelessWidget {
-  const IconWithTool(
-      {super.key,
-      required this.icon,
-      required this.label,
-      required this.isSelected});
+  const IconWithTool({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+  });
 
   final IconData icon;
   final String label;
@@ -109,24 +124,29 @@ class IconWithTool extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
           border: Border(
-        top: (isSelected)
-            ? BorderSide(
-                color: Colors.blue.shade800,
-                width: 3,
-              )
-            : BorderSide.none,
-      )),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon),
-            Text(label),
-          ],
+            top: (isSelected)
+                ? BorderSide(
+                    color: Colors.blue.shade800,
+                    width: 3,
+                  )
+                : BorderSide.none,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            spacing: 4,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon),
+              Text(label),
+            ],
+          ),
         ),
       ),
     );

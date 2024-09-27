@@ -139,7 +139,11 @@ class Tab {
         ],
       );
 
-      final allStylesheets = result.skip(1).cast<CSSStylesheet?>().toList();
+      final allStylesheets = result
+          .skip(1)
+          .cast<CSSStylesheet?>()
+          .whereType<CSSStylesheet>()
+          .toList();
 
       _history.last = HtmlPage(
         document: document,

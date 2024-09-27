@@ -14,6 +14,7 @@ import 'package:syntax_highlight/syntax_highlight.dart';
 import 'package:window_manager/window_manager.dart';
 
 late final Highlighter htmlHighlighter;
+late final Highlighter cssHightlighter;
 late final BrowserFavorites browserFavorites;
 late final NavigationHistory navigationHistory;
 
@@ -26,9 +27,19 @@ void main() async {
   navigationHistory = NavigationHistory(db);
 
   await windowManager.ensureInitialized();
-  Highlighter.initialize(['../../../assets/languages/html']);
+  Highlighter.initialize(
+    [
+      '../../../assets/languages/html',
+      '../../../assets/languages/css',
+    ],
+  );
 
   var lightTheme = await HighlighterTheme.loadLightTheme();
+
+  cssHightlighter = Highlighter(
+    language: '../../../assets/languages/css',
+    theme: lightTheme,
+  );
   htmlHighlighter = Highlighter(
     language: '../../../assets/languages/html',
     theme: lightTheme,

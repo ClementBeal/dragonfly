@@ -2,7 +2,7 @@ part of 'a_page.dart';
 
 class HtmlPage extends Page {
   final Document? document;
-  final List<CSSStylesheet?> stylesheets;
+  final List<CSSStylesheet> stylesheets;
   final BrowserImage? favicon;
 
   HtmlPage({
