@@ -1,6 +1,6 @@
+import 'package:collection/collection.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/browser/blocs/render_screen_cubit.dart';
-import 'package:dragonfly/src/screens/browser/browser_theme.dart';
 import 'package:dragonfly/src/screens/browser/helpers/color_utils.dart';
 import 'package:dragonfly/src/screens/browser/pages/file_explorer_page.dart';
 import 'package:dragonfly/src/screens/browser/pages/json/json_screen.dart';
@@ -84,48 +84,46 @@ class RenderPageWidget extends StatelessWidget {
                 page: p,
                 tab: tab,
               ),
-            HtmlPage page => CSSOMProvider(
-                cssom: page.cssom ?? cssomBuilder.browserStyle!,
-                child: (page.document!.documentElement != null)
-                    ? BlocBuilder<RenderScreenCubit, RenderScreenState>(
-                        builder: (context, state) {
-                        // TO DO
-                        // dirty hack for testing purpose
-                        // it has to be moded to a special package
-                        // called `dragonfly_renderer`
+            HtmlPage page => (page.document!.documentElement != null)
+                ? BlocBuilder<RenderScreenCubit, RenderScreenState>(
+                    builder: (context, state) {
+                    // TO DO
+                    // dirty hack for testing purpose
+                    // it has to be moded to a special package
+                    // called `dragonfly_renderer`
 
-                        final renderTree = BrowserRenderTree(
-                          dom: page.document!,
-                          cssom: page.cssom!,
-                          initialRoute: page.uri.toString(),
-                        ).parse();
+                    final renderTree = BrowserRenderTree(
+                      dom: page.document!,
+                      cssom: CssomBuilder().parse(
+                          page.stylesheets.whereType<String>().join("\n")),
+                      initialRoute: page.uri.toString(),
+                    ).parse();
 
-                        return Stack(
-                          children: [
-                            TreeRenderer(renderTree.child),
-                            if (state.hoveredLink != null)
-                              Align(
-                                alignment: Alignment.bottomLeft,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    color: Colors.black87,
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      state.hoveredLink!,
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                    ),
+                    return Stack(
+                      children: [
+                        TreeRenderer(renderTree.child),
+                        if (state.hoveredLink != null)
+                          Align(
+                            alignment: Alignment.bottomLeft,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: Colors.black87,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  state.hoveredLink!,
+                                  style: TextStyle(
+                                    color: Colors.white,
                                   ),
                                 ),
                               ),
-                          ],
-                        );
-                      })
-                    : const SizedBox.shrink(),
-              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  })
+                : const SizedBox.shrink(),
             MediaPage p => MediaPageScreen(page: p),
             JsonPage p => JsonScreen(page: p),
           },
@@ -171,7 +169,6 @@ class TreeRenderer extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
-              // crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 for (final c in r.children) TreeRenderer(c),
               ],
@@ -183,7 +180,6 @@ class TreeRenderer extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            // crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               for (final c in r.children) TreeRenderer(c),
             ],
@@ -203,9 +199,6 @@ class TreeRenderer extends StatelessWidget {
           child: SizedBox.expand(
             child: SingleChildScrollView(
               child: Column(
-                // crossAxisAlignment: CrossAxisAlignment.start,
-                // mainAxisAlignment: MainAxisAlignment.start,
-                // crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   TreeRenderer(r.child),
                 ],
@@ -213,42 +206,46 @@ class TreeRenderer extends StatelessWidget {
             ),
           ),
         ),
-      RenderTreeText r => Text(
-          r.text,
-          textAlign: switch (r.textAlign) {
-            "start" => TextAlign.start,
-            "end" => TextAlign.end,
-            "left" => TextAlign.left,
-            "right" => TextAlign.right,
-            "center" => TextAlign.center,
-            "justify" => TextAlign.justify,
-            _ => null,
-          },
-          style: TextStyle(
-              color: (r.color != null) ? HexColor.fromHex(r.color!) : null,
-              fontSize: r.fontSize,
-              fontFamily: r.fontFamily,
-              letterSpacing: r.letterSpacing,
-              wordSpacing: r.wordSpacing,
-              decoration: TextDecoration.combine(
-                [
-                  if (r.textDecoration == "underline") TextDecoration.underline,
-                ],
-              ),
-              fontWeight: switch (r.fontWeight) {
-                "normal" => FontWeight.normal,
-                "bold" => FontWeight.bold,
-                "100" => FontWeight.w100,
-                "200" => FontWeight.w200,
-                "300" => FontWeight.w300,
-                "400" => FontWeight.w400,
-                "500" => FontWeight.w500,
-                "600" => FontWeight.w600,
-                "700" => FontWeight.w700,
-                "800" => FontWeight.w800,
-                "900" => FontWeight.w900,
-                _ => FontWeight.normal,
-              }),
+      RenderTreeText r => CommonStyleBlock(
+          null,
+          child: Text(
+            r.text,
+            textAlign: switch (r.textAlign) {
+              "start" => TextAlign.start,
+              "end" => TextAlign.end,
+              "left" => TextAlign.left,
+              "right" => TextAlign.right,
+              "center" => TextAlign.center,
+              "justify" => TextAlign.justify,
+              _ => null,
+            },
+            style: TextStyle(
+                color: (r.color != null) ? HexColor.fromHex(r.color!) : null,
+                fontSize: 18,
+                fontFamily: r.fontFamily,
+                letterSpacing: r.letterSpacing,
+                wordSpacing: r.wordSpacing,
+                decoration: TextDecoration.combine(
+                  [
+                    if (r.textDecoration == "underline")
+                      TextDecoration.underline,
+                  ],
+                ),
+                fontWeight: switch (r.fontWeight) {
+                  "normal" => FontWeight.normal,
+                  "bold" => FontWeight.bold,
+                  "100" => FontWeight.w100,
+                  "200" => FontWeight.w200,
+                  "300" => FontWeight.w300,
+                  "400" => FontWeight.w400,
+                  "500" => FontWeight.w500,
+                  "600" => FontWeight.w600,
+                  "700" => FontWeight.w700,
+                  "800" => FontWeight.w800,
+                  "900" => FontWeight.w900,
+                  _ => FontWeight.normal,
+                }),
+          ),
         ),
       RenderTreeLink r => MouseRegion(
           onEnter: (event) {
@@ -274,7 +271,6 @@ class TreeRenderer extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                // crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   for (final c in r.children) TreeRenderer(c),
                 ],
@@ -288,6 +284,11 @@ class TreeRenderer extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: switch (r.justifyContent) {
               "start" => MainAxisAlignment.start,
+              "center" => MainAxisAlignment.center,
+              "end" => MainAxisAlignment.end,
+              "spaceBetween" => MainAxisAlignment.spaceBetween,
+              "spaceAround" => MainAxisAlignment.spaceAround,
+              "spaceEvenly" => MainAxisAlignment.spaceEvenly,
               _ => MainAxisAlignment.start,
             },
             children: [
@@ -324,7 +325,6 @@ class TreeRenderer extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            // crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               for (final c in r.children) TreeRenderer(c),
             ],
@@ -337,70 +337,68 @@ class TreeRenderer extends StatelessWidget {
 class CommonStyleBlock extends StatelessWidget {
   const CommonStyleBlock(this.commonStyle, {super.key, required this.child});
 
-  final CommonStyle commonStyle;
+  final CommonStyle? commonStyle;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      cursor: (commonStyle.cursor == "pointer")
+      cursor: (commonStyle?.cursor == "pointer")
           ? SystemMouseCursors.click
           : MouseCursor.defer,
       child: Container(
         alignment: AlignmentDirectional.center,
-        // alignment:
-        //     (r.isCentered != null && r.isCentered!) ? Alignment.center : null,
         constraints: BoxConstraints(
-          maxWidth: commonStyle.maxWidth ?? double.infinity,
-          maxHeight: commonStyle.maxHeight ?? double.infinity,
-          minHeight: commonStyle.minHeight ?? 0.0,
-          minWidth: commonStyle.minWidth ?? 0.0,
+          maxWidth: commonStyle?.maxWidth ?? double.infinity,
+          maxHeight: commonStyle?.maxHeight ?? double.infinity,
+          minHeight: commonStyle?.minHeight ?? 0.0,
+          minWidth: commonStyle?.minWidth ?? 0.0,
         ),
         decoration: BoxDecoration(
-          color: (commonStyle.backgroundColor != null)
-              ? HexColor.fromHex(commonStyle.backgroundColor!)
+          color: (commonStyle?.backgroundColor != null)
+              ? HexColor.fromHex(commonStyle!.backgroundColor!)
               : null,
           border: Border(
-            bottom: (commonStyle.borderBottomColor != null)
+            bottom: (commonStyle?.borderBottomColor != null)
                 ? BorderSide(
-                    width: commonStyle.borderRightWidth ?? 0.0,
-                    color: HexColor.fromHex(commonStyle.borderBottomColor!),
+                    width: commonStyle?.borderRightWidth ?? 0.0,
+                    color: HexColor.fromHex(commonStyle!.borderBottomColor!),
                   )
                 : BorderSide.none,
-            left: (commonStyle.borderLeftColor != null)
+            left: (commonStyle?.borderLeftColor != null)
                 ? BorderSide(
-                    width: commonStyle.borderLeftWidth ?? 0.0,
-                    color: HexColor.fromHex(commonStyle.borderLeftColor!),
+                    width: commonStyle!.borderLeftWidth ?? 0.0,
+                    color: HexColor.fromHex(commonStyle!.borderLeftColor!),
                   )
                 : BorderSide.none,
-            top: (commonStyle.borderTopColor != null)
+            top: (commonStyle?.borderTopColor != null)
                 ? BorderSide(
-                    width: commonStyle.borderTopWidth ?? 0.0,
-                    color: HexColor.fromHex(commonStyle.borderTopColor!),
+                    width: commonStyle?.borderTopWidth ?? 0.0,
+                    color: HexColor.fromHex(commonStyle!.borderTopColor!),
                   )
                 : BorderSide.none,
-            right: (commonStyle.borderRightColor != null)
+            right: (commonStyle?.borderRightColor != null)
                 ? BorderSide(
-                    width: commonStyle.borderRightWidth ?? 0.0,
-                    color: HexColor.fromHex(commonStyle.borderRightColor!),
+                    width: commonStyle?.borderRightWidth ?? 0.0,
+                    color: HexColor.fromHex(commonStyle!.borderRightColor!),
                   )
                 : BorderSide.none,
           ),
-          borderRadius: (commonStyle.borderRadius != null)
-              ? BorderRadius.circular(commonStyle.borderRadius!)
+          borderRadius: (commonStyle?.borderRadius != null)
+              ? BorderRadius.circular(commonStyle!.borderRadius!)
               : null,
         ),
         padding: EdgeInsets.only(
-          bottom: commonStyle.paddingBottom ?? 0.0,
-          left: commonStyle.paddingLeft ?? 0.0,
-          top: commonStyle.paddingTop ?? 0.0,
-          right: commonStyle.paddingRight ?? 0.0,
+          bottom: commonStyle?.paddingBottom ?? 0.0,
+          left: commonStyle?.paddingLeft ?? 0.0,
+          top: commonStyle?.paddingTop ?? 0.0,
+          right: commonStyle?.paddingRight ?? 0.0,
         ),
         margin: EdgeInsets.only(
-          bottom: commonStyle.marginBottom ?? 0.0,
-          left: commonStyle.marginLeft ?? 0.0,
-          top: commonStyle.marginTop ?? 0.0,
-          right: commonStyle.marginRight ?? 0.0,
+          bottom: commonStyle?.marginBottom ?? 0.0,
+          left: commonStyle?.marginLeft ?? 0.0,
+          top: commonStyle?.marginTop ?? 0.0,
+          right: commonStyle?.marginRight ?? 0.0,
         ),
         child: child,
       ),

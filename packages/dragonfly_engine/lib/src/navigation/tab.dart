@@ -90,7 +90,7 @@ class Tab {
     _history.add(
       HtmlPage(
         document: null,
-        cssom: null,
+        stylesheets: [],
         status: PageStatus.loading,
         uri: uri,
       ),
@@ -124,15 +124,11 @@ class Tab {
         ],
       );
 
-      // we should merge the the CSSom trees
-      final currentCSSOM =
-          (result.length > 1) ? result.skip(1).first as CssomTree? : null;
-
-      print("cssom -> $currentCSSOM");
+      final allStylesheets = result.skip(1).cast<String?>().toList();
 
       _history.last = HtmlPage(
         document: document,
-        cssom: currentCSSOM ?? CssomBuilder().parse(css),
+        stylesheets: [css, ...allStylesheets],
         favicon: result.first as BrowserImage?,
         status: PageStatus.success,
         uri: uri,
@@ -143,7 +139,7 @@ class Tab {
       print(htmlRequest?.statusCode);
       _history.last = HtmlPage(
         document: null,
-        cssom: null,
+        stylesheets: [],
         favicon: null,
         status: PageStatus.error,
         uri: uri,
@@ -151,7 +147,8 @@ class Tab {
     }
   }
 
-  Future<CssomTree?> _downloadCSSFile(Uri baseUri, String href) async {
+  /// Return the CSS string
+  Future<String?> _downloadCSSFile(Uri baseUri, String href) async {
     Uri goodUrl;
 
     if (href.startsWith("/")) {
@@ -173,9 +170,7 @@ class Tab {
       if (response != null &&
           response.statusCode >= 200 &&
           response.statusCode < 300) {
-        return CssomBuilder().parse(
-          utf8.decode(response.body),
-        );
+        return utf8.decode(response.body);
       } else {
         return null;
       }

@@ -2,27 +2,28 @@ part of 'a_page.dart';
 
 class HtmlPage extends Page {
   final Document? document;
-  final CssomTree? cssom;
+  final List<String?> stylesheets;
   final BrowserImage? favicon;
 
-  HtmlPage(
-      {required super.uri,
-      required super.status,
-      super.guid,
-      this.favicon,
-      required this.document,
-      required this.cssom});
+  HtmlPage({
+    required super.uri,
+    required super.status,
+    super.guid,
+    this.favicon,
+    required this.document,
+    required this.stylesheets,
+  });
 
   HtmlPage copyWith({
     Document? document,
     PageStatus? status,
-    CssomTree? cssom,
+    List<String>? stylesheets,
   }) {
     return HtmlPage(
       uri: uri,
       guid: guid,
       document: document ?? this.document,
-      cssom: cssom ?? this.cssom,
+      stylesheets: stylesheets ?? this.stylesheets,
       status: status ?? this.status,
     );
   }

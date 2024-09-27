@@ -61,7 +61,8 @@ class CssomBuilder {
   /// otherwise, it create it from scratch
   CssomTree parse(String css) {
     final document = CssParser().parse(css);
-    final tree = browserStyle?.clone() ?? CssomTree(rules: []);
+
+    final tree = CssomTree(rules: []);
 
     for (var rule in document.rules) {
       final selector = rule.selector;
