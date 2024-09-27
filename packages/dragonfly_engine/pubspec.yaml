@@ -17,6 +17,7 @@ dependencies:
   dragonfly_browservault: ^0.0.1
   path: ^1.9.0
   mime: ^1.0.6
+  csslib: ^1.0.0
 
 dev_dependencies:
   lints: ^4.0.0
