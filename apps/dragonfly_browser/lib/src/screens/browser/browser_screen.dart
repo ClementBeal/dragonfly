@@ -132,6 +132,14 @@ class RenderPageWidget extends StatelessWidget {
   }
 }
 
+class MyBehavior extends ScrollBehavior {
+  @override
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child;
+  }
+}
+
 class TreeRenderer extends StatelessWidget {
   const TreeRenderer(this.renderNode, {super.key});
 
@@ -197,11 +205,14 @@ class TreeRenderer extends StatelessWidget {
             color: HexColor.fromHex(r.backgroundColor),
           ),
           child: SizedBox.expand(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  TreeRenderer(r.child),
-                ],
+            child: ScrollConfiguration(
+              behavior: MyBehavior(),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    TreeRenderer(r.child),
+                  ],
+                ),
               ),
             ),
           ),
