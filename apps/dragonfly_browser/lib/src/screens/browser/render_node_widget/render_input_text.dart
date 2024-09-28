@@ -84,7 +84,7 @@ class BrowserInputSubmit extends StatelessWidget {
             horizontal: 4,
             vertical: 2,
           ),
-          child: Text(r.value ?? ""),
+          child: AbsorbPointer(child: Text(r.value ?? "")),
         ),
       ),
     );
@@ -190,5 +190,76 @@ class _BrowserInputFileState extends State<BrowserInputFile> {
         ],
       ),
     );
+  }
+}
+
+class BrowserInputCheckbox extends StatelessWidget {
+  const BrowserInputCheckbox({super.key, required this.r});
+
+  final RenderTreeInputCheckbox r;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: const Size.square(14),
+      foregroundPainter: CustomCheckboxPainter(
+        isChecked: r.isChecked ?? false,
+        color: Colors.blue,
+      ),
+    );
+  }
+}
+
+class CustomCheckboxPainter extends CustomPainter {
+  final Color color;
+  final bool isChecked;
+
+  CustomCheckboxPainter({required this.color, required this.isChecked});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (isChecked) {
+      final paint = Paint()
+        ..color = color
+        ..style = PaintingStyle.fill
+        ..strokeWidth = 2;
+
+      // Draw the square
+      canvas.drawRect(
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        paint,
+      );
+
+      paint.color = Colors.white;
+
+      // Draw the checkmark
+      canvas.drawLine(
+        Offset(size.width * 0.2, size.height * 0.3),
+        Offset(size.width * 0.5, size.height * 0.7),
+        paint,
+      );
+      canvas.drawLine(
+        Offset(size.width * 0.5, size.height * 0.7),
+        Offset(size.width * 0.8, size.height * 0.2),
+        paint,
+      );
+    } else {
+      final paint = Paint()
+        ..color = Colors.black54
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1;
+
+      // Draw the square
+      canvas.drawRect(
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return (oldDelegate as CustomCheckboxPainter).color != color ||
+        (oldDelegate).isChecked != isChecked;
   }
 }

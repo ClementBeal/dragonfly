@@ -74,3 +74,18 @@ class RenderTreeInputFile extends RenderTreeBox {
     required super.commonStyle,
   });
 }
+
+class RenderTreeInputCheckbox extends RenderTreeBox {
+  /// The button's text
+  final bool? isChecked;
+
+  /// Activate or not the button
+  final bool? isDisabled;
+
+  RenderTreeInputCheckbox({
+    this.isChecked,
+    this.isDisabled,
+    required super.children,
+    required super.commonStyle,
+  });
+}
