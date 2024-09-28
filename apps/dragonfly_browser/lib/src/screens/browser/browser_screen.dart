@@ -339,6 +339,9 @@ class TreeRenderer extends StatelessWidget {
       RenderTreeInputCheckbox r => BrowserInputCheckbox(
           r: r,
         ),
+      RenderTreeInputRadio r => BrowserInputRadio(
+          r: r,
+        ),
       RenderTreeBox r => CommonStyleBlock(
           r.commonStyle,
           child: Column(

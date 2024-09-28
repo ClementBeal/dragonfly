@@ -263,3 +263,69 @@ class CustomCheckboxPainter extends CustomPainter {
         (oldDelegate).isChecked != isChecked;
   }
 }
+
+class BrowserInputRadio extends StatelessWidget {
+  const BrowserInputRadio({super.key, required this.r});
+
+  final RenderTreeInputRadio r;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: const Size.square(14),
+      foregroundPainter: CustomRadioPainter(
+        isChecked: r.isChecked ?? false,
+        color: Colors.blue,
+      ),
+    );
+  }
+}
+
+class CustomRadioPainter extends CustomPainter {
+  final Color color;
+  final bool isChecked;
+
+  CustomRadioPainter({required this.color, required this.isChecked});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (isChecked) {
+      final paint = Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2;
+
+      canvas.drawCircle(
+        size.center(Offset.zero),
+        size.width / 2,
+        paint,
+      );
+
+      paint.style = PaintingStyle.fill;
+
+      canvas.drawCircle(
+        size.center(Offset.zero),
+        size.width * 0.25,
+        paint,
+      );
+    } else {
+      final paint = Paint()
+        ..color = Colors.black54
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1;
+
+      // Draw the square
+      canvas.drawCircle(
+        size.center(Offset.zero),
+        size.width / 2,
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return (oldDelegate as CustomRadioPainter).color != color ||
+        (oldDelegate).isChecked != isChecked;
+  }
+}

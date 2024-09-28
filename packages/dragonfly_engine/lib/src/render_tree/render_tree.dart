@@ -239,6 +239,15 @@ class BrowserRenderTree {
             ...element.children.map((e) => _parse(e, c)),
           ],
         );
+      } else if (element.attributes["type"] == "radio") {
+        return RenderTreeInputRadio(
+          isChecked: element.attributes["checked"] != null,
+          isDisabled: element.attributes["disabled"]?.apply(bool.parse),
+          commonStyle: CommonStyle.fromCSSStyle(c),
+          children: [
+            ...element.children.map((e) => _parse(e, c)),
+          ],
+        );
       }
     } else if (displayProperty == "inline") {
       return RenderTreeInline(
