@@ -333,6 +333,9 @@ class TreeRenderer extends StatelessWidget {
       RenderTreeInputReset r => BrowserInputReset(
           r: r,
         ),
+      RenderTreeInputFile r => BrowserInputFile(
+          r: r,
+        ),
       RenderTreeBox r => CommonStyleBlock(
           r.commonStyle,
           child: Column(

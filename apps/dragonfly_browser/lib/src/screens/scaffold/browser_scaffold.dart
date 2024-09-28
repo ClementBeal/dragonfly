@@ -275,7 +275,7 @@ class _BrowserSearchBarState extends State<BrowserSearchBar> {
         },
         child: TextField(
           controller: _searchController,
-          style: const TextStyle(color: Colors.white),
+          // style: const TextStyle(color: Colors.white),
           textAlignVertical: TextAlignVertical.center,
           onEditingComplete: () {
             final formattedUri = detectUrl(_searchController.text);

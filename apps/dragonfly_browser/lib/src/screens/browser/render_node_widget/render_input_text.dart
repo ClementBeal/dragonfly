@@ -1,10 +1,14 @@
 import 'package:dragonfly_engine/dragonfly_engine.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 class BrowserInputTextField extends StatelessWidget {
   final RenderTreeInputText r;
 
-  const BrowserInputTextField({super.key, required this.r});
+  const BrowserInputTextField({
+    super.key,
+    required this.r,
+  });
 
   Size _textSize(String text) {
     final TextPainter textPainter = TextPainter(
@@ -61,7 +65,11 @@ class BrowserInputSubmit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        FormState? form = Form.maybeOf(context);
+
+        form?.validate();
+      },
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
@@ -113,6 +121,73 @@ class BrowserInputReset extends StatelessWidget {
           ),
           child: AbsorbPointer(child: Text(r.value ?? "")),
         ),
+      ),
+    );
+  }
+}
+
+class BrowserInputFile extends StatefulWidget {
+  final RenderTreeInputFile r;
+
+  const BrowserInputFile({
+    super.key,
+    required this.r,
+  });
+
+  @override
+  State<BrowserInputFile> createState() => _BrowserInputFileState();
+}
+
+class _BrowserInputFileState extends State<BrowserInputFile> {
+  PlatformFile? selectedFile;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
+        FilePickerResult? result = await FilePicker.platform.pickFiles();
+        if (result != null) {
+          PlatformFile file = result.files.first;
+          setState(() {
+            selectedFile = file;
+          });
+        }
+      },
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 4,
+        children: [
+          DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(
+                width: 1,
+                color: Colors.black,
+              ),
+              color: const Color(0xffe9e9ed),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 4,
+                vertical: 2,
+              ),
+              child: AbsorbPointer(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Browse..."),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          AbsorbPointer(
+            child: Text(
+              selectedFile?.name ?? "No file selected.",
+            ),
+          ),
+        ],
       ),
     );
   }

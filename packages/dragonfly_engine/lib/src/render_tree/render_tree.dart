@@ -209,6 +209,27 @@ class BrowserRenderTree {
             ...element.children.map((e) => _parse(e, c)),
           ],
         );
+      } else if (element.attributes["type"] == "file") {
+        return RenderTreeInputFile(
+          isDisabled: element.attributes["disabled"]?.apply(bool.parse),
+          value: element.attributes["value"],
+          commonStyle: CommonStyle.fromCSSStyle(c),
+          children: [
+            if (element.text != "")
+              RenderTreeText(
+                text: element.text,
+                color: c.textColor,
+                fontFamily: c.fontFamily,
+                fontSize: c.fontSizeConverted,
+                textAlign: c.textAlign,
+                fontWeight: c.fontWeight,
+                textDecoration: null,
+                letterSpacing: null,
+                wordSpacing: null,
+              ),
+            ...element.children.map((e) => _parse(e, c)),
+          ],
+        );
       }
     } else if (displayProperty == "inline") {
       return RenderTreeInline(
