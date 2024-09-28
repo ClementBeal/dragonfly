@@ -342,7 +342,7 @@ class TreeRenderer extends StatelessWidget {
       RenderTreeInputRadio r => BrowserInputRadio(
           r: r,
         ),
-      RenderTreeInputHidden r => SizedBox.shrink(),
+      RenderTreeInputHidden() => const SizedBox.shrink(),
       RenderTreeBox r => CommonStyleBlock(
           r.commonStyle,
           child: Column(
