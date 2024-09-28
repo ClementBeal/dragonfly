@@ -1,4 +1,5 @@
 import 'package:dragonfly_engine/dragonfly_engine.dart';
+import 'package:dragonfly_engine/src/render_tree/nodes/render_tree_node.dart';
 import 'package:dragonfly_engine/src/utils/extension.dart';
 import 'package:html/dom.dart';
 
@@ -261,6 +262,21 @@ class BrowserRenderTree {
     } else if (displayProperty == "inline") {
       return RenderTreeInline(
         children: element.children.map((e) => _parse(e, c)).toList(),
+      );
+    } else if (element.localName! == "textarea") {
+      return RenderTreeInputTextArea(
+        name: element.attributes["name"],
+        placeholder: element.attributes["placeholder"],
+        isReadOnly: element.attributes["readonly"] != null,
+        maxLength: element.attributes["maxlength"]?.apply(int.parse),
+        isDisabled: element.attributes["disabled"] != null,
+        numberOfCols: element.attributes["cols"]?.apply(int.parse) ?? 20,
+        numberOfRows: element.attributes["rows"]?.apply(int.parse) ?? 2,
+        value: element.attributes["value"],
+        commonStyle: CommonStyle.fromCSSStyle(c),
+        children: [
+          ...element.children.map((e) => _parse(e, c)),
+        ],
       );
     } else if (displayProperty == "grid") {
       return RenderTreeGrid(

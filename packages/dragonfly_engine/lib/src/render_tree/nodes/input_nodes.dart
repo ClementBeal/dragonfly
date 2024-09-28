@@ -119,3 +119,32 @@ class RenderTreeInputHidden extends RenderTreeBox {
     required super.commonStyle,
   });
 }
+
+class RenderTreeInputTextArea extends RenderTreeBox {
+  /// The button's text
+  final String? value;
+
+  final String? name;
+
+  /// Activate or not the button
+  final bool? isDisabled;
+
+  final String? placeholder;
+  final int? maxLength;
+  final int numberOfRows;
+  final int numberOfCols;
+  final bool? isReadOnly;
+
+  RenderTreeInputTextArea({
+    this.value,
+    this.isDisabled,
+    this.name,
+    this.placeholder,
+    this.maxLength,
+    required this.numberOfRows,
+    required this.numberOfCols,
+    this.isReadOnly,
+    required super.children,
+    required super.commonStyle,
+  });
+}

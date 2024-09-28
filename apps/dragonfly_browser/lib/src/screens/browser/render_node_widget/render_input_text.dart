@@ -329,3 +329,98 @@ class CustomRadioPainter extends CustomPainter {
         (oldDelegate).isChecked != isChecked;
   }
 }
+
+class BrowserInputTextArea extends StatefulWidget {
+  const BrowserInputTextArea({
+    super.key,
+    required this.r,
+  });
+
+  final RenderTreeInputTextArea r;
+
+  @override
+  BrowserInputTextAreaState createState() => BrowserInputTextAreaState();
+}
+
+class BrowserInputTextAreaState extends State<BrowserInputTextArea> {
+  late double _boxWidth;
+  late double _boxHeight;
+  late final double _lineHeight;
+
+  @override
+  void initState() {
+    super.initState();
+    _boxWidth = _textSize("a" * widget.r.numberOfCols).width;
+    _lineHeight = _textSize("a").height;
+    _boxHeight = _lineHeight * widget.r.numberOfRows;
+  }
+
+  Size _textSize(String text) {
+    final TextPainter textPainter = TextPainter(
+        text: TextSpan(
+          text: text,
+          style: const TextStyle(fontSize: 14),
+        ),
+        maxLines: 1,
+        textDirection: TextDirection.ltr)
+      ..layout(
+        minWidth: 0,
+        maxWidth: double.infinity,
+      );
+
+    return textPainter.size;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        SizedBox(
+          width: _boxWidth,
+          height: _boxHeight,
+          child: TextFormField(
+            initialValue: widget.r.value,
+            textAlignVertical: TextAlignVertical.top,
+            expands: true,
+            minLines: null,
+            maxLines: null,
+            maxLength: widget.r.maxLength,
+            readOnly: widget.r.isReadOnly ?? false,
+            cursorHeight: _lineHeight,
+            style: const TextStyle(height: 1.1),
+            decoration: InputDecoration(
+              isDense: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(2),
+                borderSide: const BorderSide(
+                  width: 2,
+                  color: Colors.black,
+                ),
+              ),
+              hintText: widget.r.placeholder,
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 8,
+                horizontal: 2,
+              ),
+            ),
+          ),
+        ),
+        GestureDetector(
+          onPanUpdate: (details) {
+            setState(() {
+              _boxWidth += details.delta.dx;
+              _boxHeight += details.delta.dy;
+              _boxHeight = (_boxHeight < 0) ? 0 : _boxHeight;
+              _boxWidth = (_boxWidth < 0) ? 0 : _boxWidth;
+            });
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.resizeDownRight,
+            child: const Icon(Icons.drag_handle),
+          ),
+        ),
+      ],
+    );
+  }
+}
