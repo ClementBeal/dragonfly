@@ -104,3 +104,18 @@ class RenderTreeInputRadio extends RenderTreeBox {
     required super.commonStyle,
   });
 }
+
+class RenderTreeInputHidden extends RenderTreeBox {
+  /// The button's text
+  final String? value;
+
+  /// Activate or not the button
+  final bool? isDisabled;
+
+  RenderTreeInputHidden({
+    this.value,
+    this.isDisabled,
+    required super.children,
+    required super.commonStyle,
+  });
+}

@@ -248,6 +248,15 @@ class BrowserRenderTree {
             ...element.children.map((e) => _parse(e, c)),
           ],
         );
+      } else if (element.attributes["type"] == "hidden") {
+        return RenderTreeInputHidden(
+          value: element.attributes["value"],
+          isDisabled: element.attributes["disabled"]?.apply(bool.parse),
+          commonStyle: CommonStyle.fromCSSStyle(c),
+          children: [
+            ...element.children.map((e) => _parse(e, c)),
+          ],
+        );
       }
     } else if (displayProperty == "inline") {
       return RenderTreeInline(
