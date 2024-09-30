@@ -140,7 +140,8 @@ class IconWithTool extends StatelessWidget {
   Widget build(BuildContext context) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      child: DecoratedBox(
+      child: AnimatedContainer(
+        duration: Durations.short3,
         decoration: BoxDecoration(
           border: Border(
             top: (isSelected)
