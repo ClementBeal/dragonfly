@@ -440,6 +440,12 @@ class BrowserInputTextAreaState extends State<BrowserInputTextArea> {
                 horizontal: 2,
               ),
             ),
+            onChanged: (value) {
+              if (widget.r.name != null) {
+                BrowserForm.maybeOf(context)
+                    ?.updateField(widget.r.name!, FormDataText(value));
+              }
+            },
           ),
         ),
         GestureDetector(
