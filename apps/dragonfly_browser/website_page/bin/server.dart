@@ -6,7 +6,6 @@ import 'package:shelf_static/shelf_static.dart';
 void main(List<String> args) async {
   // Assume your current directory is the root of your Dart project
   final pagesDir = Directory(r'pages');
-  print(pagesDir.absolute.path);
 
   // Create a handler that serves files from the 'website_project/pages' directory
   final handler = createStaticHandler(

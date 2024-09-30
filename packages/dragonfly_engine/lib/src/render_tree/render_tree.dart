@@ -214,6 +214,7 @@ class BrowserRenderTree {
         return RenderTreeInputFile(
           isDisabled: element.attributes["disabled"]?.apply(bool.parse),
           value: element.attributes["value"],
+          name: element.attributes["name"],
           commonStyle: CommonStyle.fromCSSStyle(c),
           children: [
             if (element.text != "")
@@ -235,6 +236,7 @@ class BrowserRenderTree {
         return RenderTreeInputCheckbox(
           isChecked: element.attributes["checked"] != null,
           isDisabled: element.attributes["disabled"]?.apply(bool.parse),
+          name: element.attributes["name"],
           commonStyle: CommonStyle.fromCSSStyle(c),
           children: [
             ...element.children.map((e) => _parse(e, c)),
@@ -244,6 +246,7 @@ class BrowserRenderTree {
         return RenderTreeInputRadio(
           isChecked: element.attributes["checked"] != null,
           isDisabled: element.attributes["disabled"]?.apply(bool.parse),
+          name: element.attributes["name"],
           commonStyle: CommonStyle.fromCSSStyle(c),
           children: [
             ...element.children.map((e) => _parse(e, c)),
@@ -253,6 +256,7 @@ class BrowserRenderTree {
         return RenderTreeInputHidden(
           value: element.attributes["value"],
           isDisabled: element.attributes["disabled"]?.apply(bool.parse),
+          name: element.attributes["name"],
           commonStyle: CommonStyle.fromCSSStyle(c),
           children: [
             ...element.children.map((e) => _parse(e, c)),

@@ -1,6 +1,11 @@
+import 'dart:io';
+
+import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
+import 'package:dragonfly/src/screens/settings/cubit/settings_cubit.dart';
 import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BrowserInputTextField extends StatelessWidget {
   final RenderTreeInputText r;
@@ -33,6 +38,12 @@ class BrowserInputTextField extends StatelessWidget {
     return SizedBox(
       width: size.width,
       child: TextFormField(
+        onChanged: (value) {
+          if (r.name != null) {
+            BrowserForm.maybeOf(context)
+                ?.updateField(r.name!, FormDataText(value));
+          }
+        },
         cursorHeight: size.height,
         obscureText: r.isPassord,
         decoration: InputDecoration(
@@ -68,7 +79,25 @@ class BrowserInputSubmit extends StatelessWidget {
       onTap: () {
         FormState? form = Form.maybeOf(context);
 
-        form?.validate();
+        if (form?.validate() != true) {
+          return;
+        }
+
+        final browserForm = BrowserForm.maybeOf(context);
+
+        if (browserForm == null) {
+          return;
+        }
+
+        final tab = context.read<BrowserCubit>().state.currentTab;
+
+        if (tab != null) {
+          tab.sendForm(
+            browserForm.widget.r.action ?? "",
+            browserForm.widget.r.method?.toUpperCase() ?? "GET",
+            browserForm.fieldsData,
+          );
+        }
       },
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -151,6 +180,11 @@ class _BrowserInputFileState extends State<BrowserInputFile> {
           setState(() {
             selectedFile = file;
           });
+
+          if (widget.r.name != null) {
+            BrowserForm.maybeOf(context)
+                ?.updateField(widget.r.name!, FormDataText(file.path!));
+          }
         }
       },
       child: Row(
@@ -346,12 +380,14 @@ class BrowserInputTextAreaState extends State<BrowserInputTextArea> {
   late double _boxWidth;
   late double _boxHeight;
   late final double _lineHeight;
+  late final double _lineWidth;
 
   @override
   void initState() {
     super.initState();
     _boxWidth = _textSize("a" * widget.r.numberOfCols).width;
     _lineHeight = _textSize("a").height;
+    _lineWidth = _textSize("a").width;
     _boxHeight = _lineHeight * widget.r.numberOfRows;
   }
 
@@ -411,8 +447,9 @@ class BrowserInputTextAreaState extends State<BrowserInputTextArea> {
             setState(() {
               _boxWidth += details.delta.dx;
               _boxHeight += details.delta.dy;
-              _boxHeight = (_boxHeight < 0) ? 0 : _boxHeight;
-              _boxWidth = (_boxWidth < 0) ? 0 : _boxWidth;
+              _boxHeight =
+                  (_boxHeight < _lineHeight) ? _lineHeight : _boxHeight;
+              _boxWidth = (_boxWidth < _lineWidth) ? _lineWidth : _boxWidth;
             });
           },
           child: MouseRegion(
@@ -421,6 +458,39 @@ class BrowserInputTextAreaState extends State<BrowserInputTextArea> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class BrowserForm extends StatefulWidget {
+  const BrowserForm({
+    super.key,
+    required this.r,
+    required this.child,
+  });
+
+  final RenderTreeForm r;
+  final Widget child;
+
+  @override
+  State<BrowserForm> createState() => BrowserFormState();
+
+  static BrowserFormState? maybeOf(BuildContext context) {
+    return context.findAncestorStateOfType<BrowserFormState>();
+  }
+}
+
+class BrowserFormState extends State<BrowserForm> {
+  final fieldsData = <String, FormData>{};
+
+  void updateField(String name, FormData data) {
+    fieldsData[name] = data;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      child: widget.child,
     );
   }
 }

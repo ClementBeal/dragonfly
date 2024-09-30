@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:dragonfly_engine/src/files/cache_file.dart';
+import 'package:dragonfly_engine/src/navigation/tab.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 
@@ -25,12 +26,21 @@ class NetworkTracker {
   Future<NetworkResponse?> request(
     Uri uri,
     String method,
-    Map<String, String> headers,
-  ) async {
+    Map<String, String> headers, {
+    Map<String, FormData> data = const {},
+  }) async {
     try {
       final request = http.Request(method, uri)
         ..headers.addAll(headers)
         ..headers["User-Agent"] = "DragonFly/1.0";
+
+      if (method == "POST") {
+        if (data.isNotEmpty) {
+          request.bodyFields = {
+            for (final a in data.entries) a.key: a.value.getValue(),
+          };
+        }
+      }
 
       final networkRequest = NetworkRequest(
         url: uri.toString(),

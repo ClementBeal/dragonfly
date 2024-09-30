@@ -1,4 +1,3 @@
-import 'package:dragonfly/main.dart';
 import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

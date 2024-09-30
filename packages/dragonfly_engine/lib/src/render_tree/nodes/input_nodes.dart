@@ -31,10 +31,7 @@ class RenderTreeInputText extends RenderTreeBox {
 }
 
 class RenderTreeInputSubmit extends RenderTreeBox {
-  /// The button's text
   final String? value;
-
-  /// Activate or not the button
   final bool? isDisabled;
 
   RenderTreeInputSubmit({
@@ -46,10 +43,7 @@ class RenderTreeInputSubmit extends RenderTreeBox {
 }
 
 class RenderTreeInputReset extends RenderTreeBox {
-  /// The button's text
   final String? value;
-
-  /// Activate or not the button
   final bool? isDisabled;
 
   RenderTreeInputReset({
@@ -61,13 +55,12 @@ class RenderTreeInputReset extends RenderTreeBox {
 }
 
 class RenderTreeInputFile extends RenderTreeBox {
-  /// The button's text
+  final String? name;
   final String? value;
-
-  /// Activate or not the button
   final bool? isDisabled;
 
   RenderTreeInputFile({
+    this.name,
     this.value,
     this.isDisabled,
     required super.children,
@@ -76,13 +69,12 @@ class RenderTreeInputFile extends RenderTreeBox {
 }
 
 class RenderTreeInputCheckbox extends RenderTreeBox {
-  /// The button's text
+  final String? name;
   final bool? isChecked;
-
-  /// Activate or not the button
   final bool? isDisabled;
 
   RenderTreeInputCheckbox({
+    this.name,
     this.isChecked,
     this.isDisabled,
     required super.children,
@@ -91,13 +83,12 @@ class RenderTreeInputCheckbox extends RenderTreeBox {
 }
 
 class RenderTreeInputRadio extends RenderTreeBox {
-  /// The button's text
+  final String? name;
   final bool? isChecked;
-
-  /// Activate or not the button
   final bool? isDisabled;
 
   RenderTreeInputRadio({
+    this.name,
     this.isChecked,
     this.isDisabled,
     required super.children,
@@ -106,13 +97,12 @@ class RenderTreeInputRadio extends RenderTreeBox {
 }
 
 class RenderTreeInputHidden extends RenderTreeBox {
-  /// The button's text
+  final String? name; // Added name field
   final String? value;
-
-  /// Activate or not the button
   final bool? isDisabled;
 
   RenderTreeInputHidden({
+    this.name, // Added name parameter
     this.value,
     this.isDisabled,
     required super.children,

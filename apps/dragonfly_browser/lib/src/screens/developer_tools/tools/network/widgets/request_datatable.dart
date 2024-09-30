@@ -152,7 +152,7 @@ class _NetworkRequestDataTableState extends State<NetworkRequestDataTable> {
                           DataCell(TextWithTooltip((e.response != null)
                               ? e.response!.isCached.toString()
                               : "")),
-                          DataCell(TextWithTooltip("GET")),
+                          DataCell(TextWithTooltip(e.method)),
                           DataCell(TextWithTooltip(Uri.parse(e.url).host)),
                           DataCell(TextWithTooltip(Uri.parse(e.url).path)),
                           DataCell(TextWithTooltip(e.url)),

@@ -173,7 +173,8 @@ class TreeRenderer extends StatelessWidget {
             ],
           ),
         ),
-      RenderTreeForm r => Form(
+      RenderTreeForm r => BrowserForm(
+          r: r,
           child: CommonStyleBlock(
             r.commonStyle,
             child: Column(

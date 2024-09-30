@@ -61,6 +61,9 @@ class Tab {
   /// Order of the tab in the tab bar.
   int order;
 
+  /// To trigger a function when the tab is updated
+  Function()? onUpdate;
+
   /// Creates a new Tab instance.
   ///
   /// [order] specifies the order of the tab.
@@ -68,6 +71,7 @@ class Tab {
   Tab({
     required this.order,
     required this.navigationHistory,
+    this.onUpdate,
   })  : guid = Uuid().v4(),
         interpreter = JavascriptInterpreter();
 
@@ -101,7 +105,18 @@ class Tab {
     navigateTo(_history.last.uri, onNavigationDone);
   }
 
-  Future<void> _navigateHttpScheme(Uri uri) async {
+  Future<void> _navigateHttpScheme(
+    Uri uri, {
+    String method = "GET",
+    Map<String, FormData> data = const {},
+    Map<String, String> headers = const {},
+  }) async {
+    if (method == "GET" && data.isNotEmpty) {
+      uri = uri.replace(queryParameters: {
+        for (final a in data.entries) a.key: a.value.getValue()
+      });
+    }
+
     _history.add(
       HtmlPage(
         document: null,
@@ -112,7 +127,12 @@ class Tab {
     );
     _currentIndex++;
 
-    final htmlRequest = await tracker.request(uri, "GET", {});
+    final htmlRequest = await tracker.request(
+      uri,
+      method,
+      headers,
+      data: data,
+    );
 
     if (htmlRequest != null &&
         htmlRequest.statusCode >= 200 &&
@@ -162,8 +182,7 @@ class Tab {
       );
     } else {
       print("error here");
-      print(htmlRequest);
-      print(htmlRequest?.statusCode);
+
       _history.last = HtmlPage(
         document: null,
         stylesheets: [],
@@ -343,6 +362,44 @@ class Tab {
     }
   }
 
+  Future<void> sendForm(
+      String action, String formMethod, Map<String, FormData> data) async {
+    Uri actionUri;
+    final currentPageUri = currentPage?.uri;
+
+    if (currentPage == null) {
+      return;
+    }
+
+    print(action);
+
+    if (action.startsWith("/")) {
+      // Relative URL with leading slash, resolve against the base URI.
+      actionUri = currentPageUri!.replace(path: action);
+    } else if (action.startsWith("http") || action.startsWith("https")) {
+      // Absolute URL, use as-is.
+      actionUri = Uri.parse(action);
+    } else {
+      // Relative URL without leading slash, resolve against the base URI.
+      final currentPath = currentPageUri!.path.endsWith("/")
+          ? currentPageUri.path
+          : "${currentPageUri.path}";
+
+      actionUri = currentPageUri.replace(path: currentPath + action);
+    }
+
+    final headers = <String, String>{};
+
+    await _navigateHttpScheme(
+      actionUri,
+      method: formMethod,
+      data: data,
+      headers: headers,
+    );
+
+    onUpdate?.call();
+  }
+
   /// Returns the currently displayed page, or null if no page is loaded.
   Page? get currentPage => _currentIndex >= 0 ? _history[_currentIndex] : null;
 
@@ -374,3 +431,29 @@ class Tab {
 }
 
 final cssomBuilder = CssomBuilder();
+
+sealed class FormData {
+  dynamic getValue();
+}
+
+class FormDataText extends FormData {
+  final String value;
+
+  FormDataText(this.value);
+
+  @override
+  dynamic getValue() {
+    return value;
+  }
+}
+
+class FormDataFile extends FormData {
+  final String filePath;
+
+  FormDataFile({required this.filePath});
+
+  @override
+  dynamic getValue() {
+    return File(filePath).readAsBytesSync();
+  }
+}

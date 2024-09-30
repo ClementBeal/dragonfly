@@ -58,6 +58,7 @@ class Browser {
     final newTab = Tab(
       order: (lastOrder ?? -1) + 1,
       navigationHistory: navigationHistory,
+      onUpdate: onUpdate,
     );
 
     if (initialUrl != null) {
