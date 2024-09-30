@@ -36,6 +36,7 @@ class _HTMLDisplay extends StatelessWidget {
               .map(
                 (e) => HTMLElementBlock(
                   element: e,
+                  indent: 0,
                 ),
               )
               .toList(),
@@ -49,9 +50,11 @@ class HTMLElementBlock extends StatefulWidget {
   const HTMLElementBlock({
     super.key,
     required this.element,
+    required this.indent,
   });
 
   final Element element;
+  final int indent;
 
   @override
   State<HTMLElementBlock> createState() => _HTMLElementBlockState();
@@ -59,10 +62,55 @@ class HTMLElementBlock extends StatefulWidget {
 
 class _HTMLElementBlockState extends State<HTMLElementBlock> {
   bool isHovered = false;
+  bool isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
     final tagName = widget.element.localName;
+    final content = <String>[tagName!];
+    final classes = widget.element.className;
+
+    if (classes.isNotEmpty) {
+      content.add("class=\"$classes\"");
+    }
+
+    for (var at in widget.element.attributes.entries) {
+      content.add("${at.key}=\"${at.value}\"");
+    }
+
+    final isSelfClosed =
+        widget.element.children.isEmpty && widget.element.nodes.isEmpty;
+
+    final openTag =
+        (isSelfClosed) ? "<${content.join(" ")} />" : "<${content.join(" ")}>";
+
+    if (isExpanded) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text.rich(
+            htmlHighlighter.highlight(openTag),
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 4.0 * widget.indent),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: widget.element.children
+                  .map(
+                    (e) => HTMLElementBlock(
+                      element: e,
+                      indent: widget.indent + 1,
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+          Text.rich(
+            htmlHighlighter.highlight("</$tagName>"),
+          ),
+        ],
+      );
+    }
 
     return MouseRegion(
       onEnter: (event) {
@@ -83,31 +131,41 @@ class _HTMLElementBlockState extends State<HTMLElementBlock> {
         child: Wrap(
           children: [
             Text.rich(
-              htmlHighlighter.highlight("<$tagName>"),
+              htmlHighlighter.highlight(openTag),
             ),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: Colors.black87,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  "...",
-                  style: TextStyle(
-                    color: Colors.white,
+            if (widget.element.children.isEmpty &&
+                widget.element.nodes.isNotEmpty)
+              Text(widget.element.nodes.first.text ?? "")
+            else if (widget.element.children.isNotEmpty)
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isExpanded = true;
+                  });
+                },
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.black87,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        "...",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-            ...widget.element.children.map(
-              (e) => HTMLElementBlock(
-                element: e,
+            if (!isSelfClosed)
+              Text.rich(
+                htmlHighlighter.highlight("</$tagName>"),
               ),
-            ),
-            Text.rich(
-              htmlHighlighter.highlight("</$tagName>"),
-            ),
           ],
         ),
       ),
