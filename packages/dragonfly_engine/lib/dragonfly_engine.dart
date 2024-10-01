@@ -3,6 +3,8 @@
 /// More dartdocs go here.
 library;
 
+import 'package:dragonfly_browservault/dragonfly_browservault.dart';
+
 export 'src/navigation/browser.dart' show Browser;
 export 'src/navigation/tab.dart'
     show
@@ -52,3 +54,7 @@ export 'src/render_tree/nodes/render_tree_node.dart'
 export 'src/render_tree/render_tree.dart' show BrowserRenderTree, RenderTree;
 export 'src/utils/network_tracker.dart'
     show NetworkTracker, NetworkRequest, NetworkResponse;
+
+void initializeEngine(String cachePath) {
+  initializeDb(cachePath);
+}

@@ -93,10 +93,12 @@ class RenderPageWidget extends StatelessWidget {
 
                     final renderTree = BrowserRenderTree(
                       dom: page.document!,
-                      cssom: CssomBuilder().parse(page.stylesheets
-                          .whereType<CSSStylesheet>()
-                          .map((e) => e.content)
-                          .join("\n")),
+                      cssom: CssomBuilder().parse(
+                        page.stylesheets
+                            .whereType<CSSStylesheet>()
+                            .map((e) => e.content)
+                            .join("\n"),
+                      ),
                       initialRoute: page.uri.toString(),
                     ).parse();
 

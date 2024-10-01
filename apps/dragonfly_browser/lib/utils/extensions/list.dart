@@ -5,6 +5,10 @@ extension BetterIterable<T> on Iterable<T> {
     return core.intersperseOuter(element, this);
   }
 
+  Iterable<T> intersperseInner(T Function() element) {
+    return core.intersperseInner(element, this);
+  }
+
   Iterable<T> addAfterEach(T Function(int i) element) sync* {
     final iterator = this.iterator;
     int i = 0;
