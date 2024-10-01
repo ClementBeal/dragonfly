@@ -47,7 +47,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
+    return Dialog.fullscreen(
       child: SizedBox(
         width: 1200,
         height: 800,
@@ -61,7 +61,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   onSortChanged: (newSort) => setState(() => sort = newSort),
                 )),
             Expanded(
-              child: Builder(builder: (context) {
+              child: LayoutBuilder(builder: (context, constraints) {
+                final isSmallScreen = constraints.maxWidth < 500;
                 final today = DateTime.now();
 
                 final List<Link> sortedHistory = switch (sort) {
@@ -123,11 +124,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     return ListTile(
                       title: Text(sortedHistory[i].title),
                       subtitle: Text(sortedHistory[i].link.toString()),
-                      trailing: IconButton(
-                        icon: Text(
-                            DateFormat().format(sortedHistory[i].timestamp)),
-                        onPressed: () {},
-                      ),
+                      trailing: (isSmallScreen)
+                          ? null
+                          : IconButton(
+                              icon: Text(
+                                DateFormat().format(
+                                  sortedHistory[i].timestamp,
+                                ),
+                                softWrap: true,
+                              ),
+                              onPressed: () {},
+                            ),
                       onTap: () {},
                     );
                   },

@@ -25,7 +25,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final dbFolderPath = await getTemporaryDirectory();
-  initializeEngine(dbFolderPath.path);
+  final cacheFolderPath = await getTemporaryDirectory();
+
+  initializeEngine(dbFolderPath.path, cacheFolderPath.path);
 
   navigationHistory = NavigationHistory(db);
 

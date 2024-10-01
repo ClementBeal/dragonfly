@@ -6,8 +6,6 @@ import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:path/path.dart' as p;
 import 'package:uuid/v4.dart';
 
-final cacheDirectory = Directory("cache");
-
 class FileCache {
   /// Save the file in the cache folder
   ///

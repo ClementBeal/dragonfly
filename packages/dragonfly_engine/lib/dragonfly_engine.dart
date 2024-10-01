@@ -3,6 +3,8 @@
 /// More dartdocs go here.
 library;
 
+import 'dart:io';
+
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 
 export 'src/navigation/browser.dart' show Browser;
@@ -55,6 +57,9 @@ export 'src/render_tree/render_tree.dart' show BrowserRenderTree, RenderTree;
 export 'src/utils/network_tracker.dart'
     show NetworkTracker, NetworkRequest, NetworkResponse;
 
-void initializeEngine(String cachePath) {
-  initializeDb(cachePath);
+late final Directory cacheDirectory;
+
+void initializeEngine(String dbFolderPath, String cacheFolder) {
+  initializeDb(dbFolderPath);
+  cacheDirectory = Directory(cacheFolder);
 }
