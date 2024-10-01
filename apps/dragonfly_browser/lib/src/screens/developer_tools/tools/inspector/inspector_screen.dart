@@ -29,17 +29,19 @@ class _HTMLDisplay extends StatelessWidget {
 
         final document = currentPage.document;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: document!.children
-              .take(1)
-              .map(
-                (e) => HTMLElementBlock(
-                  element: e,
-                  indent: 0,
-                ),
-              )
-              .toList(),
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: document!.children
+                .take(1)
+                .map(
+                  (e) => HTMLElementBlock(
+                    element: e,
+                    indent: 0,
+                  ),
+                )
+                .toList(),
+          ),
         );
       },
     );
