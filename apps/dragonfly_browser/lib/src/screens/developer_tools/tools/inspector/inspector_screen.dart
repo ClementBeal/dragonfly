@@ -1,5 +1,6 @@
 import 'package:dragonfly/main.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
+import 'package:dragonfly/src/screens/scaffold/widgets/tab_bar.dart';
 import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart' hide Element;
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -114,63 +115,98 @@ class _HTMLElementBlockState extends State<HTMLElementBlock> {
       );
     }
 
-    return MouseRegion(
-      onEnter: (event) {
-        setState(() {
-          isHovered = true;
-        });
+    return GestureDetector(
+      onSecondaryTapUp: (details) {
+        showElementInspectorMenu(context, widget.element, details);
       },
-      onExit: (event) {
-        setState(() {
-          isHovered = false;
-        });
-      },
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-            color: (isHovered)
-                ? Theme.of(context).colorScheme.primaryContainer
-                : null),
-        child: Wrap(
-          children: [
-            Text.rich(
-              htmlHighlighter.highlight(openTag),
-            ),
-            if (widget.element.children.isEmpty &&
-                widget.element.nodes.isNotEmpty)
-              Text(widget.element.nodes.first.text ?? "")
-            else if (widget.element.children.isNotEmpty)
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    isExpanded = true;
-                  });
-                },
-                child: MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Colors.black87,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Text(
-                        "...",
-                        style: TextStyle(
-                          color: Colors.white,
+      child: MouseRegion(
+        onEnter: (event) {
+          setState(() {
+            isHovered = true;
+          });
+        },
+        onExit: (event) {
+          setState(() {
+            isHovered = false;
+          });
+        },
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+              color: (isHovered)
+                  ? Theme.of(context).colorScheme.primaryContainer
+                  : null),
+          child: Wrap(
+            children: [
+              Text.rich(
+                htmlHighlighter.highlight(openTag),
+              ),
+              if (widget.element.children.isEmpty &&
+                  widget.element.nodes.isNotEmpty)
+                Text(widget.element.nodes.first.text ?? "")
+              else if (widget.element.children.isNotEmpty)
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      isExpanded = true;
+                    });
+                  },
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.black87,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          "...",
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            if (!isSelfClosed)
-              Text.rich(
-                htmlHighlighter.highlight("</$tagName>"),
-              ),
-          ],
+              if (!isSelfClosed)
+                Text.rich(
+                  htmlHighlighter.highlight("</$tagName>"),
+                ),
+            ],
+          ),
         ),
       ),
     );
   }
+}
+
+void showElementInspectorMenu(
+    BuildContext context, Element domElement, TapUpDetails details) {
+  showMenu(
+    context: context,
+    position: RelativeRect.fromLTRB(
+      details.globalPosition.dx,
+      details.globalPosition.dy,
+      details.globalPosition.dx,
+      details.globalPosition.dy,
+    ),
+    items: [
+      PopupMenuItem<String>(
+        value: 'edit',
+        child: Text('Edit as HTML'),
+      ),
+      PopupMenuItem<String>(
+        value: 'delete',
+        child: Text('Delete node'),
+        onTap: () {
+          context
+              .read<BrowserCubit>()
+              .state
+              .currentTab
+              ?.removeElementFromDOM(domElement);
+        },
+      ),
+    ],
+  );
 }
