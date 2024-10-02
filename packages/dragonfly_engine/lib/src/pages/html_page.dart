@@ -5,6 +5,8 @@ class HtmlPage extends Page {
   final List<CSSStylesheet> stylesheets;
   final BrowserImage? favicon;
 
+  late RenderTree? _renderTree;
+
   HtmlPage({
     required super.uri,
     required super.status,
@@ -12,7 +14,20 @@ class HtmlPage extends Page {
     this.favicon,
     required this.document,
     required this.stylesheets,
-  });
+  }) {
+    if (status == PageStatus.success) {
+      _renderTree = BrowserRenderTree(
+        dom: document!,
+        cssom: CssomBuilder().parse(
+          stylesheets
+              .whereType<CSSStylesheet>()
+              .map((e) => e.content)
+              .join("\n"),
+        ),
+        initialRoute: uri.toString(),
+      ).parse();
+    }
+  }
 
   HtmlPage copyWith({
     Document? document,
@@ -32,4 +47,6 @@ class HtmlPage extends Page {
   String? getTitle() {
     return document?.getElementsByTagName("title").firstOrNull?.text.trim();
   }
+
+  RenderTree? get renderTree => _renderTree;
 }

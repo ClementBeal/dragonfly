@@ -15,7 +15,6 @@ dependencies:
   flutter_svg: ^2.0.10+1
   path: ^1.9.0
   path_provider: ^2.1.4
-  sqlite3: ^2.4.6
   syntax_highlight: ^0.4.0
   window_manager: ^0.4.2
   dragonfly_browservault: ^0.0.1
@@ -28,6 +27,7 @@ dependencies:
   desktop_drop: ^0.4.4
   file_picker: ^8.1.2
   csslib: ^1.0.0 # format the CSS
+  sqlite3_flutter_libs: ^0.5.24
 
 dev_dependencies:
   flutter_test:

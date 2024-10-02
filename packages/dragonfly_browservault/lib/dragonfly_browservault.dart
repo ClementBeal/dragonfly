@@ -9,4 +9,4 @@ export 'src/navigation_history.dart'
     show Link, NavigationHistory, NavigationHistoryException;
 export 'src/db_manager.dart' show DatabaseManager;
 export 'src/cache.dart' show FileCacheRepo;
-export 'src/_db.dart' show db;
+export 'src/_db.dart' show db, initializeDb;

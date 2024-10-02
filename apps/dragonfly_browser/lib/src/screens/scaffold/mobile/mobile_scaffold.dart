@@ -10,16 +10,20 @@ class MobileScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      children: [
-        Expanded(
-          child: BrowserScreen(),
+    return Scaffold(
+      body: SafeArea(
+        child: const Column(
+          children: [
+            Expanded(
+              child: BrowserScreen(),
+            ),
+            SizedBox(
+              height: 60,
+              child: MobileSearchBar(),
+            ),
+          ],
         ),
-        SizedBox(
-          height: 40,
-          child: MobileSearchBar(),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -56,7 +60,18 @@ Future<void> showMobileTabs(BuildContext context) async {
     showDragHandle: true,
     constraints: const BoxConstraints.expand(),
     backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-    builder: (context) => Scaffold(
+    builder: (context) => MobileTabs(),
+  );
+}
+
+class MobileTabs extends StatelessWidget {
+  const MobileTabs({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
       floatingActionButton: FloatingActionButton(
         shape: const CircleBorder(),
         onPressed: () {
@@ -110,9 +125,17 @@ Future<void> showMobileTabs(BuildContext context) async {
                             ),
                             Expanded(
                               child: FittedBox(
-                                child: RenderPageWidget(
-                                  page: tab.currentPage,
-                                  tab: tab,
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    return SizedBox(
+                                      height: 400,
+                                      width: 400,
+                                      child: RenderPageWidget(
+                                        page: tab.currentPage,
+                                        tab: tab,
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                             ),
@@ -127,6 +150,6 @@ Future<void> showMobileTabs(BuildContext context) async {
           ),
         ],
       ),
-    ),
-  );
+    );
+  }
 }

@@ -275,6 +275,7 @@ class _BrowserSearchBarState extends State<BrowserSearchBar> {
         },
         child: TextField(
           controller: _searchController,
+          keyboardType: TextInputType.url,
           // style: const TextStyle(color: Colors.white),
           textAlignVertical: TextAlignVertical.center,
           onEditingComplete: () {

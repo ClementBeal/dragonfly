@@ -16,7 +16,7 @@ void main(List<String> args) async {
   );
 
   // Start the server on localhost, port 8080
-  final server = await shelf_io.serve(handler, 'localhost', 8088);
+  final server = await shelf_io.serve(handler, '0.0.0.0', 8088);
 
   print('Serving at http://${server.address.host}:${server.port}');
 }

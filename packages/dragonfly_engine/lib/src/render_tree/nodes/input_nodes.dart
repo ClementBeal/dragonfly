@@ -27,6 +27,7 @@ class RenderTreeInputText extends RenderTreeBox {
     this.isPassord = false,
     required super.children,
     required super.commonStyle,
+    required super.domElementHash,
   });
 }
 
@@ -39,6 +40,7 @@ class RenderTreeInputSubmit extends RenderTreeBox {
     this.isDisabled,
     required super.children,
     required super.commonStyle,
+    required super.domElementHash,
   });
 }
 
@@ -51,6 +53,7 @@ class RenderTreeInputReset extends RenderTreeBox {
     this.isDisabled,
     required super.children,
     required super.commonStyle,
+    required super.domElementHash,
   });
 }
 
@@ -65,6 +68,7 @@ class RenderTreeInputFile extends RenderTreeBox {
     this.isDisabled,
     required super.children,
     required super.commonStyle,
+    required super.domElementHash,
   });
 }
 
@@ -79,6 +83,7 @@ class RenderTreeInputCheckbox extends RenderTreeBox {
     this.isDisabled,
     required super.children,
     required super.commonStyle,
+    required super.domElementHash,
   });
 }
 
@@ -93,6 +98,7 @@ class RenderTreeInputRadio extends RenderTreeBox {
     this.isDisabled,
     required super.children,
     required super.commonStyle,
+    required super.domElementHash,
   });
 }
 
@@ -107,6 +113,7 @@ class RenderTreeInputHidden extends RenderTreeBox {
     this.isDisabled,
     required super.children,
     required super.commonStyle,
+    required super.domElementHash,
   });
 }
 
@@ -136,5 +143,6 @@ class RenderTreeInputTextArea extends RenderTreeBox {
     this.isReadOnly,
     required super.children,
     required super.commonStyle,
+    required super.domElementHash,
   });
 }

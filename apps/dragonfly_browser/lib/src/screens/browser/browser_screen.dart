@@ -6,6 +6,9 @@ import 'package:dragonfly/src/screens/browser/pages/json/json_screen.dart';
 import 'package:dragonfly/src/screens/browser/pages/media_page/media_page_screen.dart';
 import 'package:dragonfly/src/screens/browser/render_node_widget/render_image.dart';
 import 'package:dragonfly/src/screens/browser/render_node_widget/render_input_text.dart';
+import 'package:dragonfly/src/screens/browser/render_node_widget/render_tree_view.dart';
+import 'package:dragonfly/src/screens/developer_tools/cubit/devtols_cubit.dart';
+import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
 import 'package:dragonfly/src/screens/lobby/lobby_screen.dart';
 import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart' hide Element, Page, Tab;
@@ -91,14 +94,7 @@ class RenderPageWidget extends StatelessWidget {
                     // it has to be moded to a special package
                     // called `dragonfly_renderer`
 
-                    final renderTree = BrowserRenderTree(
-                      dom: page.document!,
-                      cssom: CssomBuilder().parse(page.stylesheets
-                          .whereType<CSSStylesheet>()
-                          .map((e) => e.content)
-                          .join("\n")),
-                      initialRoute: page.uri.toString(),
-                    ).parse();
+                    final renderTree = page.renderTree!;
 
                     return Stack(
                       children: [
@@ -107,14 +103,14 @@ class RenderPageWidget extends StatelessWidget {
                           Align(
                             alignment: Alignment.bottomLeft,
                             child: DecoratedBox(
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 color: Colors.black87,
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
                                   state.hoveredLink!,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                   ),
                                 ),
@@ -133,14 +129,6 @@ class RenderPageWidget extends StatelessWidget {
   }
 }
 
-class MyBehavior extends ScrollBehavior {
-  @override
-  Widget buildOverscrollIndicator(
-      BuildContext context, Widget child, ScrollableDetails details) {
-    return child;
-  }
-}
-
 class TreeRenderer extends StatelessWidget {
   const TreeRenderer(this.renderNode, {super.key});
 
@@ -151,6 +139,7 @@ class TreeRenderer extends StatelessWidget {
     return switch (renderNode) {
       RenderTreeList r => CommonStyleBlock(
           r.commonStyle,
+          domHash: r.domElementHash,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -177,6 +166,7 @@ class TreeRenderer extends StatelessWidget {
           r: r,
           child: CommonStyleBlock(
             r.commonStyle,
+            domHash: r.domElementHash,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,6 +178,7 @@ class TreeRenderer extends StatelessWidget {
         ),
       RenderTreeListItem r => CommonStyleBlock(
           r.commonStyle,
+          domHash: r.domElementHash,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,31 +188,21 @@ class TreeRenderer extends StatelessWidget {
           ),
         ),
       RenderTreeInline r => Row(
-          mainAxisSize: MainAxisSize.max,
+          mainAxisSize: MainAxisSize.min,
           children: r.children.map((a) => TreeRenderer(a)).toList(),
         ),
-      RenderTreeImage r => RenderImage(
-          node: r,
+      RenderTreeImage r => Align(
+          alignment: Alignment.topLeft,
+          child: RenderImage(
+            node: r,
+          ),
         ),
-      RenderTreeView r => DecoratedBox(
-          decoration: BoxDecoration(
-            color: HexColor.fromHex(r.backgroundColor),
-          ),
-          child: SizedBox.expand(
-            child: ScrollConfiguration(
-              behavior: MyBehavior(),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    TreeRenderer(r.child),
-                  ],
-                ),
-              ),
-            ),
-          ),
+      RenderTreeView r => BrowserRenderTreeView(
+          r: r,
         ),
       RenderTreeText r => CommonStyleBlock(
           null,
+          domHash: r.domElementHash,
           child: Text(
             r.text,
             textAlign: switch (r.textAlign) {
@@ -235,7 +216,7 @@ class TreeRenderer extends StatelessWidget {
             },
             style: TextStyle(
                 color: (r.color != null) ? HexColor.fromHex(r.color!) : null,
-                fontSize: 18,
+                fontSize: r.fontSize,
                 fontFamily: r.fontFamily,
                 letterSpacing: r.letterSpacing,
                 wordSpacing: r.wordSpacing,
@@ -282,6 +263,7 @@ class TreeRenderer extends StatelessWidget {
             },
             child: CommonStyleBlock(
               r.commonStyle,
+              domHash: r.domElementHash,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -294,15 +276,16 @@ class TreeRenderer extends StatelessWidget {
         ),
       RenderTreeFlex r => CommonStyleBlock(
           r.commonStyle,
+          domHash: r.domElementHash,
           child: Row(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: switch (r.justifyContent) {
               "start" => MainAxisAlignment.start,
               "center" => MainAxisAlignment.center,
               "end" => MainAxisAlignment.end,
-              "spaceBetween" => MainAxisAlignment.spaceBetween,
-              "spaceAround" => MainAxisAlignment.spaceAround,
-              "spaceEvenly" => MainAxisAlignment.spaceEvenly,
+              "space-between" => MainAxisAlignment.spaceBetween,
+              "space-around" => MainAxisAlignment.spaceAround,
+              "space-evenly" => MainAxisAlignment.spaceEvenly,
               _ => MainAxisAlignment.start,
             },
             children: [
@@ -312,6 +295,7 @@ class TreeRenderer extends StatelessWidget {
         ),
       RenderTreeGrid r => CommonStyleBlock(
           r.commonStyle,
+          domHash: r.domElementHash,
           child: GridView(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -349,23 +333,41 @@ class TreeRenderer extends StatelessWidget {
       RenderTreeInputHidden() => const SizedBox.shrink(),
       RenderTreeBox r => CommonStyleBlock(
           r.commonStyle,
+          domHash: r.domElementHash,
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              for (final c in r.children) TreeRenderer(c),
+              for (final c in r.children)
+                Align(
+                  alignment: const Alignment(0, 0),
+                  child: TreeRenderer(c),
+                ),
             ],
           ),
         ),
+      RenderTreeScript() => const SizedBox.shrink(),
     };
   }
 }
 
 class CommonStyleBlock extends StatelessWidget {
-  const CommonStyleBlock(this.commonStyle, {super.key, required this.child});
+  const CommonStyleBlock(
+    this.commonStyle, {
+    super.key,
+    required this.child,
+    required this.domHash,
+  });
 
   final CommonStyle? commonStyle;
   final Widget child;
+  final int domHash;
+
+  static const elementColor = Color.fromARGB(255, 176, 208, 211);
+  static final marginColor =
+      const Color.fromARGB(255, 241, 166, 106).withOpacity(0.9);
+  static final paddingColor =
+      const Color.fromARGB(255, 155, 197, 61).withOpacity(0.9);
 
   @override
   Widget build(BuildContext context) {
@@ -373,61 +375,102 @@ class CommonStyleBlock extends StatelessWidget {
       cursor: (commonStyle?.cursor == "pointer")
           ? SystemMouseCursors.click
           : MouseCursor.defer,
-      child: Container(
-        alignment: AlignmentDirectional.center,
-        constraints: BoxConstraints(
-          maxWidth: commonStyle?.maxWidth ?? double.infinity,
-          maxHeight: commonStyle?.maxHeight ?? double.infinity,
-          minHeight: commonStyle?.minHeight ?? 0.0,
-          minWidth: commonStyle?.minWidth ?? 0.0,
-        ),
-        decoration: BoxDecoration(
-          color: (commonStyle?.backgroundColor != null)
-              ? HexColor.fromHex(commonStyle!.backgroundColor!)
-              : null,
-          border: Border(
-            bottom: (commonStyle?.borderBottomColor != null)
-                ? BorderSide(
-                    width: commonStyle?.borderRightWidth ?? 0.0,
-                    color: HexColor.fromHex(commonStyle!.borderBottomColor!),
-                  )
-                : BorderSide.none,
-            left: (commonStyle?.borderLeftColor != null)
-                ? BorderSide(
-                    width: commonStyle!.borderLeftWidth ?? 0.0,
-                    color: HexColor.fromHex(commonStyle!.borderLeftColor!),
-                  )
-                : BorderSide.none,
-            top: (commonStyle?.borderTopColor != null)
-                ? BorderSide(
-                    width: commonStyle?.borderTopWidth ?? 0.0,
-                    color: HexColor.fromHex(commonStyle!.borderTopColor!),
-                  )
-                : BorderSide.none,
-            right: (commonStyle?.borderRightColor != null)
-                ? BorderSide(
-                    width: commonStyle?.borderRightWidth ?? 0.0,
-                    color: HexColor.fromHex(commonStyle!.borderRightColor!),
-                  )
-                : BorderSide.none,
+      child: BlocBuilder<DevToolsCubit, DevToolsState>(
+        buildWhen: (previous, current) {
+          return current.selectedDomHash == domHash ||
+              previous.selectedDomHash == domHash;
+        },
+        builder: (context, state) => DecoratedBox(
+          position: DecorationPosition.background,
+          decoration: (state.selectedDomHash == domHash)
+              ? BoxDecoration(color: marginColor)
+              : const BoxDecoration(),
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: commonStyle?.marginBottom ?? 0.0,
+              left: commonStyle?.marginLeft ?? 0.0,
+              top: commonStyle?.marginTop ?? 0.0,
+              right: commonStyle?.marginRight ?? 0.0,
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: commonStyle?.maxWidth ?? double.infinity,
+                maxHeight: commonStyle?.maxHeight ?? double.infinity,
+                minHeight: commonStyle?.minHeight ?? 0.0,
+                minWidth: commonStyle?.minWidth ?? 0.0,
+              ),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: (state.selectedDomHash == domHash)
+                      ? elementColor
+                      : (commonStyle?.backgroundColor != null)
+                          ? HexColor.fromHex(commonStyle!.backgroundColor!)
+                          : null,
+                  border: Border(
+                    bottom: (commonStyle?.borderBottomColor != null)
+                        ? BorderSide(
+                            width: commonStyle?.borderRightWidth ?? 0.0,
+                            color: HexColor.fromHex(
+                                commonStyle!.borderBottomColor!),
+                          )
+                        : BorderSide.none,
+                    left: (commonStyle?.borderLeftColor != null)
+                        ? BorderSide(
+                            width: commonStyle!.borderLeftWidth ?? 0.0,
+                            color:
+                                HexColor.fromHex(commonStyle!.borderLeftColor!),
+                          )
+                        : BorderSide.none,
+                    top: (commonStyle?.borderTopColor != null)
+                        ? BorderSide(
+                            width: commonStyle?.borderTopWidth ?? 0.0,
+                            color:
+                                HexColor.fromHex(commonStyle!.borderTopColor!),
+                          )
+                        : BorderSide.none,
+                    right: (commonStyle?.borderRightColor != null)
+                        ? BorderSide(
+                            width: commonStyle?.borderRightWidth ?? 0.0,
+                            color: HexColor.fromHex(
+                                commonStyle!.borderRightColor!),
+                          )
+                        : BorderSide.none,
+                  ),
+                  borderRadius: (commonStyle?.borderRadius != null)
+                      ? BorderRadius.circular(commonStyle!.borderRadius!)
+                      : null,
+                ),
+                child: DecoratedBox(
+                  decoration: (state.selectedDomHash == domHash)
+                      ? BoxDecoration(color: paddingColor)
+                      : BoxDecoration(),
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      bottom: commonStyle?.paddingBottom ?? 0.0,
+                      left: commonStyle?.paddingLeft ?? 0.0,
+                      top: commonStyle?.paddingTop ?? 0.0,
+                      right: commonStyle?.paddingRight ?? 0.0,
+                    ),
+                    child: Align(
+                      alignment: (commonStyle?.isCentered ?? false)
+                          ? Alignment.center
+                          : Alignment.topLeft,
+                      child: DecoratedBox(
+                        position: DecorationPosition.foreground,
+                        decoration: BoxDecoration(
+                          color: (state.selectedDomHash == domHash)
+                              ? elementColor
+                              : null,
+                        ),
+                        child: child,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
-          borderRadius: (commonStyle?.borderRadius != null)
-              ? BorderRadius.circular(commonStyle!.borderRadius!)
-              : null,
         ),
-        padding: EdgeInsets.only(
-          bottom: commonStyle?.paddingBottom ?? 0.0,
-          left: commonStyle?.paddingLeft ?? 0.0,
-          top: commonStyle?.paddingTop ?? 0.0,
-          right: commonStyle?.paddingRight ?? 0.0,
-        ),
-        margin: EdgeInsets.only(
-          bottom: commonStyle?.marginBottom ?? 0.0,
-          left: commonStyle?.marginLeft ?? 0.0,
-          top: commonStyle?.marginTop ?? 0.0,
-          right: commonStyle?.marginRight ?? 0.0,
-        ),
-        child: child,
       ),
     );
   }

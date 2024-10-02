@@ -1,11 +1,12 @@
 import 'package:dragonfly/src/screens/developer_tools/tools/console/console_screen.dart';
+import 'package:dragonfly/src/screens/developer_tools/tools/inspector/inspector_screen.dart';
 import 'package:dragonfly/src/screens/developer_tools/tools/network/network_tool_screen.dart';
 import 'package:dragonfly/src/screens/developer_tools/tools/stylesheets/stylesheets_tool_screen.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-enum DeveloperTool { network, console, stylesheet }
+enum DeveloperTool { network, console, stylesheet, inspector }
 
 class DeveloperToolsScreen extends StatefulWidget {
   const DeveloperToolsScreen({super.key, required this.isInsideColumn});
@@ -17,7 +18,7 @@ class DeveloperToolsScreen extends StatefulWidget {
 }
 
 class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
-  DeveloperTool selectedTool = DeveloperTool.console;
+  DeveloperTool selectedTool = DeveloperTool.inspector;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +56,31 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
                           ),
                         ),
                       ),
+                      GestureDetector(
+                        onTap: () {
+                          context
+                              .read<BrowserInterfaceCubit>()
+                              .openMobileViewPort();
+                        },
+                        child: Center(
+                          child: Icon(
+                            Icons.phone_iphone,
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedTool = DeveloperTool.inspector;
+                          });
+                        },
+                        child: IconWithTool(
+                          icon: Icons.select_all,
+                          label: "Inspector",
+                          isSelected: selectedTool == DeveloperTool.inspector,
+                        ),
+                      ),
                       GestureDetector(
                         onTap: () {
                           setState(() {
@@ -100,6 +125,7 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
                   DeveloperTool.network => const NetworkToolScreen(),
                   DeveloperTool.console => const ConsoleScreen(),
                   DeveloperTool.stylesheet => const StylesheetsScreen(),
+                  DeveloperTool.inspector => const InspectorScreen(),
                 }),
               ],
             ),
@@ -126,7 +152,8 @@ class IconWithTool extends StatelessWidget {
   Widget build(BuildContext context) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      child: DecoratedBox(
+      child: AnimatedContainer(
+        duration: Durations.short3,
         decoration: BoxDecoration(
           border: Border(
             top: (isSelected)

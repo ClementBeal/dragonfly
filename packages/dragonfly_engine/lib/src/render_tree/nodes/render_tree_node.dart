@@ -2,7 +2,13 @@ import 'package:dragonfly_engine/src/css/css_style.dart';
 
 part 'input_nodes.dart';
 
-sealed class RenderTreeObject {}
+sealed class RenderTreeObject {
+  RenderTreeObject({required this.domElementHash});
+
+  final int domElementHash;
+
+  CommonStyle? findStyle(int nodeHash);
+}
 
 class CommonStyle {
   final String? backgroundColor;
@@ -88,6 +94,34 @@ class CommonStyle {
       cursor: c.cursor,
     );
   }
+
+  factory CommonStyle.empty() => CommonStyle(
+        backgroundColor: null,
+        paddingTop: null,
+        paddingRight: null,
+        paddingBottom: null,
+        paddingLeft: null,
+        marginTop: null,
+        marginRight: null,
+        marginBottom: null,
+        marginLeft: null,
+        borderWidth: null,
+        borderLeftColor: null,
+        borderRightColor: null,
+        borderTopColor: null,
+        borderBottomColor: null,
+        borderLeftWidth: null,
+        borderRightWidth: null,
+        borderTopWidth: null,
+        borderBottomWidth: null,
+        borderRadius: null,
+        maxWidth: null,
+        maxHeight: null,
+        minWidth: null,
+        minHeight: null,
+        isCentered: null,
+        cursor: null,
+      );
 }
 
 class RenderTreeView extends RenderTreeObject {
@@ -99,11 +133,17 @@ class RenderTreeView extends RenderTreeObject {
     required this.devicePixelRatio,
     required this.child,
     required this.backgroundColor,
+    required super.domElementHash,
   });
 
   @override
   String toString() {
     return "RenderTreeView";
+  }
+
+  @override
+  CommonStyle? findStyle(int nodeHash) {
+    return (nodeHash == domElementHash) ? null : child.findStyle(nodeHash);
   }
 }
 
@@ -114,11 +154,24 @@ class RenderTreeBox extends RenderTreeObject {
   RenderTreeBox({
     required this.children,
     required this.commonStyle,
+    required super.domElementHash,
   });
 
   @override
   String toString() {
     return "RenderTreeBox";
+  }
+
+  @override
+  CommonStyle? findStyle(int nodeHash) {
+    if (nodeHash == domElementHash) return commonStyle;
+
+    for (var child in children) {
+      final a = child.findStyle(nodeHash);
+      if (a != null) return a;
+    }
+
+    return null;
   }
 }
 
@@ -143,11 +196,17 @@ class RenderTreeText extends RenderTreeObject {
     required this.wordSpacing,
     required this.textAlign,
     required this.fontWeight,
+    required super.domElementHash,
   });
 
   @override
   String toString() {
     return "RenderTreeText";
+  }
+
+  @override
+  CommonStyle? findStyle(int nodeHash) {
+    return null;
   }
 }
 
@@ -156,7 +215,16 @@ class RenderTreeInline extends RenderTreeObject {
 
   RenderTreeInline({
     required this.children,
+    required super.domElementHash,
   });
+
+  @override
+  CommonStyle? findStyle(int nodeHash) {
+    for (var child in children) {
+      if (child.domElementHash == nodeHash) return null;
+    }
+    return null;
+  }
 }
 
 class RenderTreeList extends RenderTreeBox {
@@ -166,6 +234,7 @@ class RenderTreeList extends RenderTreeBox {
     required this.listType,
     required super.commonStyle,
     required super.children,
+    required super.domElementHash,
   });
 }
 
@@ -173,6 +242,7 @@ class RenderTreeListItem extends RenderTreeBox {
   RenderTreeListItem({
     required super.children,
     required super.commonStyle,
+    required super.domElementHash,
   });
 }
 
@@ -183,6 +253,7 @@ class RenderTreeLink extends RenderTreeBox {
     required this.link,
     required super.commonStyle,
     required super.children,
+    required super.domElementHash,
   });
 }
 
@@ -193,6 +264,7 @@ class RenderTreeImage extends RenderTreeBox {
     required this.link,
     required super.commonStyle,
     required super.children,
+    required super.domElementHash,
   });
 }
 
@@ -205,6 +277,7 @@ class RenderTreeFlex extends RenderTreeBox {
     required this.justifyContent,
     required super.children,
     required super.commonStyle,
+    required super.domElementHash,
   });
 }
 
@@ -217,6 +290,7 @@ class RenderTreeGrid extends RenderTreeBox {
     required this.columnGap,
     required super.children,
     required super.commonStyle,
+    required super.domElementHash,
   });
 }
 
@@ -232,5 +306,15 @@ class RenderTreeForm extends RenderTreeBox {
     required this.action,
     required super.children,
     required super.commonStyle,
+    required super.domElementHash,
   });
+}
+
+class RenderTreeScript extends RenderTreeObject {
+  RenderTreeScript({required super.domElementHash});
+
+  @override
+  CommonStyle? findStyle(int nodeHash) {
+    return null;
+  }
 }

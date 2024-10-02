@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:dragonfly/config/themes.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/browser/blocs/render_screen_cubit.dart';
 import 'package:dragonfly/src/screens/browser/pages/cubit/file_explorer_cubit.dart';
+import 'package:dragonfly/src/screens/developer_tools/cubit/devtols_cubit.dart';
 import 'package:dragonfly/src/screens/scaffold/browser_scaffold.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
 import 'package:dragonfly/src/screens/settings/cubit/settings_cubit.dart';
@@ -10,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -21,12 +25,20 @@ late final NavigationHistory navigationHistory;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final dbManager = DatabaseManager();
-  final db = dbManager.initialize(".");
+  final dbFolderPath = await getTemporaryDirectory();
+  final cacheFolderPath = await getTemporaryDirectory();
+
+  initializeEngine(dbFolderPath.path, cacheFolderPath.path);
 
   navigationHistory = NavigationHistory(db);
 
-  await windowManager.ensureInitialized();
+  if (Platform.isLinux ||
+      Platform.isWindows ||
+      Platform.isFuchsia ||
+      Platform.isMacOS) {
+    await windowManager.ensureInitialized();
+  }
+
   Highlighter.initialize(
     [
       '../../../assets/languages/html',
@@ -89,6 +101,7 @@ class _MainAppState extends State<MainApp> {
         BlocProvider(create: (context) => SettingsCubit()),
         BlocProvider(create: (context) => BrowserInterfaceCubit()),
         BlocProvider(create: (context) => RenderScreenCubit()),
+        BlocProvider(create: (context) => DevToolsCubit()),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         buildWhen: (previous, current) =>

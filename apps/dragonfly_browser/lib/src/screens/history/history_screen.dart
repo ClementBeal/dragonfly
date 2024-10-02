@@ -1,5 +1,6 @@
 import 'package:dragonfly/main.dart';
 import 'package:dragonfly/src/screens/scaffold/widgets/favicon_icon.dart';
+import 'package:dragonfly/utils/extensions/list.dart';
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart';
@@ -44,25 +45,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
     history = navigationHistory.getAllLinks();
   }
 
-  List<Link> _getHistoryForMonth(List<Link> history, int monthsAgo) {
-    final now = DateTime.now();
-    final startingMonth = now.month - monthsAgo;
-    final startingYear = now.year - (startingMonth < 1 ? 1 : 0);
-    final startingDate = DateTime(startingYear, (startingMonth + 12) % 12);
-    final endingDate = DateTime(startingYear + (startingMonth + 1 > 12 ? 1 : 0),
-        (startingMonth + 1) % 12);
-
-    return history
-        .where((link) =>
-            link.timestamp.isAfter(startingDate) &&
-            link.timestamp.isBefore(endingDate))
-        .toList()
-      ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Dialog(
+    return Dialog.fullscreen(
       child: SizedBox(
         width: 1200,
         height: 800,
@@ -76,7 +61,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   onSortChanged: (newSort) => setState(() => sort = newSort),
                 )),
             Expanded(
-              child: Builder(builder: (context) {
+              child: LayoutBuilder(builder: (context, constraints) {
+                final isSmallScreen = constraints.maxWidth < 500;
                 final today = DateTime.now();
 
                 final List<Link> sortedHistory = switch (sort) {
@@ -133,29 +119,23 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
                 return ListView.builder(
                   shrinkWrap: true,
-                  itemCount: sortedHistory
-                      .length, // Replace with actual history length
+                  itemCount: sortedHistory.length,
                   itemBuilder: (context, i) {
-                    // final favicon =
-                    //     FileCache.getCacheFile(sortedHistory[i].link);
-
                     return ListTile(
-                      // leading: BrowserImageRender(
-                      //   favicon,
-                      //   onEmpty: () => const Icon(Icons.language),
-                      // ),
                       title: Text(sortedHistory[i].title),
                       subtitle: Text(sortedHistory[i].link.toString()),
-                      trailing: IconButton(
-                        icon: Text(
-                            DateFormat().format(sortedHistory[i].timestamp)),
-                        onPressed: () {
-                          // TODO: Implement history deletion logic
-                        },
-                      ),
-                      onTap: () {
-                        // TODO: Implement navigation to history item
-                      },
+                      trailing: (isSmallScreen)
+                          ? null
+                          : IconButton(
+                              icon: Text(
+                                DateFormat().format(
+                                  sortedHistory[i].timestamp,
+                                ),
+                                softWrap: true,
+                              ),
+                              onPressed: () {},
+                            ),
+                      onTap: () {},
                     );
                   },
                 );
@@ -177,9 +157,8 @@ class TimePeriodList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      spacing: 8,
-      mainAxisAlignment: MainAxisAlignment.center,
+    return ListView(
+      scrollDirection: Axis.horizontal,
       children: [
         ChoiceChip(
           label: const Text('Today'),
@@ -253,7 +232,12 @@ class TimePeriodList extends StatelessWidget {
             onSortChanged(HistorySort.before);
           },
         ),
-      ],
+      ]
+          .cast<Widget>()
+          .intersperseInner(() => const SizedBox(
+                width: 8,
+              ))
+          .toList(),
     );
   }
 

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
-import 'package:dragonfly_css_parser/dragonfly_css_parser.dart';
 import 'package:dragonfly_engine/src/css/css_browser_theme.dart';
 import 'package:dragonfly_engine/src/css/cssom_builder.dart';
 import 'package:dragonfly_engine/src/file_explorer/file_explorer.dart';
@@ -398,6 +397,79 @@ class Tab {
     );
 
     onUpdate?.call();
+  }
+
+  void removeElementFromDOM(Element elementToRemove) {
+    final page = currentPage;
+
+    if (page == null || page is! HtmlPage) return;
+
+    final document = page.document;
+
+    if (document == null) return;
+
+    for (var child in document.children) {
+      if (child == elementToRemove) {
+        elementToRemove.remove();
+        break;
+      }
+
+      if (_removeElementFromDOM(child, elementToRemove)) break;
+    }
+
+    onUpdate?.call();
+  }
+
+  bool _removeElementFromDOM(Element parent, Element elementToRemove) {
+    for (var child in parent.children) {
+      if (child == elementToRemove) {
+        elementToRemove.remove();
+        return true;
+      }
+
+      if (_removeElementFromDOM(child, elementToRemove)) return true;
+    }
+
+    return false;
+  }
+
+  void duplicateElementInDOM(Element elementToDuplicate) {
+    final page = currentPage;
+
+    if (page == null || page is! HtmlPage) return;
+
+    final document = page.document;
+
+    if (document == null) return;
+
+    for (var i = 0; i < document.children.length; i++) {
+      if (document.children[i] == elementToDuplicate) {
+        document.insertBefore(
+            elementToDuplicate.clone(true), elementToDuplicate);
+        break;
+      }
+
+      if (_findElementInDOM(document.children[i], elementToDuplicate)) {
+        break;
+      }
+    }
+
+    onUpdate?.call();
+  }
+
+  bool _findElementInDOM(Element parent, Element elementToDuplicate) {
+    for (var i = 0; i < parent.children.length; i++) {
+      if (parent.children[i] == elementToDuplicate) {
+        parent.insertBefore(elementToDuplicate.clone(true), elementToDuplicate);
+        return true;
+      }
+
+      if (_findElementInDOM(parent.children[i], elementToDuplicate)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /// Returns the currently displayed page, or null if no page is loaded.
