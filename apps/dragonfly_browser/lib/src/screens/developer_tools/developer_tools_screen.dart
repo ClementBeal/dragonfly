@@ -56,6 +56,18 @@ class _DeveloperToolsScreenState extends State<DeveloperToolsScreen> {
                           ),
                         ),
                       ),
+                      GestureDetector(
+                        onTap: () {
+                          context
+                              .read<BrowserInterfaceCubit>()
+                              .openMobileViewPort();
+                        },
+                        child: Center(
+                          child: Icon(
+                            Icons.phone_iphone,
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: 8),
                       GestureDetector(
                         onTap: () {

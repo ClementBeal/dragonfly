@@ -6,7 +6,9 @@ import 'package:dragonfly/src/screens/browser/pages/json/json_screen.dart';
 import 'package:dragonfly/src/screens/browser/pages/media_page/media_page_screen.dart';
 import 'package:dragonfly/src/screens/browser/render_node_widget/render_image.dart';
 import 'package:dragonfly/src/screens/browser/render_node_widget/render_input_text.dart';
+import 'package:dragonfly/src/screens/browser/render_node_widget/render_tree_view.dart';
 import 'package:dragonfly/src/screens/developer_tools/cubit/devtols_cubit.dart';
+import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
 import 'package:dragonfly/src/screens/lobby/lobby_screen.dart';
 import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart' hide Element, Page, Tab;
@@ -127,14 +129,6 @@ class RenderPageWidget extends StatelessWidget {
   }
 }
 
-class MyBehavior extends ScrollBehavior {
-  @override
-  Widget buildOverscrollIndicator(
-      BuildContext context, Widget child, ScrollableDetails details) {
-    return child;
-  }
-}
-
 class TreeRenderer extends StatelessWidget {
   const TreeRenderer(this.renderNode, {super.key});
 
@@ -203,23 +197,8 @@ class TreeRenderer extends StatelessWidget {
             node: r,
           ),
         ),
-      RenderTreeView r => DecoratedBox(
-          decoration: BoxDecoration(
-            color: HexColor.fromHex(r.backgroundColor),
-          ),
-          child: SizedBox.expand(
-            child: ScrollConfiguration(
-              behavior: MyBehavior(),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TreeRenderer(r.child),
-                  ],
-                ),
-              ),
-            ),
-          ),
+      RenderTreeView r => BrowserRenderTreeView(
+          r: r,
         ),
       RenderTreeText r => CommonStyleBlock(
           null,

@@ -8,6 +8,7 @@ enum Dock { top, bottom, left, right }
 
 class BrowserInterfaceState {
   final bool showDevtools;
+  final bool showMobileViewPort;
   final RedockingData? currentRedockingDock;
   final List<RedockableInterface> topDocks;
   final List<RedockableInterface> leftDocks;
@@ -16,6 +17,7 @@ class BrowserInterfaceState {
 
   BrowserInterfaceState({
     required this.showDevtools,
+    required this.showMobileViewPort,
     this.currentRedockingDock,
     required this.topDocks,
     required this.leftDocks,
@@ -25,6 +27,7 @@ class BrowserInterfaceState {
 
   factory BrowserInterfaceState.initial() => BrowserInterfaceState(
         showDevtools: false,
+        showMobileViewPort: false,
         currentRedockingDock: null,
         topDocks: [
           RedockableInterface.tabBar,
@@ -40,6 +43,7 @@ class BrowserInterfaceState {
 
   BrowserInterfaceState copyWith({
     bool? showDevtools,
+    bool? showMobileViewPort,
     RedockingData? Function()? currentRedockingDock,
     List<RedockableInterface>? topDocks,
     List<RedockableInterface>? leftDocks,
@@ -48,6 +52,7 @@ class BrowserInterfaceState {
   }) {
     return BrowserInterfaceState(
       showDevtools: showDevtools ?? this.showDevtools,
+      showMobileViewPort: showMobileViewPort ?? this.showMobileViewPort,
       currentRedockingDock: (currentRedockingDock != null)
           ? currentRedockingDock()
           : this.currentRedockingDock,
@@ -152,5 +157,21 @@ class BrowserInterfaceCubit extends Cubit<BrowserInterfaceState> {
         }
     }
     emit(state.copyWith());
+  }
+
+  void openMobileViewPort() {
+    emit(
+      state.copyWith(
+        showMobileViewPort: true,
+      ),
+    );
+  }
+
+  void closeMobileViewPort() {
+    emit(
+      state.copyWith(
+        showMobileViewPort: false,
+      ),
+    );
   }
 }
