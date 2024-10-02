@@ -4,15 +4,13 @@ packages:
   - apps/**
   - packages/**
 
-
 scripts:
   analyze:
     exec: dart analyze .
   test:
     exec: dart test
 
-  
+  loc:
+    exec: find lib test -type f -print0 | xargs -0 wc -l | tail -n 1
   browser_website:
     run: melos exec dart bin/server.dart
-
-  
