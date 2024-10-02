@@ -30,6 +30,10 @@ class _HTMLDisplay extends StatelessWidget {
 
         final document = currentPage.document;
 
+        if (document == null) {
+          return SizedBox.shrink();
+        }
+
         return SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

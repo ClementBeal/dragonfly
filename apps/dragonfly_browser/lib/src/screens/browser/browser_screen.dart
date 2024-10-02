@@ -487,13 +487,14 @@ class CommonStyleBlock extends StatelessWidget {
                           ? Alignment.center
                           : Alignment.topLeft,
                       child: DecoratedBox(
-                          position: DecorationPosition.foreground,
-                          decoration: BoxDecoration(
-                            color: (state.selectedDomHash == domHash)
-                                ? elementColor
-                                : null,
-                          ),
-                          child: child),
+                        position: DecorationPosition.foreground,
+                        decoration: BoxDecoration(
+                          color: (state.selectedDomHash == domHash)
+                              ? elementColor
+                              : null,
+                        ),
+                        child: child,
+                      ),
                     ),
                   ),
                 ),
