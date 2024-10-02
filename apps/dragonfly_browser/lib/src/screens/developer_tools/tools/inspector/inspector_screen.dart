@@ -1,6 +1,7 @@
 import 'package:dragonfly/main.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/developer_tools/cubit/devtols_cubit.dart';
+import 'package:dragonfly/src/screens/developer_tools/tools/inspector/tools/inspector_layout.dart';
 import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart' hide Element;
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -37,15 +38,16 @@ class _HTMLDisplay extends StatelessWidget {
         return SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: document!.children
-                .take(1)
-                .map(
-                  (e) => HTMLElementBlock(
-                    element: e,
-                    indent: 0,
+            children: [
+              ...document.children.take(1).map(
+                    (e) => HTMLElementBlock(
+                      element: e,
+                      indent: 0,
+                    ),
                   ),
-                )
-                .toList(),
+              Divider(),
+              InspectorDataPanel(),
+            ],
           ),
         );
       },
@@ -304,4 +306,90 @@ void showElementInspectorMenu(BuildContext context, Element domElement,
       ),
     ],
   );
+}
+
+class InspectorDataPanel extends StatefulWidget {
+  const InspectorDataPanel({super.key});
+
+  @override
+  State<InspectorDataPanel> createState() => _InspectorDataPanelState();
+}
+
+class _InspectorDataPanelState extends State<InspectorDataPanel> {
+  int selectedInspectorTool = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 40,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              AAA(
+                label: "Style",
+                isActivated: selectedInspectorTool == 0,
+                onTap: () {
+                  setState(() {
+                    selectedInspectorTool = 0;
+                  });
+                },
+              ),
+              AAA(
+                label: "Layout",
+                isActivated: selectedInspectorTool == 1,
+                onTap: () {
+                  setState(() {
+                    selectedInspectorTool = 1;
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
+        IndexedStack(
+          index: selectedInspectorTool,
+          children: [
+            SizedBox.shrink(),
+            InspectorLayout(),
+          ],
+        )
+      ],
+    );
+  }
+}
+
+class AAA extends StatelessWidget {
+  const AAA({
+    super.key,
+    required this.label,
+    required this.isActivated,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isActivated;
+  final Function() onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: Durations.short2,
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: (isActivated)
+                ? BorderSide(color: Colors.blue, width: 3)
+                : BorderSide.none,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Center(child: Text(label)),
+        ),
+      ),
+    );
+  }
 }
