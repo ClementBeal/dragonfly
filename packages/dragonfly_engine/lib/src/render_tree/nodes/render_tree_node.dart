@@ -3,9 +3,11 @@ import 'package:dragonfly_engine/src/css/css_style.dart';
 part 'input_nodes.dart';
 
 sealed class RenderTreeObject {
+  RenderTreeObject({required this.domElementHash});
+
   final int domElementHash;
 
-  RenderTreeObject({required this.domElementHash});
+  CommonStyle? findStyle(int nodeHash);
 }
 
 class CommonStyle {
@@ -92,6 +94,34 @@ class CommonStyle {
       cursor: c.cursor,
     );
   }
+
+  factory CommonStyle.empty() => CommonStyle(
+        backgroundColor: null,
+        paddingTop: null,
+        paddingRight: null,
+        paddingBottom: null,
+        paddingLeft: null,
+        marginTop: null,
+        marginRight: null,
+        marginBottom: null,
+        marginLeft: null,
+        borderWidth: null,
+        borderLeftColor: null,
+        borderRightColor: null,
+        borderTopColor: null,
+        borderBottomColor: null,
+        borderLeftWidth: null,
+        borderRightWidth: null,
+        borderTopWidth: null,
+        borderBottomWidth: null,
+        borderRadius: null,
+        maxWidth: null,
+        maxHeight: null,
+        minWidth: null,
+        minHeight: null,
+        isCentered: null,
+        cursor: null,
+      );
 }
 
 class RenderTreeView extends RenderTreeObject {
@@ -110,6 +140,11 @@ class RenderTreeView extends RenderTreeObject {
   String toString() {
     return "RenderTreeView";
   }
+
+  @override
+  CommonStyle? findStyle(int nodeHash) {
+    return (nodeHash == domElementHash) ? null : child.findStyle(nodeHash);
+  }
 }
 
 class RenderTreeBox extends RenderTreeObject {
@@ -125,6 +160,18 @@ class RenderTreeBox extends RenderTreeObject {
   @override
   String toString() {
     return "RenderTreeBox";
+  }
+
+  @override
+  CommonStyle? findStyle(int nodeHash) {
+    if (nodeHash == domElementHash) return commonStyle;
+
+    for (var child in children) {
+      final a = child.findStyle(nodeHash);
+      if (a != null) return a;
+    }
+
+    return null;
   }
 }
 
@@ -156,6 +203,11 @@ class RenderTreeText extends RenderTreeObject {
   String toString() {
     return "RenderTreeText";
   }
+
+  @override
+  CommonStyle? findStyle(int nodeHash) {
+    return null;
+  }
 }
 
 class RenderTreeInline extends RenderTreeObject {
@@ -165,6 +217,14 @@ class RenderTreeInline extends RenderTreeObject {
     required this.children,
     required super.domElementHash,
   });
+
+  @override
+  CommonStyle? findStyle(int nodeHash) {
+    for (var child in children) {
+      if (child.domElementHash == nodeHash) return null;
+    }
+    return null;
+  }
 }
 
 class RenderTreeList extends RenderTreeBox {
@@ -252,4 +312,9 @@ class RenderTreeForm extends RenderTreeBox {
 
 class RenderTreeScript extends RenderTreeObject {
   RenderTreeScript({required super.domElementHash});
+
+  @override
+  CommonStyle? findStyle(int nodeHash) {
+    return null;
+  }
 }

@@ -1,5 +1,4 @@
 import 'package:dragonfly_engine/dragonfly_engine.dart';
-import 'package:dragonfly_engine/src/render_tree/nodes/render_tree_node.dart';
 import 'package:dragonfly_engine/src/utils/extension.dart';
 import 'package:html/dom.dart';
 
@@ -11,6 +10,12 @@ class RenderTree {
   @override
   String toString() {
     return "RenderTree:\n|$child";
+  }
+
+  CommonStyle? findStyle(int nodeHash) {
+    final a = child.findStyle(nodeHash);
+    print("a => $a");
+    return a;
   }
 }
 

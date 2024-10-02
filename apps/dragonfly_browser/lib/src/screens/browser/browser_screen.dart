@@ -92,16 +92,7 @@ class RenderPageWidget extends StatelessWidget {
                     // it has to be moded to a special package
                     // called `dragonfly_renderer`
 
-                    final renderTree = BrowserRenderTree(
-                      dom: page.document!,
-                      cssom: CssomBuilder().parse(
-                        page.stylesheets
-                            .whereType<CSSStylesheet>()
-                            .map((e) => e.content)
-                            .join("\n"),
-                      ),
-                      initialRoute: page.uri.toString(),
-                    ).parse();
+                    final renderTree = page.renderTree!;
 
                     return Stack(
                       children: [
