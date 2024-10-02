@@ -234,3 +234,5 @@ class RenderTreeForm extends RenderTreeBox {
     required super.commonStyle,
   });
 }
+
+class RenderTreeScript extends RenderTreeObject {}

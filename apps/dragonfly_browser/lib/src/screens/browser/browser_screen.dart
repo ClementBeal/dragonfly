@@ -199,11 +199,14 @@ class TreeRenderer extends StatelessWidget {
           ),
         ),
       RenderTreeInline r => Row(
-          mainAxisSize: MainAxisSize.max,
+          mainAxisSize: MainAxisSize.min,
           children: r.children.map((a) => TreeRenderer(a)).toList(),
         ),
-      RenderTreeImage r => RenderImage(
-          node: r,
+      RenderTreeImage r => Align(
+          alignment: Alignment.topLeft,
+          child: RenderImage(
+            node: r,
+          ),
         ),
       RenderTreeView r => DecoratedBox(
           decoration: BoxDecoration(
@@ -214,6 +217,7 @@ class TreeRenderer extends StatelessWidget {
               behavior: MyBehavior(),
               child: SingleChildScrollView(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     TreeRenderer(r.child),
                   ],
@@ -237,7 +241,7 @@ class TreeRenderer extends StatelessWidget {
             },
             style: TextStyle(
                 color: (r.color != null) ? HexColor.fromHex(r.color!) : null,
-                fontSize: 18,
+                fontSize: r.fontSize,
                 fontFamily: r.fontFamily,
                 letterSpacing: r.letterSpacing,
                 wordSpacing: r.wordSpacing,
@@ -297,14 +301,14 @@ class TreeRenderer extends StatelessWidget {
       RenderTreeFlex r => CommonStyleBlock(
           r.commonStyle,
           child: Row(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: switch (r.justifyContent) {
               "start" => MainAxisAlignment.start,
               "center" => MainAxisAlignment.center,
               "end" => MainAxisAlignment.end,
-              "spaceBetween" => MainAxisAlignment.spaceBetween,
-              "spaceAround" => MainAxisAlignment.spaceAround,
-              "spaceEvenly" => MainAxisAlignment.spaceEvenly,
+              "space-between" => MainAxisAlignment.spaceBetween,
+              "space-around" => MainAxisAlignment.spaceAround,
+              "space-evenly" => MainAxisAlignment.spaceEvenly,
               _ => MainAxisAlignment.start,
             },
             children: [
@@ -353,12 +357,17 @@ class TreeRenderer extends StatelessWidget {
           r.commonStyle,
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              for (final c in r.children) TreeRenderer(c),
+              for (final c in r.children)
+                Align(
+                  alignment: Alignment(0, 0),
+                  child: TreeRenderer(c),
+                ),
             ],
           ),
         ),
+      RenderTreeScript() => SizedBox.shrink(),
     };
   }
 }
@@ -376,7 +385,9 @@ class CommonStyleBlock extends StatelessWidget {
           ? SystemMouseCursors.click
           : MouseCursor.defer,
       child: Container(
-        alignment: AlignmentDirectional.center,
+        alignment: (commonStyle?.isCentered ?? false)
+            ? Alignment.center
+            : Alignment.topLeft,
         constraints: BoxConstraints(
           maxWidth: commonStyle?.maxWidth ?? double.infinity,
           maxHeight: commonStyle?.maxHeight ?? double.infinity,

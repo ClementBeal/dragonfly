@@ -90,8 +90,11 @@ class BrowserRenderTree {
         .trim();
 
     final displayProperty = c.display ?? "inline";
+    final tag = element.localName!;
 
-    if (element.localName! == "a") {
+    if (tag == "script") {
+      return RenderTreeScript();
+    } else if (element.localName! == "a") {
       return RenderTreeLink(
         link: element.attributes["href"] ?? "",
         commonStyle: CommonStyle.fromCSSStyle(c),

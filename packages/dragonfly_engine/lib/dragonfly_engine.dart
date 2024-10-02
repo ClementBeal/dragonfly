@@ -51,7 +51,8 @@ export 'src/render_tree/nodes/render_tree_node.dart'
         RenderTreeInputRadio,
         RenderTreeInputHidden,
         RenderTreeInputTextArea,
-        RenderTreeInline;
+        RenderTreeInline,
+        RenderTreeScript;
 
 export 'src/render_tree/render_tree.dart' show BrowserRenderTree, RenderTree;
 export 'src/utils/network_tracker.dart'
