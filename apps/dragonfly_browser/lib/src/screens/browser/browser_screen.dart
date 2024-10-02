@@ -394,7 +394,7 @@ class CommonStyleBlock extends StatelessWidget {
   final int domHash;
 
   static final elementColor =
-      const Color.fromARGB(255, 176, 208, 211).withOpacity(0.9);
+      const Color.fromARGB(255, 176, 208, 211).withOpacity(0.3);
   static final marginColor =
       const Color.fromARGB(255, 241, 166, 106).withOpacity(0.9);
   static final paddingColor =
@@ -411,151 +411,94 @@ class CommonStyleBlock extends StatelessWidget {
           return current.selectedDomHash == domHash ||
               previous.selectedDomHash == domHash;
         },
-        builder: (context, state) => Padding(
-          padding: EdgeInsets.only(
-            bottom: commonStyle?.marginBottom ?? 0.0,
-            left: commonStyle?.marginLeft ?? 0.0,
-            top: commonStyle?.marginTop ?? 0.0,
-            right: commonStyle?.marginRight ?? 0.0,
-          ),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: commonStyle?.maxWidth ?? double.infinity,
-              maxHeight: commonStyle?.maxHeight ?? double.infinity,
-              minHeight: commonStyle?.minHeight ?? 0.0,
-              minWidth: commonStyle?.minWidth ?? 0.0,
-            ),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: (commonStyle?.backgroundColor != null)
-                    ? HexColor.fromHex(commonStyle!.backgroundColor!)
-                    : null,
-                border: Border(
-                  bottom: (commonStyle?.borderBottomColor != null)
-                      ? BorderSide(
-                          width: commonStyle?.borderRightWidth ?? 0.0,
-                          color:
-                              HexColor.fromHex(commonStyle!.borderBottomColor!),
-                        )
-                      : BorderSide.none,
-                  left: (commonStyle?.borderLeftColor != null)
-                      ? BorderSide(
-                          width: commonStyle!.borderLeftWidth ?? 0.0,
-                          color:
-                              HexColor.fromHex(commonStyle!.borderLeftColor!),
-                        )
-                      : BorderSide.none,
-                  top: (commonStyle?.borderTopColor != null)
-                      ? BorderSide(
-                          width: commonStyle?.borderTopWidth ?? 0.0,
-                          color: HexColor.fromHex(commonStyle!.borderTopColor!),
-                        )
-                      : BorderSide.none,
-                  right: (commonStyle?.borderRightColor != null)
-                      ? BorderSide(
-                          width: commonStyle?.borderRightWidth ?? 0.0,
-                          color:
-                              HexColor.fromHex(commonStyle!.borderRightColor!),
-                        )
-                      : BorderSide.none,
-                ),
-                borderRadius: (commonStyle?.borderRadius != null)
-                    ? BorderRadius.circular(commonStyle!.borderRadius!)
-                    : null,
-              ),
-              child: Padding(
-                padding: EdgeInsets.only(
-                  bottom: commonStyle?.paddingBottom ?? 0.0,
-                  left: commonStyle?.paddingLeft ?? 0.0,
-                  top: commonStyle?.paddingTop ?? 0.0,
-                  right: commonStyle?.paddingRight ?? 0.0,
-                ),
-                child: Align(
-                  alignment: (commonStyle?.isCentered ?? false)
-                      ? Alignment.center
-                      : Alignment.topLeft,
-                  child: child,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    return MouseRegion(
-      cursor: (commonStyle?.cursor == "pointer")
-          ? SystemMouseCursors.click
-          : MouseCursor.defer,
-      child: BlocBuilder<DevToolsCubit, DevToolsState>(
-        buildWhen: (previous, current) {
-          return current.selectedDomHash == domHash ||
-              previous.selectedDomHash == domHash;
-        },
         builder: (context, state) => DecoratedBox(
-          decoration: BoxDecoration(
-            color: (state.selectedDomHash == domHash)
-                ? Colors.blue.shade800.withOpacity(0.4)
-                : null,
-          ),
-          child: Container(
-            alignment: (commonStyle?.isCentered ?? false)
-                ? Alignment.center
-                : Alignment.topLeft,
-            constraints: BoxConstraints(
-              maxWidth: commonStyle?.maxWidth ?? double.infinity,
-              maxHeight: commonStyle?.maxHeight ?? double.infinity,
-              minHeight: commonStyle?.minHeight ?? 0.0,
-              minWidth: commonStyle?.minWidth ?? 0.0,
-            ),
-            decoration: BoxDecoration(
-              color: (commonStyle?.backgroundColor != null)
-                  ? HexColor.fromHex(commonStyle!.backgroundColor!)
-                  : null,
-              border: Border(
-                bottom: (commonStyle?.borderBottomColor != null)
-                    ? BorderSide(
-                        width: commonStyle?.borderRightWidth ?? 0.0,
-                        color:
-                            HexColor.fromHex(commonStyle!.borderBottomColor!),
-                      )
-                    : BorderSide.none,
-                left: (commonStyle?.borderLeftColor != null)
-                    ? BorderSide(
-                        width: commonStyle!.borderLeftWidth ?? 0.0,
-                        color: HexColor.fromHex(commonStyle!.borderLeftColor!),
-                      )
-                    : BorderSide.none,
-                top: (commonStyle?.borderTopColor != null)
-                    ? BorderSide(
-                        width: commonStyle?.borderTopWidth ?? 0.0,
-                        color: HexColor.fromHex(commonStyle!.borderTopColor!),
-                      )
-                    : BorderSide.none,
-                right: (commonStyle?.borderRightColor != null)
-                    ? BorderSide(
-                        width: commonStyle?.borderRightWidth ?? 0.0,
-                        color: HexColor.fromHex(commonStyle!.borderRightColor!),
-                      )
-                    : BorderSide.none,
-              ),
-              borderRadius: (commonStyle?.borderRadius != null)
-                  ? BorderRadius.circular(commonStyle!.borderRadius!)
-                  : null,
-            ),
+          position: DecorationPosition.background,
+          decoration: (state.selectedDomHash == domHash)
+              ? BoxDecoration(color: marginColor)
+              : const BoxDecoration(),
+          child: Padding(
             padding: EdgeInsets.only(
-              bottom: commonStyle?.paddingBottom ?? 0.0,
-              left: commonStyle?.paddingLeft ?? 0.0,
-              top: commonStyle?.paddingTop ?? 0.0,
-              right: commonStyle?.paddingRight ?? 0.0,
-            ),
-            margin: EdgeInsets.only(
               bottom: commonStyle?.marginBottom ?? 0.0,
               left: commonStyle?.marginLeft ?? 0.0,
               top: commonStyle?.marginTop ?? 0.0,
               right: commonStyle?.marginRight ?? 0.0,
             ),
-            child: child,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: commonStyle?.maxWidth ?? double.infinity,
+                maxHeight: commonStyle?.maxHeight ?? double.infinity,
+                minHeight: commonStyle?.minHeight ?? 0.0,
+                minWidth: commonStyle?.minWidth ?? 0.0,
+              ),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: (state.selectedDomHash == domHash)
+                      ? elementColor
+                      : (commonStyle?.backgroundColor != null)
+                          ? HexColor.fromHex(commonStyle!.backgroundColor!)
+                          : null,
+                  border: Border(
+                    bottom: (commonStyle?.borderBottomColor != null)
+                        ? BorderSide(
+                            width: commonStyle?.borderRightWidth ?? 0.0,
+                            color: HexColor.fromHex(
+                                commonStyle!.borderBottomColor!),
+                          )
+                        : BorderSide.none,
+                    left: (commonStyle?.borderLeftColor != null)
+                        ? BorderSide(
+                            width: commonStyle!.borderLeftWidth ?? 0.0,
+                            color:
+                                HexColor.fromHex(commonStyle!.borderLeftColor!),
+                          )
+                        : BorderSide.none,
+                    top: (commonStyle?.borderTopColor != null)
+                        ? BorderSide(
+                            width: commonStyle?.borderTopWidth ?? 0.0,
+                            color:
+                                HexColor.fromHex(commonStyle!.borderTopColor!),
+                          )
+                        : BorderSide.none,
+                    right: (commonStyle?.borderRightColor != null)
+                        ? BorderSide(
+                            width: commonStyle?.borderRightWidth ?? 0.0,
+                            color: HexColor.fromHex(
+                                commonStyle!.borderRightColor!),
+                          )
+                        : BorderSide.none,
+                  ),
+                  borderRadius: (commonStyle?.borderRadius != null)
+                      ? BorderRadius.circular(commonStyle!.borderRadius!)
+                      : null,
+                ),
+                child: DecoratedBox(
+                  decoration: (state.selectedDomHash == domHash)
+                      ? BoxDecoration(color: paddingColor)
+                      : BoxDecoration(),
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      bottom: commonStyle?.paddingBottom ?? 0.0,
+                      left: commonStyle?.paddingLeft ?? 0.0,
+                      top: commonStyle?.paddingTop ?? 0.0,
+                      right: commonStyle?.paddingRight ?? 0.0,
+                    ),
+                    child: Align(
+                      alignment: (commonStyle?.isCentered ?? false)
+                          ? Alignment.center
+                          : Alignment.topLeft,
+                      child: DecoratedBox(
+                          position: DecorationPosition.foreground,
+                          decoration: BoxDecoration(
+                            color: (state.selectedDomHash == domHash)
+                                ? elementColor
+                                : null,
+                          ),
+                          child: child),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ),
