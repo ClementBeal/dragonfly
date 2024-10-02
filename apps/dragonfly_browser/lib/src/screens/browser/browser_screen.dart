@@ -110,14 +110,14 @@ class RenderPageWidget extends StatelessWidget {
                           Align(
                             alignment: Alignment.bottomLeft,
                             child: DecoratedBox(
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 color: Colors.black87,
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
                                   state.hoveredLink!,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                   ),
                                 ),
@@ -370,13 +370,13 @@ class TreeRenderer extends StatelessWidget {
             children: [
               for (final c in r.children)
                 Align(
-                  alignment: Alignment(0, 0),
+                  alignment: const Alignment(0, 0),
                   child: TreeRenderer(c),
                 ),
             ],
           ),
         ),
-      RenderTreeScript() => SizedBox.shrink(),
+      RenderTreeScript() => const SizedBox.shrink(),
     };
   }
 }
@@ -394,14 +394,95 @@ class CommonStyleBlock extends StatelessWidget {
   final int domHash;
 
   static final elementColor =
-      Color.fromARGB(255, 176, 208, 211).withOpacity(0.9);
+      const Color.fromARGB(255, 176, 208, 211).withOpacity(0.9);
   static final marginColor =
-      Color.fromARGB(255, 241, 166, 106).withOpacity(0.9);
+      const Color.fromARGB(255, 241, 166, 106).withOpacity(0.9);
   static final paddingColor =
-      Color.fromARGB(255, 155, 197, 61).withOpacity(0.9);
+      const Color.fromARGB(255, 155, 197, 61).withOpacity(0.9);
 
   @override
   Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: (commonStyle?.cursor == "pointer")
+          ? SystemMouseCursors.click
+          : MouseCursor.defer,
+      child: BlocBuilder<DevToolsCubit, DevToolsState>(
+        buildWhen: (previous, current) {
+          return current.selectedDomHash == domHash ||
+              previous.selectedDomHash == domHash;
+        },
+        builder: (context, state) => Padding(
+          padding: EdgeInsets.only(
+            bottom: commonStyle?.marginBottom ?? 0.0,
+            left: commonStyle?.marginLeft ?? 0.0,
+            top: commonStyle?.marginTop ?? 0.0,
+            right: commonStyle?.marginRight ?? 0.0,
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: commonStyle?.maxWidth ?? double.infinity,
+              maxHeight: commonStyle?.maxHeight ?? double.infinity,
+              minHeight: commonStyle?.minHeight ?? 0.0,
+              minWidth: commonStyle?.minWidth ?? 0.0,
+            ),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: (commonStyle?.backgroundColor != null)
+                    ? HexColor.fromHex(commonStyle!.backgroundColor!)
+                    : null,
+                border: Border(
+                  bottom: (commonStyle?.borderBottomColor != null)
+                      ? BorderSide(
+                          width: commonStyle?.borderRightWidth ?? 0.0,
+                          color:
+                              HexColor.fromHex(commonStyle!.borderBottomColor!),
+                        )
+                      : BorderSide.none,
+                  left: (commonStyle?.borderLeftColor != null)
+                      ? BorderSide(
+                          width: commonStyle!.borderLeftWidth ?? 0.0,
+                          color:
+                              HexColor.fromHex(commonStyle!.borderLeftColor!),
+                        )
+                      : BorderSide.none,
+                  top: (commonStyle?.borderTopColor != null)
+                      ? BorderSide(
+                          width: commonStyle?.borderTopWidth ?? 0.0,
+                          color: HexColor.fromHex(commonStyle!.borderTopColor!),
+                        )
+                      : BorderSide.none,
+                  right: (commonStyle?.borderRightColor != null)
+                      ? BorderSide(
+                          width: commonStyle?.borderRightWidth ?? 0.0,
+                          color:
+                              HexColor.fromHex(commonStyle!.borderRightColor!),
+                        )
+                      : BorderSide.none,
+                ),
+                borderRadius: (commonStyle?.borderRadius != null)
+                    ? BorderRadius.circular(commonStyle!.borderRadius!)
+                    : null,
+              ),
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: commonStyle?.paddingBottom ?? 0.0,
+                  left: commonStyle?.paddingLeft ?? 0.0,
+                  top: commonStyle?.paddingTop ?? 0.0,
+                  right: commonStyle?.paddingRight ?? 0.0,
+                ),
+                child: Align(
+                  alignment: (commonStyle?.isCentered ?? false)
+                      ? Alignment.center
+                      : Alignment.topLeft,
+                  child: child,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
     return MouseRegion(
       cursor: (commonStyle?.cursor == "pointer")
           ? SystemMouseCursors.click
