@@ -9,6 +9,8 @@ enum Dock { top, bottom, left, right }
 class BrowserInterfaceState {
   final bool showDevtools;
   final bool showMobileViewPort;
+  final double viewportWidth;
+  final double viewportHeight;
   final RedockingData? currentRedockingDock;
   final List<RedockableInterface> topDocks;
   final List<RedockableInterface> leftDocks;
@@ -18,6 +20,8 @@ class BrowserInterfaceState {
   BrowserInterfaceState({
     required this.showDevtools,
     required this.showMobileViewPort,
+    required this.viewportWidth,
+    required this.viewportHeight,
     this.currentRedockingDock,
     required this.topDocks,
     required this.leftDocks,
@@ -28,6 +32,8 @@ class BrowserInterfaceState {
   factory BrowserInterfaceState.initial() => BrowserInterfaceState(
         showDevtools: false,
         showMobileViewPort: false,
+        viewportHeight: 800,
+        viewportWidth: 420,
         currentRedockingDock: null,
         topDocks: [
           RedockableInterface.tabBar,
@@ -44,6 +50,8 @@ class BrowserInterfaceState {
   BrowserInterfaceState copyWith({
     bool? showDevtools,
     bool? showMobileViewPort,
+    double? viewportHeight,
+    double? viewportWidth,
     RedockingData? Function()? currentRedockingDock,
     List<RedockableInterface>? topDocks,
     List<RedockableInterface>? leftDocks,
@@ -53,6 +61,8 @@ class BrowserInterfaceState {
     return BrowserInterfaceState(
       showDevtools: showDevtools ?? this.showDevtools,
       showMobileViewPort: showMobileViewPort ?? this.showMobileViewPort,
+      viewportHeight: viewportHeight ?? this.viewportHeight,
+      viewportWidth: viewportWidth ?? this.viewportWidth,
       currentRedockingDock: (currentRedockingDock != null)
           ? currentRedockingDock()
           : this.currentRedockingDock,
@@ -171,6 +181,15 @@ class BrowserInterfaceCubit extends Cubit<BrowserInterfaceState> {
     emit(
       state.copyWith(
         showMobileViewPort: false,
+      ),
+    );
+  }
+
+  void setDeviceViewport(double width, double height) {
+    emit(
+      state.copyWith(
+        viewportWidth: width,
+        viewportHeight: height,
       ),
     );
   }
