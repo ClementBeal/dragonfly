@@ -1,5 +1,6 @@
 import 'package:dragonfly/main.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
+import 'package:dragonfly/src/screens/developer_tools/cubit/devtols_cubit.dart';
 import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart' hide Element;
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -174,6 +175,7 @@ class _HTMLElementBlockState extends State<HTMLElementBlock> {
           setState(() {
             isHovered = true;
           });
+          context.read<DevToolsCubit>().selectDomNode(widget.element.hashCode);
         },
         onExit: (event) {
           setState(() {

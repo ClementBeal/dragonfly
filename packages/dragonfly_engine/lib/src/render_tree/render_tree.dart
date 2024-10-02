@@ -65,6 +65,7 @@ class BrowserRenderTree {
           dom.querySelector("body")!,
           htmlStyle,
         ),
+        domElementHash: dom.hashCode,
       ),
     );
   }
@@ -93,11 +94,14 @@ class BrowserRenderTree {
     final tag = element.localName!;
 
     if (tag == "script") {
-      return RenderTreeScript();
+      return RenderTreeScript(
+        domElementHash: element.hashCode,
+      );
     } else if (element.localName! == "a") {
       return RenderTreeLink(
         link: element.attributes["href"] ?? "",
         commonStyle: CommonStyle.fromCSSStyle(c),
+        domElementHash: element.hashCode,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -110,6 +114,7 @@ class BrowserRenderTree {
               textDecoration: null,
               letterSpacing: null,
               wordSpacing: null,
+              domElementHash: element.hashCode,
             ),
           ...element.children.map((e) => _parse(e, c)),
         ],
@@ -118,6 +123,7 @@ class BrowserRenderTree {
       return RenderTreeImage(
         link: element.attributes["src"]!,
         commonStyle: CommonStyle.fromCSSStyle(c),
+        domElementHash: element.hashCode,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -130,6 +136,7 @@ class BrowserRenderTree {
               textDecoration: null,
               letterSpacing: null,
               wordSpacing: null,
+              domElementHash: element.hashCode,
             ),
           ...element.children.map((e) => _parse(e, c)),
         ],
@@ -139,6 +146,7 @@ class BrowserRenderTree {
         action: element.attributes["action"],
         method: element.attributes["method"],
         commonStyle: CommonStyle.fromCSSStyle(c),
+        domElementHash: element.hashCode,
         children: [
           ...element.children.map((e) => _parse(e, c)),
         ],
@@ -155,6 +163,7 @@ class BrowserRenderTree {
           name: element.attributes["name"],
           placeholder: element.attributes["placeholder"],
           commonStyle: CommonStyle.fromCSSStyle(c),
+          domElementHash: element.hashCode,
           children: [
             if (element.text != "")
               RenderTreeText(
@@ -167,6 +176,7 @@ class BrowserRenderTree {
                 textDecoration: null,
                 letterSpacing: null,
                 wordSpacing: null,
+                domElementHash: element.hashCode,
               ),
             ...element.children.map((e) => _parse(e, c)),
           ],
@@ -176,6 +186,7 @@ class BrowserRenderTree {
           isDisabled: element.attributes["disabled"]?.apply(bool.parse),
           value: element.attributes["value"],
           commonStyle: CommonStyle.fromCSSStyle(c),
+          domElementHash: element.hashCode,
           children: [
             if (element.text != "")
               RenderTreeText(
@@ -188,6 +199,7 @@ class BrowserRenderTree {
                 textDecoration: null,
                 letterSpacing: null,
                 wordSpacing: null,
+                domElementHash: element.hashCode,
               ),
             ...element.children.map((e) => _parse(e, c)),
           ],
@@ -197,6 +209,7 @@ class BrowserRenderTree {
           isDisabled: element.attributes["disabled"]?.apply(bool.parse),
           value: element.attributes["value"],
           commonStyle: CommonStyle.fromCSSStyle(c),
+          domElementHash: element.hashCode,
           children: [
             if (element.text != "")
               RenderTreeText(
@@ -209,6 +222,7 @@ class BrowserRenderTree {
                 textDecoration: null,
                 letterSpacing: null,
                 wordSpacing: null,
+                domElementHash: element.hashCode,
               ),
             ...element.children.map((e) => _parse(e, c)),
           ],
@@ -219,6 +233,7 @@ class BrowserRenderTree {
           value: element.attributes["value"],
           name: element.attributes["name"],
           commonStyle: CommonStyle.fromCSSStyle(c),
+          domElementHash: element.hashCode,
           children: [
             if (element.text != "")
               RenderTreeText(
@@ -231,6 +246,7 @@ class BrowserRenderTree {
                 textDecoration: null,
                 letterSpacing: null,
                 wordSpacing: null,
+                domElementHash: element.hashCode,
               ),
             ...element.children.map((e) => _parse(e, c)),
           ],
@@ -241,6 +257,7 @@ class BrowserRenderTree {
           isDisabled: element.attributes["disabled"]?.apply(bool.parse),
           name: element.attributes["name"],
           commonStyle: CommonStyle.fromCSSStyle(c),
+          domElementHash: element.hashCode,
           children: [
             ...element.children.map((e) => _parse(e, c)),
           ],
@@ -251,6 +268,7 @@ class BrowserRenderTree {
           isDisabled: element.attributes["disabled"]?.apply(bool.parse),
           name: element.attributes["name"],
           commonStyle: CommonStyle.fromCSSStyle(c),
+          domElementHash: element.hashCode,
           children: [
             ...element.children.map((e) => _parse(e, c)),
           ],
@@ -261,6 +279,7 @@ class BrowserRenderTree {
           isDisabled: element.attributes["disabled"]?.apply(bool.parse),
           name: element.attributes["name"],
           commonStyle: CommonStyle.fromCSSStyle(c),
+          domElementHash: element.hashCode,
           children: [
             ...element.children.map((e) => _parse(e, c)),
           ],
@@ -268,6 +287,7 @@ class BrowserRenderTree {
       }
     } else if (displayProperty == "inline") {
       return RenderTreeInline(
+        domElementHash: element.hashCode,
         children: element.children.map((e) => _parse(e, c)).toList(),
       );
     } else if (element.localName! == "textarea") {
@@ -281,6 +301,7 @@ class BrowserRenderTree {
         numberOfRows: element.attributes["rows"]?.apply(int.parse) ?? 2,
         value: element.attributes["value"],
         commonStyle: CommonStyle.fromCSSStyle(c),
+        domElementHash: element.hashCode,
         children: [
           ...element.children.map((e) => _parse(e, c)),
         ],
@@ -290,6 +311,7 @@ class BrowserRenderTree {
         columnGap: c.columnGapConverted,
         rowGap: c.rowGapConverted,
         commonStyle: CommonStyle.fromCSSStyle(c),
+        domElementHash: element.hashCode,
         children: element.children.map((e) => _parse(e, c)).toList(),
       );
     } else if (displayProperty == "flex") {
@@ -297,11 +319,13 @@ class BrowserRenderTree {
         direction: "row",
         justifyContent: c.justifyContent,
         commonStyle: CommonStyle.fromCSSStyle(c),
+        domElementHash: element.hashCode,
         children: element.children.map((e) => _parse(e, c)).toList(),
       );
     } else if (displayProperty == "list-item") {
       return RenderTreeListItem(
         commonStyle: CommonStyle.fromCSSStyle(c),
+        domElementHash: element.hashCode,
         children: [
           if (element.text != "")
             RenderTreeText(
@@ -320,6 +344,7 @@ class BrowserRenderTree {
               textDecoration: null,
               letterSpacing: null,
               wordSpacing: null,
+              domElementHash: element.hashCode,
             ),
           ...element.children.map((e) => _parse(e, c)),
         ],
@@ -329,6 +354,7 @@ class BrowserRenderTree {
         return RenderTreeList(
           listType: c.listStyleType!,
           commonStyle: CommonStyle.fromCSSStyle(c),
+          domElementHash: element.hashCode,
           children: [
             if (text != "")
               RenderTreeText(
@@ -341,6 +367,7 @@ class BrowserRenderTree {
                 textDecoration: null,
                 letterSpacing: null,
                 wordSpacing: null,
+                domElementHash: element.hashCode,
               ),
             ...element.children.map((e) => _parse(e, c)),
           ],
@@ -349,6 +376,7 @@ class BrowserRenderTree {
 
       return RenderTreeBox(
         commonStyle: CommonStyle.fromCSSStyle(c),
+        domElementHash: element.hashCode,
         children: [
           if (text != "")
             RenderTreeText(
@@ -361,6 +389,7 @@ class BrowserRenderTree {
               textDecoration: null,
               letterSpacing: null,
               wordSpacing: null,
+              domElementHash: element.hashCode,
             ),
           ...element.children.map((e) => _parse(e, c)),
         ],
@@ -377,6 +406,7 @@ class BrowserRenderTree {
       wordSpacing: null,
       textAlign: null,
       fontWeight: null,
+      domElementHash: element.hashCode,
     );
   }
 }

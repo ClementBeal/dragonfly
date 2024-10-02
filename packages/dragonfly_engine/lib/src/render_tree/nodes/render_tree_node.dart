@@ -2,7 +2,11 @@ import 'package:dragonfly_engine/src/css/css_style.dart';
 
 part 'input_nodes.dart';
 
-sealed class RenderTreeObject {}
+sealed class RenderTreeObject {
+  final int domElementHash;
+
+  RenderTreeObject({required this.domElementHash});
+}
 
 class CommonStyle {
   final String? backgroundColor;
@@ -99,6 +103,7 @@ class RenderTreeView extends RenderTreeObject {
     required this.devicePixelRatio,
     required this.child,
     required this.backgroundColor,
+    required super.domElementHash,
   });
 
   @override
@@ -114,6 +119,7 @@ class RenderTreeBox extends RenderTreeObject {
   RenderTreeBox({
     required this.children,
     required this.commonStyle,
+    required super.domElementHash,
   });
 
   @override
@@ -143,6 +149,7 @@ class RenderTreeText extends RenderTreeObject {
     required this.wordSpacing,
     required this.textAlign,
     required this.fontWeight,
+    required super.domElementHash,
   });
 
   @override
@@ -156,6 +163,7 @@ class RenderTreeInline extends RenderTreeObject {
 
   RenderTreeInline({
     required this.children,
+    required super.domElementHash,
   });
 }
 
@@ -166,6 +174,7 @@ class RenderTreeList extends RenderTreeBox {
     required this.listType,
     required super.commonStyle,
     required super.children,
+    required super.domElementHash,
   });
 }
 
@@ -173,6 +182,7 @@ class RenderTreeListItem extends RenderTreeBox {
   RenderTreeListItem({
     required super.children,
     required super.commonStyle,
+    required super.domElementHash,
   });
 }
 
@@ -183,6 +193,7 @@ class RenderTreeLink extends RenderTreeBox {
     required this.link,
     required super.commonStyle,
     required super.children,
+    required super.domElementHash,
   });
 }
 
@@ -193,6 +204,7 @@ class RenderTreeImage extends RenderTreeBox {
     required this.link,
     required super.commonStyle,
     required super.children,
+    required super.domElementHash,
   });
 }
 
@@ -205,6 +217,7 @@ class RenderTreeFlex extends RenderTreeBox {
     required this.justifyContent,
     required super.children,
     required super.commonStyle,
+    required super.domElementHash,
   });
 }
 
@@ -217,6 +230,7 @@ class RenderTreeGrid extends RenderTreeBox {
     required this.columnGap,
     required super.children,
     required super.commonStyle,
+    required super.domElementHash,
   });
 }
 
@@ -232,7 +246,10 @@ class RenderTreeForm extends RenderTreeBox {
     required this.action,
     required super.children,
     required super.commonStyle,
+    required super.domElementHash,
   });
 }
 
-class RenderTreeScript extends RenderTreeObject {}
+class RenderTreeScript extends RenderTreeObject {
+  RenderTreeScript({required super.domElementHash});
+}

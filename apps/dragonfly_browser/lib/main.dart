@@ -4,6 +4,7 @@ import 'package:dragonfly/config/themes.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
 import 'package:dragonfly/src/screens/browser/blocs/render_screen_cubit.dart';
 import 'package:dragonfly/src/screens/browser/pages/cubit/file_explorer_cubit.dart';
+import 'package:dragonfly/src/screens/developer_tools/cubit/devtols_cubit.dart';
 import 'package:dragonfly/src/screens/scaffold/browser_scaffold.dart';
 import 'package:dragonfly/src/screens/lobby/cubit/browser_interface_cubit.dart';
 import 'package:dragonfly/src/screens/settings/cubit/settings_cubit.dart';
@@ -100,6 +101,7 @@ class _MainAppState extends State<MainApp> {
         BlocProvider(create: (context) => SettingsCubit()),
         BlocProvider(create: (context) => BrowserInterfaceCubit()),
         BlocProvider(create: (context) => RenderScreenCubit()),
+        BlocProvider(create: (context) => DevToolsCubit()),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         buildWhen: (previous, current) =>
