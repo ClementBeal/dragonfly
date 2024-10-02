@@ -393,8 +393,7 @@ class CommonStyleBlock extends StatelessWidget {
   final Widget child;
   final int domHash;
 
-  static final elementColor =
-      const Color.fromARGB(255, 176, 208, 211).withOpacity(0.3);
+  static const elementColor = Color.fromARGB(255, 176, 208, 211);
   static final marginColor =
       const Color.fromARGB(255, 241, 166, 106).withOpacity(0.9);
   static final paddingColor =
