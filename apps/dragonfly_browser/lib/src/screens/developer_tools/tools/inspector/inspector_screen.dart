@@ -140,7 +140,7 @@ class _HTMLElementBlockState extends State<HTMLElementBlock> {
               htmlHighlighter.highlight(openTag),
             ),
             Padding(
-              padding: EdgeInsets.only(left: 12.0 * widget.indent),
+              padding: EdgeInsets.only(left: 4.0 * widget.indent),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: widget.element.children
@@ -156,9 +156,10 @@ class _HTMLElementBlockState extends State<HTMLElementBlock> {
                     .toList(),
               ),
             ),
-            Text.rich(
-              htmlHighlighter.highlight("</$tagName>"),
-            ),
+            if (!isSelfClosed)
+              Text.rich(
+                htmlHighlighter.highlight("</$tagName>"),
+              ),
           ],
         ),
       );
