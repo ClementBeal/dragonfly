@@ -393,6 +393,13 @@ class CommonStyleBlock extends StatelessWidget {
   final Widget child;
   final int domHash;
 
+  static final elementColor =
+      Color.fromARGB(255, 176, 208, 211).withOpacity(0.9);
+  static final marginColor =
+      Color.fromARGB(255, 241, 166, 106).withOpacity(0.9);
+  static final paddingColor =
+      Color.fromARGB(255, 155, 197, 61).withOpacity(0.9);
+
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
@@ -406,7 +413,9 @@ class CommonStyleBlock extends StatelessWidget {
         },
         builder: (context, state) => DecoratedBox(
           decoration: BoxDecoration(
-            color: (state.selectedDomHash == domHash) ? Colors.red : null,
+            color: (state.selectedDomHash == domHash)
+                ? Colors.blue.shade800.withOpacity(0.4)
+                : null,
           ),
           child: Container(
             alignment: (commonStyle?.isCentered ?? false)

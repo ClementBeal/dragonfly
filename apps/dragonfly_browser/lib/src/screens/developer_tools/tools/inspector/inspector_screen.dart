@@ -130,38 +130,51 @@ class _HTMLElementBlockState extends State<HTMLElementBlock> {
         (isSelfClosed) ? "<${content.join(" ")} />" : "<${content.join(" ")}>";
 
     if (isExpanded) {
-      return GestureDetector(
-        onSecondaryTapUp: (details) {
-          showElementInspectorMenu(context, widget.element, details, this);
+      return MouseRegion(
+        onEnter: (event) {
+          setState(() {
+            isHovered = true;
+          });
+          context.read<DevToolsCubit>().selectDomNode(widget.element.hashCode);
         },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text.rich(
-              htmlHighlighter.highlight(openTag),
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 4.0 * widget.indent),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: widget.element.children
-                    .asMap()
-                    .entries
-                    .map(
-                      (e) => HTMLElementBlock(
-                        element: e.value,
-                        indent: widget.indent + 1,
-                        key: keys[e.key],
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-            if (!isSelfClosed)
+        onExit: (event) {
+          setState(() {
+            isHovered = false;
+          });
+        },
+        child: GestureDetector(
+          onSecondaryTapUp: (details) {
+            showElementInspectorMenu(context, widget.element, details, this);
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
               Text.rich(
-                htmlHighlighter.highlight("</$tagName>"),
+                htmlHighlighter.highlight(openTag),
               ),
-          ],
+              Padding(
+                padding: EdgeInsets.only(left: 4.0 * widget.indent),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: widget.element.children
+                      .asMap()
+                      .entries
+                      .map(
+                        (e) => HTMLElementBlock(
+                          element: e.value,
+                          indent: widget.indent + 1,
+                          key: keys[e.key],
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+              if (!isSelfClosed)
+                Text.rich(
+                  htmlHighlighter.highlight("</$tagName>"),
+                ),
+            ],
+          ),
         ),
       );
     }
