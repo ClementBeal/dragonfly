@@ -433,6 +433,45 @@ class Tab {
     return false;
   }
 
+  void duplicateElementInDOM(Element elementToDuplicate) {
+    final page = currentPage;
+
+    if (page == null || page is! HtmlPage) return;
+
+    final document = page.document;
+
+    if (document == null) return;
+
+    for (var i = 0; i < document.children.length; i++) {
+      if (document.children[i] == elementToDuplicate) {
+        document.insertBefore(
+            elementToDuplicate.clone(true), elementToDuplicate);
+        break;
+      }
+
+      if (_findElementInDOM(document.children[i], elementToDuplicate)) {
+        break;
+      }
+    }
+
+    onUpdate?.call();
+  }
+
+  bool _findElementInDOM(Element parent, Element elementToDuplicate) {
+    for (var i = 0; i < parent.children.length; i++) {
+      if (parent.children[i] == elementToDuplicate) {
+        parent.insertBefore(elementToDuplicate.clone(true), elementToDuplicate);
+        return true;
+      }
+
+      if (_findElementInDOM(parent.children[i], elementToDuplicate)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   /// Returns the currently displayed page, or null if no page is loaded.
   Page? get currentPage => _currentIndex >= 0 ? _history[_currentIndex] : null;
 

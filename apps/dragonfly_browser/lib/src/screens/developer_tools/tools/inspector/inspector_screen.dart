@@ -207,6 +207,17 @@ void showElementInspectorMenu(
               ?.removeElementFromDOM(domElement);
         },
       ),
+      PopupMenuItem<String>(
+        value: 'duplicate',
+        child: Text('Duplicate node'),
+        onTap: () {
+          context
+              .read<BrowserCubit>()
+              .state
+              .currentTab
+              ?.duplicateElementInDOM(domElement);
+        },
+      ),
     ],
   );
 }
