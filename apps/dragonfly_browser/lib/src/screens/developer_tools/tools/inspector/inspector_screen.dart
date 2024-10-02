@@ -1,6 +1,5 @@
 import 'package:dragonfly/main.dart';
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
-import 'package:dragonfly/src/screens/scaffold/widgets/tab_bar.dart';
 import 'package:dragonfly_engine/dragonfly_engine.dart';
 import 'package:flutter/material.dart' hide Element;
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -66,6 +65,48 @@ class HTMLElementBlock extends StatefulWidget {
 class _HTMLElementBlockState extends State<HTMLElementBlock> {
   bool isHovered = false;
   bool isExpanded = false;
+  late final List<GlobalKey<_HTMLElementBlockState>> keys;
+
+  @override
+  void initState() {
+    super.initState();
+
+    keys = widget.element.children
+        .map(
+          (e) => GlobalKey<_HTMLElementBlockState>(),
+        )
+        .toList();
+  }
+
+  Future<void> _expandAllSubtree() async {
+    // TO DO : refactor that...
+    // it works and the expand is pretty but it has an hardcoded delay
+    // good enough for a start but definitively bad if the page has a tons of children
+    setState(() {
+      isExpanded = true;
+    });
+
+    await Future.delayed(Duration(milliseconds: 40));
+
+    for (var key in keys) {
+      key.currentState?._expandAllSubtree();
+    }
+  }
+
+  Future<void> _collapseAllSubtree() async {
+    // TO DO : refactor that...
+    // it works and the expand is pretty but it has an hardcoded delay
+    // good enough for a start but definitively bad if the page has a tons of children
+    setState(() {
+      isExpanded = false;
+    });
+
+    await Future.delayed(Duration(milliseconds: 40));
+
+    for (var key in keys) {
+      key.currentState?._collapseAllSubtree();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,36 +129,44 @@ class _HTMLElementBlockState extends State<HTMLElementBlock> {
         (isSelfClosed) ? "<${content.join(" ")} />" : "<${content.join(" ")}>";
 
     if (isExpanded) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text.rich(
-            htmlHighlighter.highlight(openTag),
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 4.0 * widget.indent),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: widget.element.children
-                  .map(
-                    (e) => HTMLElementBlock(
-                      element: e,
-                      indent: widget.indent + 1,
-                    ),
-                  )
-                  .toList(),
+      return GestureDetector(
+        onSecondaryTapUp: (details) {
+          showElementInspectorMenu(context, widget.element, details, this);
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text.rich(
+              htmlHighlighter.highlight(openTag),
             ),
-          ),
-          Text.rich(
-            htmlHighlighter.highlight("</$tagName>"),
-          ),
-        ],
+            Padding(
+              padding: EdgeInsets.only(left: 12.0 * widget.indent),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: widget.element.children
+                    .asMap()
+                    .entries
+                    .map(
+                      (e) => HTMLElementBlock(
+                        element: e.value,
+                        indent: widget.indent + 1,
+                        key: keys[e.key],
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+            Text.rich(
+              htmlHighlighter.highlight("</$tagName>"),
+            ),
+          ],
+        ),
       );
     }
 
     return GestureDetector(
       onSecondaryTapUp: (details) {
-        showElementInspectorMenu(context, widget.element, details);
+        showElementInspectorMenu(context, widget.element, details, this);
       },
       child: MouseRegion(
         onEnter: (event) {
@@ -158,7 +207,7 @@ class _HTMLElementBlockState extends State<HTMLElementBlock> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        padding: EdgeInsets.symmetric(horizontal: 8),
                         child: Text(
                           "...",
                           style: TextStyle(
@@ -181,8 +230,8 @@ class _HTMLElementBlockState extends State<HTMLElementBlock> {
   }
 }
 
-void showElementInspectorMenu(
-    BuildContext context, Element domElement, TapUpDetails details) {
+void showElementInspectorMenu(BuildContext context, Element domElement,
+    TapUpDetails details, _HTMLElementBlockState blockState) {
   showMenu(
     context: context,
     position: RelativeRect.fromLTRB(
@@ -191,7 +240,7 @@ void showElementInspectorMenu(
       details.globalPosition.dx,
       details.globalPosition.dy,
     ),
-    items: [
+    items: <PopupMenuEntry>[
       PopupMenuItem<String>(
         value: 'edit',
         child: Text('Edit as HTML'),
@@ -216,6 +265,21 @@ void showElementInspectorMenu(
               .state
               .currentTab
               ?.duplicateElementInDOM(domElement);
+        },
+      ),
+      PopupMenuDivider(),
+      PopupMenuItem<String>(
+        value: 'expand_all',
+        child: Text('Expand all'),
+        onTap: () {
+          blockState._expandAllSubtree();
+        },
+      ),
+      PopupMenuItem<String>(
+        value: 'collapse_all',
+        child: Text('Collapse all'),
+        onTap: () {
+          blockState._collapseAllSubtree();
         },
       ),
     ],
