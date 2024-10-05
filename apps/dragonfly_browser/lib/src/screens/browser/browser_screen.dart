@@ -145,7 +145,6 @@ class TreeRenderer extends StatelessWidget {
             children: [
               for (final c in r.children)
                 Row(
-                  spacing: 8,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
@@ -156,6 +155,7 @@ class TreeRenderer extends StatelessWidget {
                         color: Colors.black,
                       ),
                     ),
+                    SizedBox(width: 8),
                     TreeRenderer(c),
                   ],
                 ),

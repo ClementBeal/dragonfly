@@ -62,7 +62,6 @@ class _ContentRequestSelectionBarState
       height: 50,
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Row(
-        spacing: 12,
         children: [
           GestureDetector(
             onTap: () {
@@ -70,6 +69,7 @@ class _ContentRequestSelectionBarState
             },
             child: Icon(Icons.delete),
           ),
+          SizedBox(width: 12),
           Expanded(
             child: ListView.builder(
               itemCount: contentRequests.length,

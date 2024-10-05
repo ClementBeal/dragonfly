@@ -26,9 +26,9 @@ class _BoxModelPanelState extends State<BoxModelPanel> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      spacing: 8,
       children: [
         BoxModelLayout(),
+        SizedBox(width: 8),
         BoxModelProperties(),
       ],
     );
