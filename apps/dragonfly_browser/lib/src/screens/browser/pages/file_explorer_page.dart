@@ -162,9 +162,9 @@ class ExplorerResultListView extends StatelessWidget {
               flex: 5,
               fit: FlexFit.tight,
               child: Row(
-                spacing: 4,
                 children: [
                   FileSystemEntityIcon(result: e),
+                  SizedBox(width: 4),
                   Expanded(
                     child: TextButton(
                       onPressed: () async {

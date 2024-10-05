@@ -60,7 +60,13 @@ class CssomBuilder {
   /// it musts use the browser CSSOM if available
   /// otherwise, it create it from scratch
   CssomTree parse(String css) {
-    final document = CssParser().parse(css);
+    StyleSheet document;
+
+    try {
+      document = CssParser().parse(css);
+    } catch (e) {
+      document = StyleSheet([]);
+    }
 
     final tree = CssomTree(rules: []);
 

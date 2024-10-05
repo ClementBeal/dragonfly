@@ -227,21 +227,22 @@ class _AudioMediaPageState extends State<AudioMediaPage> {
                       ),
                     ),
                     Row(
-                      spacing: 8,
                       children: [
                         IconButton(
-                            onPressed: (_volume == 0.0)
-                                ? null
-                                : () {
-                                    setState(() {
-                                      audioPlayer
-                                          .setVolume(_isMuted ? _volume : 0.0);
+                          onPressed: (_volume == 0.0)
+                              ? null
+                              : () {
+                                  setState(() {
+                                    audioPlayer
+                                        .setVolume(_isMuted ? _volume : 0.0);
 
-                                      audioPlayer.setVolume(0.0);
-                                      _isMuted = !_isMuted;
-                                    });
-                                  },
-                            icon: const Icon(Icons.volume_mute)),
+                                    audioPlayer.setVolume(0.0);
+                                    _isMuted = !_isMuted;
+                                  });
+                                },
+                          icon: const Icon(Icons.volume_mute),
+                        ),
+                        SizedBox(width: 8),
                         Slider(
                           value: (_isMuted) ? 0.0 : _volume,
                           min: 0.0,

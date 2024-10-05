@@ -167,10 +167,10 @@ class IconWithTool extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
-            spacing: 4,
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(icon),
+              SizedBox(width: 4),
               Text(label),
             ],
           ),

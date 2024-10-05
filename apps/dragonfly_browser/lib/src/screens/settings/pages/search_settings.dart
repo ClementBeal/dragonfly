@@ -11,7 +11,6 @@ class SearchSettings extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 12,
         children: [
           SearchEngineSelector(),
         ],

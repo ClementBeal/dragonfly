@@ -189,7 +189,6 @@ class _BrowserInputFileState extends State<BrowserInputFile> {
       },
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        spacing: 4,
         children: [
           DecoratedBox(
             decoration: BoxDecoration(
@@ -216,6 +215,7 @@ class _BrowserInputFileState extends State<BrowserInputFile> {
               ),
             ),
           ),
+          SizedBox(width: 4),
           AbsorbPointer(
             child: Text(
               selectedFile?.name ?? "No file selected.",

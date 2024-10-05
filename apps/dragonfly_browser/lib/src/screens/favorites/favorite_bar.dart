@@ -1,4 +1,5 @@
 import 'package:dragonfly/src/screens/browser/blocs/browser_cubit.dart';
+import 'package:dragonfly/utils/extensions/list.dart';
 import 'package:dragonfly_browservault/dragonfly_browservault.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -45,7 +46,6 @@ class _FavoriteTabBarState extends State<FavoriteTabBar> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Row(
-          spacing: 16,
           children: _favorites
               .where(
                 (e) => e.parentId == null,
@@ -54,6 +54,10 @@ class _FavoriteTabBarState extends State<FavoriteTabBar> {
                     favorite: favorite,
                     allFavorites: _favorites,
                   ))
+              .cast<Widget>()
+              .intersperseInner(
+                () => SizedBox(width: 16),
+              )
               .toList(),
         ),
       ),
@@ -144,8 +148,7 @@ class _FavoriteChipState extends State<FavoriteChip> {
                   ),
                 false => Row(
                     mainAxisSize: MainAxisSize.min,
-                    spacing: 4,
-                    children: [
+                    children: <Widget>[
                       if (widget.favorite.isFolder)
                         const Icon(Icons.folder_open),
                       Text(
@@ -154,7 +157,7 @@ class _FavoriteChipState extends State<FavoriteChip> {
                         //   color: Colors.white,
                         // ),
                       ),
-                    ],
+                    ].intersperseInner(() => SizedBox(width: 4)).toList(),
                   ),
               }),
         ),
@@ -177,16 +180,16 @@ class FavoriteIconName extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
-      spacing: 4,
-      children: [
+      children: <Widget>[
         if (favorite.isFolder) const Icon(Icons.folder_open),
         Text(
           favorite.name,
-          // style: const TextStyle(
-          //   color: Colors.white,
-          // ),
         ),
-      ],
+      ]
+          .intersperseInner(
+            () => SizedBox(width: 4),
+          )
+          .toList(),
     );
   }
 }

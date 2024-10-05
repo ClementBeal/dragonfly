@@ -12,11 +12,13 @@ class GeneralSettings extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 12,
         children: [
           WebsiteAppearance(),
+          SizedBox(width: 12),
           MainColorSelector(),
+          SizedBox(width: 12),
           Divider(),
+          SizedBox(width: 12),
           DownloadLocationSelector(),
         ],
       ),
